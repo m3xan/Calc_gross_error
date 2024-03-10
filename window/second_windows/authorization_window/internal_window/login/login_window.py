@@ -7,13 +7,10 @@ from window.data_class_for_window.dataclass import DataclassAutWindow
 
 from data_base.test_orm import autorisation
 from data_base.test_orm import select_image
+from data_base.models import User
 
 from settings.settings import load_theme
 from new_file.check_file import check_all_file
-
-from data_base.models import User
-
-
 
 class InternalAutorizationWindow(QMainWindow):
     fin_aut:Signal = Signal(int)
