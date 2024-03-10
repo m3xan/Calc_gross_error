@@ -11,7 +11,7 @@ from data_base.test_orm import select_image
 from settings.settings import load_theme
 from new_file.check_file import check_all_file
 
-from test_new.test import User
+from data_base.models import User
 
 
 

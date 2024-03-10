@@ -4,10 +4,10 @@ new
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from test_new.test import User
-from test_new.test import Calculation
-from test_new.test import Value
-from test_new.test import Answer
+from data_base.models import User
+from data_base.models import Calculation
+from data_base.models import Value
+from data_base.models import Answer
 from data_base.engine import engine
 from data_base.decorator import with_session
 from data_base.decorator import commit_
