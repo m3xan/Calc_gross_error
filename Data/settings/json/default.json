@@ -1,0 +1,14 @@
+{
+    "window": {
+        "dockWidget": "Qt.RightDockWidgetArea",
+        "toolBar": "Qt.TopToolBarArea",
+        "theme": "light",
+        "canvas": {
+            "text": "#3a3a3a",
+            "canvas": "white"
+        }
+    },
+    "auto_save": {
+        "switched": false
+    }
+}

@@ -1,0 +1,12 @@
+yes.py
+test.py
+test_new
+venv
+*.pylintrc
+*.spec
+*.vscode
+dist
+build
+__pycache__
+*.jpg
+*.ui

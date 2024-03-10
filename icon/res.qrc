@@ -1,0 +1,31 @@
+<RCC>
+  <qresource>
+    <file>Hd-n8GFDUB0.jpg</file>
+    <file>bd.ico</file>
+    <file>calculator-Freepik.png</file>
+    <file>exel.png</file>
+    <file>file.png</file>
+    <file>info.png</file>
+    <file>leave.png</file>
+    <file>plus.png</file>
+    <file>save.png</file>
+    <file>-help-outline_89965.ico</file>
+  </qresource>
+  <qresource prefix="icon">
+    <file>calculator-Freepik.png</file>
+  </qresource>
+  <qresource prefix="image">
+    <file>Hd-n8GFDUB0.jpg</file>
+  </qresource>
+  <qresource prefix="action">
+    <file>Settings_30027.png</file>
+    <file>bd.ico</file>
+    <file>exel.png</file>
+    <file>file.png</file>
+    <file>-help-outline_89965.ico</file>
+    <file>info.png</file>
+    <file>leave.png</file>
+    <file>plus.png</file>
+    <file>save.png</file>
+  </qresource>
+</RCC>

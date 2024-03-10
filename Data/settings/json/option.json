@@ -1,0 +1,42 @@
+{
+    "window": {
+        "dockWidget": {
+            "name": "\u0420\u0430\u0441\u043f\u043e\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u043e\u0432",
+            "option": {
+                "\u041f\u0440\u0430\u0432\u043e": "Qt.RightDockWidgetArea",
+                "\u041b\u0435\u0432\u043e": "Qt.LeftDockWidgetArea"
+            }
+        },
+        "toolBar": {
+            "name": "\u0420\u0430\u0441\u043f\u043e\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u0442\u0443\u0431\u043b\u0430\u0440\u0430",
+            "option": {
+                "\u0412\u0435\u0440\u0445\u043d\u0435\u0435": "Qt.TopToolBarArea",
+                "\u041d\u0438\u0436\u043d\u0435\u0435": "Qt.BottomToolBarArea"
+            }
+        },
+        "theme": {
+            "name": "\u0422\u0435\u043c\u0430",
+            "option": {
+                "\u0421\u0432\u0435\u0442\u043b\u0430\u044f": "light",
+                "\u0422\u0451\u043c\u043d\u0430\u044f": "dark"
+            }
+        },
+        "canvas": {
+            "name": "\u0426\u0432\u0435\u0442 \u0445\u043b\u043e\u0441\u0442\u0430",
+            "option": {
+                "\u0421\u0432\u0435\u0442\u043b\u0430\u044f": {
+                    "text": "#3a3a3a",
+                    "canvas": "white"
+                },
+                "\u0422\u0451\u043c\u043d\u0430\u044f": {
+                    "text": "white",
+                    "canvas": "#3a3a3a"
+                }
+            }
+        }
+    },
+    "auto_save": {
+        "switched": true,
+        "time": 300000
+    }
+}
