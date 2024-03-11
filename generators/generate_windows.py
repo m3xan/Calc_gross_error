@@ -5,6 +5,7 @@
 import os
 import re
 import time
+import subprocess
 
 from generate_settings import write_customisation, add_resource
 
@@ -33,8 +34,12 @@ def generate_res_rc():
     Заглушка
     """
     command = f'pyside6-rcc {os.getcwd()}\\icon\\res.qrc -o {os.getcwd()}\\window\\main_window\\res_rc.py'
-    os.popen(command)
-    print('Успешная генерация файла ресурсов')
+    try:
+        subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
+        print('Успешная генерация файла ресурсов')
+    except subprocess.CalledProcessError as e:
+        print('Ошибка при генерации файла ресурсов:')
+        print(e)
 
 def generate_main_window_class():
     """
