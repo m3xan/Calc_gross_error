@@ -2,7 +2,6 @@ yes.py
 test.py
 test_new
 venv
-*.pylintrc
 *.spec
 *.vscode
 dist
