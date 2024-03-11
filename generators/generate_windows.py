@@ -32,7 +32,7 @@ def generate_res_rc():
     Переделать
     Заглушка
     """
-    command = r'pyside6-rcc D:\\calculator\\icon\\res.qrc -o D:\calculator\window\main_window\res_rc.py'
+    command = f'pyside6-rcc {os.getcwd()}\\icon\\res.qrc -o {os.getcwd()}\\window\\main_window\\res_rc.py'
     os.popen(command)
     print('Успешная генерация файла ресурсов')
 
