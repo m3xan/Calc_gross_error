@@ -1,10 +1,6 @@
-yes.py
-test.py
-test_new
 venv
 *.spec
 *.vscode
 dist
 build
 __pycache__
-*.jpg
