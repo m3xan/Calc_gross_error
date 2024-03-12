@@ -10,9 +10,9 @@ import statistics as stat
 import math
 
 def calc_roman_metod(values: list):
-    max_ = Decimal(str(max(values)))
-    min_ = Decimal(str(min(values)))
-    average = Decimal(str(stat.fmean(values)))
+    max_ = Decimal(max(values))
+    min_ = Decimal(min(values))
+    average = Decimal(stat.fmean(values))
     table_value = Decimal(2.64) # тут идём в базу данных за числом
     answer = []
     values = [(Decimal(val) - average)**2 for val in values]
