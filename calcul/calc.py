@@ -5,28 +5,28 @@ import Calc
 
 version = 0.1
 """
+from decimal import Decimal
 import statistics as stat
 import math
 
 def calc_roman_metod(values: list):
-    max_: float = max(values)
-    min_: float = min(values)
-    average = stat.fmean(values)
-    table_value = 2.64  # тут идём в базу данных за числом
+    max_ = Decimal(str(max(values)))
+    min_ = Decimal(str(min(values)))
+    average = Decimal(str(stat.fmean(values)))
+    table_value = Decimal(2.64) # тут идём в базу данных за числом
     answer = []
+    values = [(Decimal(val) - average)**2 for val in values]
 
-    values = [(val - average)**2 for val in values]
-
-    sx = math.sqrt(sum(values)/(len(values) - 1))
+    sx = Decimal(math.sqrt(sum(values)/(len(values) - 1)))
 
     b1 = abs(max_ - average) / sx
     b2 = abs(min_ - average) / sx
 
     if b1 > table_value:
-        answer.append(max_)
+        answer.append(float(max_))
 
     if b2 > table_value:
-        answer.append(min_)
+        answer.append(float(min_))
 
     return answer
 
