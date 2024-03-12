@@ -4,3 +4,7 @@ venv
 dist
 build
 __pycache__
+*.jpg
+!Hd-n8GFDUB0.jpg
+!8hOlH9yPHi7DbakNO6XafkdRmjw3DANbj2ojvQqw.jpg
+!48HgiXRHVXQ.jpg
