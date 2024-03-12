@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QLineEdit, QHBoxLayout, QPushButton
-from PySide6.QtCore import Qt, QSize, Signal
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QIcon, QPixmap, QPainter, QRegion, QColor
 
 from window.second_windows.authorization_window.internal_window.login.login_window_class import Ui_Autorization, QMainWindow
@@ -27,6 +27,8 @@ class InternalAutorizationWindow(QMainWindow):
         )
 
         self.setCircleImage(self.state.standard_image)
+        self.close_eye = QIcon(':/button/free-icon-eye-4621498.png')
+        self.open_eye = QIcon(':/button/free-icon-open-eye-829117.png')
 
         self.__init_show_button()
         self.__init_reaction()
@@ -75,13 +77,11 @@ class InternalAutorizationWindow(QMainWindow):
 
 
     def __init_show_button(self):
-        icon = QIcon()
-        icon.addFile(":/save.png", QSize(), QIcon.Normal, QIcon.Off)
 
-        self.show_button = QPushButton("Show", self)
+        self.show_button = QPushButton(self)
         self.show_button.setCursor(Qt.PointingHandCursor)
         self.show_button.setStyleSheet("border: none; padding: 0;")
-        self.show_button.setIcon(icon)
+        self.show_button.setIcon(self.close_eye)
 
         layout = QHBoxLayout(self.ui.line_edit_password)
         layout.setContentsMargins(9, -1, 26, -1)
@@ -99,10 +99,10 @@ class InternalAutorizationWindow(QMainWindow):
     def __password_visibility(self):
         if self.ui.line_edit_password.echoMode() == QLineEdit.Password:
             self.ui.line_edit_password.setEchoMode(QLineEdit.Normal)
-            self.show_button.setText("Hide")
+            self.show_button.setIcon(self.open_eye)
         else:
             self.ui.line_edit_password.setEchoMode(QLineEdit.Password)
-            self.show_button.setText("Show")
+            self.show_button.setIcon(self.close_eye)
 
     def __ckick(self):
         if self.ui.line_edit_password.text() != '':

@@ -11,6 +11,10 @@
     <file>save.png</file>
     <file>-help-outline_89965.ico</file>
   </qresource>
+  <qresource prefix="button">
+    <file>free-icon-eye-4621498.png</file>
+    <file>free-icon-open-eye-829117.png</file>
+  </qresource>
   <qresource prefix="icon">
     <file>calculator-Freepik.png</file>
   </qresource>
