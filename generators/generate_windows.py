@@ -35,7 +35,9 @@ def generate_res_rc():
     """
     command = f'pyside6-rcc {os.getcwd()}\\icon\\res.qrc -o {os.getcwd()}\\window\\main_window\\res_rc.py'
     try:
-        subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
+        subprocess.run(
+            command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8'
+        )
         print('Успешная генерация файла ресурсов')
     except subprocess.CalledProcessError as e:
         print('Ошибка при генерации файла ресурсов:')
