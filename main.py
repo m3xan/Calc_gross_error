@@ -9,8 +9,7 @@ from window.second_windows.authorization_window.authorization_window import Auth
 
 def main() -> None:
     """
-    Проверяет наличие файлов для загрузки и 
-    открывает приложение
+    Открывает приложение
     """
     app = QApplication(sys.orig_argv)
     window = AuthorizationWindow()
