@@ -58,7 +58,7 @@ def generate_res_rc():
     Переделать
     Заглушка
     """
-    command = f'pyside6-rcc {os.getcwd()}\\icon\\res.qrc -o {os.getcwd()}\\window\\main_window\\res_rc.py'
+    command = 'pyside6-rcc icon\\res.qrc -o window\\main_window\\res_rc.py'
     try:
         subprocess.run(
             command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8'
@@ -72,7 +72,7 @@ def generate_main_window_class():
     """
     Заглушка
     """
-    path = generate_class_ui2py(f'{os.getcwd()}\\window\\main_window')
+    path = generate_class_ui2py('window\\main_window')
     time.sleep(1)
     write_customisation(path,
                   r'MainWindow.addDockWidget\(Qt.RightDockWidgetArea, self.dockWidget\)',
@@ -89,7 +89,7 @@ def generate_graph_window_class():
     """
     Заглушка
     """
-    path = generate_class_ui2py(f'{os.getcwd()}\\window\\main_window\\interior_window\\graph_window')
+    path = generate_class_ui2py('window\\main_window\\interior_window\\graph_window')
     time.sleep(1)
     write_customisation(path,
                   r'GraphWindow.addToolBar\(Qt.TopToolBarArea, self.toolBar\)',
