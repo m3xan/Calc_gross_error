@@ -5,6 +5,8 @@ from window.second_windows.authorization_window.authorization_window_class impor
 from window.second_windows.authorization_window.internal_window.login.login_window import InternalAutorizationWindow
 from window.second_windows.authorization_window.internal_window.registration.registration_window import InternalRegistrationWindow
 
+from new_file.check_file import check_all_file
+
 class AuthorizationWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -36,6 +38,7 @@ class AuthorizationWindow(QMainWindow):
             self.aut_win.setVisible(True)
 
     def open_main_window(self, signall):
-        self.main_window = MainWindow(signall)
-        self.main_window.show()
-        self.deleteLater()
+        if check_all_file():
+            self.main_window = MainWindow(signall)
+            self.main_window.show()
+            self.deleteLater()

@@ -10,7 +10,6 @@ from data_base.test_orm import select_image
 from data_base.models import User
 
 from settings.settings import load_theme
-from new_file.check_file import check_all_file
 
 class InternalAutorizationWindow(QMainWindow):
     fin_aut:Signal = Signal(int)
@@ -111,9 +110,8 @@ class InternalAutorizationWindow(QMainWindow):
                 self.ui.line_edit_password.text()
             )
             if user_id is not None:
-                if check_all_file():
-                    self.fin_aut.emit(user_id)
-                    return user_id
+                self.fin_aut.emit(user_id)
+                return user_id
             return 'Неверный логин или пароль'
         return None
 
