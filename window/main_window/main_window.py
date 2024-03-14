@@ -18,7 +18,7 @@ from window.second_windows.settings.main_settings.setting_window import Settings
 from window.second_windows.load_window.load_window import LoadDialog
 
 from data_base.test_orm import test_select_2
-from  calcul import calc
+from calcul import calc
 
 from graph import graph
 from excel.excel import get_name_column
@@ -72,9 +72,9 @@ class MainWindow(QMainWindow):
             self.ui.combo_box_selection_data.clear()
             for key in self.state.data:
                 self.ui.combo_box_selection_data.addItem(
-                                                        key[1],
-                                                        key
-                                                        )
+                    key[1],
+                    key
+                )
         # change
         self.state.active_mod = 'bd'
         return f'self.state.active_mod = {self.state.active_mod}, {self.state.data}'
