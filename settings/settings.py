@@ -9,8 +9,6 @@ from  io import TextIOWrapper
 
 from PySide6.QtCore import QFile, QTextStream
 
-# переписать используя файловый дескриптор
-
 def with_json(path, mode = 'r'):
     def decorator(func):
         @functools.wraps(func)
@@ -44,7 +42,7 @@ def save_json(file: TextIOWrapper, data = None):
     """
     переделать
     """
-    file.write(json.dumps(data, indent=4))
+    file.write(json.dumps(data, indent=2))
 
 def save_data_json(categor: str, attribute: str | None, data: str, user_id = None):
     """
@@ -65,14 +63,13 @@ def load_theme(self, user_id: str = None) -> str | None:
     """
     заглушка
     """
-    theme = load_attribute('window', 'theme', user_id)
-    canvas = load_attribute('window', 'canvas', user_id)
-    qss_file_path = f"{os.getcwd()}/Data/settings/theme/{load_attribute('window', 'theme', user_id)}.qss"
+    category = load_category_json('window', user_id)
+    qss_file_path = f"{os.getcwd()}/Data/settings/theme/{category['theme']}.qss"
     style_file = QFile(qss_file_path)
     if style_file.open(QFile.ReadOnly | QFile.Text):
         self.stream = QTextStream(style_file)
         self.setStyleSheet(self.stream.readAll())
         style_file.close()
-        return theme, canvas
+        return category['theme'], category['canvas']
     print("Не удалось загрузить файл стилей")
     return None
