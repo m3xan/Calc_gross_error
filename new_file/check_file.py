@@ -3,6 +3,7 @@
 """
 
 import os
+
 FILE_PATHS = [
     r'Data\Data_base',
     r'Документация\Докуметация пользовательская.docx',
