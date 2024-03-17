@@ -6,6 +6,9 @@ import os
 import re
 import time
 import subprocess
+import threading
+import concurrent
+from concurrent.futures import ProcessPoolExecutor
 
 from generate_settings import write_customisation, add_resource
 
@@ -19,7 +22,7 @@ WINDOW_PATH = [
     'window\\second_windows\\settings\\user_setting',
     'window\\second_windows\\authorization_window',
     'window\\second_windows\\authorization_window\\internal_window\\login',
-    'window\\second_windows\\authorization_window\\internal_window\\registration'
+    'window\\second_windows\\authorization_window\\internal_window\\registration',
 ]
 
 def find_ui_file(path: str):
@@ -99,22 +102,39 @@ def generate_graph_window_class():
                   'def setupUi(self, GraphWindow, user_name):',
                   )
 
-def generate_window_wisout_change(paths: list):
+def generate_window(path: list):
     """делает файлики окон из директорий"""
-    for path in paths:
-        python_file_path =  generate_class_ui2py(path)
-        if python_file_path is not None:
-            time.sleep(1)
-            add_resource(python_file_path)
+    python_file_path =  generate_class_ui2py(path)
+    if python_file_path is not None:
+        time.sleep(1)
+        add_resource(python_file_path)
+
+def generate_window_wisout_changes(paths: list):
+    """делает файлики окон из директорий"""
+    with ProcessPoolExecutor() as executor:
+        futures = {executor.submit(generate_window, path): path for path in paths}
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                future.result()
+            except Exception as e:
+                raise e
 
 def genarate_all():
     """
     Заглушка
     """
-    generate_main_window_class()
-    generate_graph_window_class()
-    generate_window_wisout_change(WINDOW_PATH)
-    generate_res_rc()
+    threads = [
+        threading.Thread(target=generate_main_window_class),
+        threading.Thread(target=generate_graph_window_class),
+        threading.Thread(target=generate_window_wisout_changes, args=(WINDOW_PATH,)),
+        threading.Thread(target=generate_res_rc)
+    ]
+
+    for thread in threads:
+        thread.start()
+
+    for thread in threads:
+        thread.join()
 
 if __name__ == '__main__':
     genarate_all()
