@@ -2,10 +2,10 @@
   "window": {
     "dockWidget": "Qt.RightDockWidgetArea",
     "toolBar": "Qt.TopToolBarArea",
-    "theme": "light",
+    "theme": "dark",
     "canvas": {
-      "text": "#3a3a3a",
-      "canvas": "white"
+      "text": "white",
+      "canvas": "#3a3a3a"
     }
   },
   "auto_save": {
