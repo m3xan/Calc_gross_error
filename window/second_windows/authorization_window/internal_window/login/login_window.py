@@ -120,4 +120,5 @@ class InternalAutorizationWindow(QMainWindow):
             user: User = select_image(self.ui.line_edit_login.text())
             if user is not None:
                 self.state.theme = load_theme(self, user.id)
+                self.setWindowTitle(str(user.id))
                 self.setCircleImage(user.image)

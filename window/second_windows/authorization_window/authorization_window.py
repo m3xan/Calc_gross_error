@@ -1,13 +1,16 @@
 
-
+from PySide6.QtCore import Signal
 from window.main_window.main_window import MainWindow
-from window.second_windows.authorization_window.authorization_window_class import Ui_AuthorizationWindow, QMainWindow
+from window.second_windows.authorization_window.authorization_window_class import Ui_AuthorizationWindow
 from window.second_windows.authorization_window.internal_window.login.login_window import InternalAutorizationWindow
 from window.second_windows.authorization_window.internal_window.registration.registration_window import InternalRegistrationWindow
 
+from window.abstract_model.models import AbstractWindow
+
 from new_file.check_file import check_all_file
 
-class AuthorizationWindow(QMainWindow):
+class AuthorizationWindow(AbstractWindow):
+    itit_user:Signal = Signal(bool)
     def __init__(self):
         super().__init__()
         self.ui = Ui_AuthorizationWindow()

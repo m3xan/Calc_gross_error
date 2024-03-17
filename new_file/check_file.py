@@ -3,6 +3,7 @@
 """
 
 import os
+import concurrent.futures
 
 FILE_PATHS = [
     r'Data\Data_base',
@@ -23,4 +24,5 @@ def check_all_file() -> bool:
     True когда все файлы для работы найдены.
     False когда какой либо файл не найден.
     """
-    return all(check_file(path) for path in FILE_PATHS)
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        return all(executor.map(check_file, FILE_PATHS))

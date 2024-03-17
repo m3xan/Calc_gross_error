@@ -15,8 +15,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QHBoxLayout, QMainWindow, QSizePolicy,
-    QWidget)
+from PySide6.QtWidgets import (QApplication, QHBoxLayout, QLayout, QMainWindow,
+    QSizePolicy, QWidget)
 from window.main_window import res_rc
 
 class Ui_AuthorizationWindow(object):
@@ -39,6 +39,7 @@ class Ui_AuthorizationWindow(object):
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalLayout.setSizeConstraint(QLayout.SetMaximumSize)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         AuthorizationWindow.setCentralWidget(self.centralwidget)
 

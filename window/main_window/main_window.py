@@ -5,9 +5,10 @@ from functools import partial
 
 import numpy as np
 from matplotlib.backends.backend_qt import NavigationToolbar2QT
-from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QListWidgetItem, QLineEdit
+from PySide6.QtWidgets import QVBoxLayout, QListWidgetItem, QLineEdit
 from PySide6.QtCore import Qt, QTimer
 
+from window.abstract_model.models import AbstractWindow
 from window.data_class_for_window.dataclass import DataclassMainWindow
 from window.main_window.main_window_class import Ui_MainWindow
 from window.main_window.custom_context_menu import context_menu
@@ -29,7 +30,7 @@ from decorator.printing import print_return
 
 @timer_decorator
 #TODO переделать заполнение лист виджета
-class MainWindow(QMainWindow):
+class MainWindow(AbstractWindow):
     """
     class MainWindow
     """
@@ -196,8 +197,10 @@ class MainWindow(QMainWindow):
         """
         create_calc
         """
-        value = calc.calc_roman_metod(self.state.data[self.ui.combo_box_selection_data.currentData()])
-        print(value)
+        answers = calc.calc_roman_metod(self.state.data[self.ui.combo_box_selection_data.currentData()][0])
+        self.ui.list_widget_answer.clear()
+        for answer in answers:
+            self.ui.list_widget_answer.addItem(str(answer))
         self.state.save_data_mode = False
         return f'self.state.save_data_mode = {self.state.save_data_mode}'
 
@@ -261,10 +264,10 @@ class MainWindow(QMainWindow):
         self.timer = QTimer()
         self.timer.timeout.connect(self.action_save_click)
 
-    def __init_main_listwidget(self):
-        self.ui.listWidget.itemDoubleClicked.connect(self.editValue)
-        self.ui.listWidget.itemDoubleClicked.connect(self.change_stat)
-        self.ui.listWidget.customContextMenuRequested.connect(self.custom_context_menu_open)
+    def __init_main_list_widget_value(self):
+        self.ui.list_widget_value.itemDoubleClicked.connect(self.editValue)
+        self.ui.list_widget_value.itemDoubleClicked.connect(self.change_stat)
+        self.ui.list_widget_value.customContextMenuRequested.connect(self.custom_context_menu_open)
 
     def __init_main_combobox(self):
         self.ui.combo_box_selection_data.currentIndexChanged.connect(self.combo_box_selection_data_changed)
@@ -297,7 +300,7 @@ class MainWindow(QMainWindow):
         self.__init_main_action()
         self.__init_main_button()
         self.__init_main_combobox()
-        self.__init_main_listwidget()
+        self.__init_main_list_widget_value()
 
     # helpfull
     def __update_ui(self, signal):
@@ -329,7 +332,8 @@ class MainWindow(QMainWindow):
         self.ui.dockWidget.setEnabled(enable)
 
         self.ui.combo_box_selection_data.setEnabled(enable)
-        self.ui.listWidget.setEnabled(enable)
+        self.ui.list_widget_value.setEnabled(enable)
+        self.ui.list_widget_answer.setEnabled(enable)
 
         self.ui.push_button_add_data.setEnabled(enable)
         self.ui.push_button_delite_data.setEnabled(enable)
@@ -350,7 +354,7 @@ class MainWindow(QMainWindow):
             self.state.add_mod = True
             item = QListWidgetItem()
             item.setFlags(item.flags() | Qt.ItemIsEditable)  # Добавляем возможность редактирования значения
-            self.ui.listWidget.addItem(item)
+            self.ui.list_widget_value.addItem(item)
 
             # Выделяем новый элемент и запускаем его редактирование
             self.editValue(item)
@@ -384,7 +388,7 @@ class MainWindow(QMainWindow):
         При разных типах ввода разные условия и разные другие параметры
         заготовка на будещее
         """
-        self.ui.listWidget.clear()
+        self.ui.list_widget_value.clear()
         match self.state.active_mod:
             case 'bd':
                 if self.state.data is not None and self.ui.combo_box_selection_data.currentData() is not None:
@@ -406,7 +410,7 @@ class MainWindow(QMainWindow):
         key = self.ui.combo_box_selection_data.currentData()
         try:
             for numder in self.state.data[key][0]:
-                self.ui.listWidget.addItem(str(numder))
+                self.ui.list_widget_value.addItem(str(numder))
             return True
         except KeyError as err:
             raise err
@@ -459,11 +463,11 @@ class MainWindow(QMainWindow):
         """
         заглушка
         """
-        index = self.ui.listWidget.row(item)
+        index = self.ui.list_widget_value.row(item)
         edit = QLineEdit(self)
         edit.setText(item.text())
         edit.returnPressed.connect(partial(self.saveValue, item, index, edit))
-        self.ui.listWidget.setItemWidget(item, edit)
+        self.ui.list_widget_value.setItemWidget(item, edit)
         edit.setFocus()
         self.state.save_data_mode = False
 
@@ -481,16 +485,16 @@ class MainWindow(QMainWindow):
             self.state.data[b][0][index] = float(new_value)
 
             edit.deleteLater()
-            self.ui.listWidget.takeItem(index)
+            self.ui.list_widget_value.takeItem(index)
             item.setText(str(float(new_value)))
-            self.ui.listWidget.insertItem(index, item)
+            self.ui.list_widget_value.insertItem(index, item)
 
             self.state.save_data_mode = False
             self.state.change_mode = False
         else:
-            self.ui.listWidget.takeItem(index)
+            self.ui.list_widget_value.takeItem(index)
             item.setText(str(float(new_value)))
-            self.ui.listWidget.insertItem(index, item)
+            self.ui.list_widget_value.insertItem(index, item)
             b = self.ui.combo_box_selection_data.currentData()
             self.state.data[b][0].append(float(new_value))
             edit.deleteLater()
