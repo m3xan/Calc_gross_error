@@ -12,9 +12,9 @@ from window.data_class_for_window.dataclass import BaseDataclassWindows
 from window.second_windows.settings.user_setting.user_class import Ui_Dialog, QDialog, QPixmap, Qt, QPainter
 
 
-from settings.settings import load_theme
+from functions.settings.settings import load_theme
 from data_base.test_orm import update_image, update_user, select_User, User
-from walidation.walid_password import check_password_strength
+from functions.walidation.walid_password import check_password_strength
 
 
 class UserSettingsDialog(QDialog):

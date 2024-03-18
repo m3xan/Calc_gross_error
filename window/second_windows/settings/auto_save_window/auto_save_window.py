@@ -5,7 +5,7 @@
 from window.second_windows.settings.auto_save_window.auto_save_class import Ui_DialogAutoSave, QDialog
 from window.data_class_for_window.dataclass import BaseDataclassWindows
 
-from settings.settings import load_theme, load_category_json, save_data_json
+from functions.settings.settings import load_theme, load_category_json, save_data_json
 
 class AutoSaveWindow(QDialog):
     """

@@ -5,7 +5,7 @@
 
 from PySide6.QtWidgets import QMessageBox, QApplication
 
-from excel import excel
+from functions.excel import excel
 
 def action_esc_click(self):
     """

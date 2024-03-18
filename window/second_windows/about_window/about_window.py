@@ -7,7 +7,7 @@ from window.second_windows.about_window.about_window_class import Ui_Dialog
 from window.data_class_for_window.dataclass import BaseDataclassWindows
 from window.second_windows.about_window.snake_game import SnakeGame
 
-from settings.settings import load_theme
+from functions.settings.settings import load_theme
 
 class AboutDialog(QDialog):
     """

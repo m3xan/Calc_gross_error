@@ -3,7 +3,7 @@
 from PySide6.QtWidgets import QMainWindow, QDialog
 from PySide6.QtCore import Signal
 
-from settings.settings import load_theme
+from functions.settings.settings import load_theme
 
 class AbstractWindow(QMainWindow):
     windowThemeChanged: Signal = Signal(int)

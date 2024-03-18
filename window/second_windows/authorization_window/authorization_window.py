@@ -7,7 +7,7 @@ from window.second_windows.authorization_window.internal_window.registration.reg
 
 from window.abstract_model.models import AbstractWindow
 
-from new_file.check_file import check_all_file
+from functions.new_file.check_file import check_all_file
 
 class AuthorizationWindow(AbstractWindow):
     itit_user:Signal = Signal(bool)

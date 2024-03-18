@@ -10,7 +10,7 @@ from window.second_windows.add_window import add_push_button
 from window.second_windows.add_window.add_window_class import Ui_Dialog
 from window.data_class_for_window.dataclass import DataclassAddWindow
 
-from settings.settings import load_theme
+from functions.settings.settings import load_theme
 
 class AddDialog(QDialog):
     """

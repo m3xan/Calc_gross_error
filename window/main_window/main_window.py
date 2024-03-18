@@ -19,14 +19,14 @@ from window.second_windows.settings.main_settings.setting_window import Settings
 from window.second_windows.load_window.load_window import LoadDialog
 
 from data_base.test_orm import test_select_2
-from calcul import calc
+from functions.calcul import calc
 
-from graph import graph
-from excel.excel import get_name_column
-from settings.settings import save_data_json, load_theme, load_category_json, load_attribute
+from functions.graph import graph
+from functions.excel.excel import get_name_column
+from functions.settings.settings import save_data_json, load_theme, load_category_json, load_attribute
 
-from decorator.timer import timer_decorator
-from decorator.printing import print_return
+from functions.decorator.timer import timer_decorator
+from functions.decorator.printing import print_return
 
 @timer_decorator
 #TODO переделать заполнение лист виджета

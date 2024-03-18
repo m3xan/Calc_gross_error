@@ -12,7 +12,7 @@ from window.second_windows.settings.auto_save_window.auto_save_window import Aut
 from window.second_windows.settings.setting_window.settings_window import SettingDialog
 from window.second_windows.settings.user_setting.user_setting_window import UserSettingsDialog
 
-from settings.settings import load_theme
+from functions.settings.settings import load_theme
 
 class SettingsDialog(QDialog):
     change_theme = Signal(bool)

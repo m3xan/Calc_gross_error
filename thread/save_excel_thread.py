@@ -3,7 +3,7 @@
 """
 from PySide6.QtCore import QThread
 
-from excel import excel
+from functions.excel import excel
 
 class SaveThread(QThread):
     """

@@ -1,7 +1,7 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 import random
 
-from settings.settings import load_theme
+from functions.settings.settings import load_theme
 
 class SnakeGame(QtWidgets.QDialog):
     def __init__(self, user_id):

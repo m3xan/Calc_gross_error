@@ -19,7 +19,7 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
 from PySide6.QtWidgets import (QApplication, QMainWindow, QSizePolicy, QToolBar,
     QWidget)
 
-from settings.settings import load_attribute
+from functions.settings.settings import load_attribute
 
 class Ui_GraphWindow(object):
     def setupUi(self, GraphWindow, user_name):

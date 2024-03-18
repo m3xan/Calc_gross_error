@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QDockWidget, QFrame,
     QSizePolicy, QVBoxLayout, QWidget)
 from window.main_window import res_rc
 
-from settings.settings import load_attribute
+from functions.settings.settings import load_attribute
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow, user_name):

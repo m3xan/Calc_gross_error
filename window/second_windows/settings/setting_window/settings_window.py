@@ -8,7 +8,7 @@ from PySide6.QtCore import Signal
 from window.second_windows.settings.setting_window.settings_window_class import Ui_Dialog, QDialog
 from window.data_class_for_window.dataclass import BaseDataclassWindows
 
-from settings.settings import save_data_json, load_theme, load_category_json, load_attribute
+from functions.settings.settings import save_data_json, load_theme, load_category_json, load_attribute
 
 def find_key(dict_: dict, search_value):
     for key, value in dict_.items():

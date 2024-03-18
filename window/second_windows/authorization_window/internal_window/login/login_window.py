@@ -9,7 +9,7 @@ from data_base.test_orm import autorisation
 from data_base.test_orm import select_image
 from data_base.models import User
 
-from settings.settings import load_theme
+from functions.settings.settings import load_theme
 
 class InternalAutorizationWindow(QMainWindow):
     fin_aut:Signal = Signal(int)

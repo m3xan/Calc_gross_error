@@ -5,7 +5,7 @@ graph
 version = 0.01
 """
 
-from graph.canvas import Canvas
+from functions.graph.canvas import Canvas
 
 def empty_graph(color_fig, color_text):
     """

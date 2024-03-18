@@ -42,7 +42,7 @@ def generate_class_ui2py(path: str):
     if ui_file is None:
         print('В директории файла нет')
     else:
-        file_path: str = os.path.join(path, find_ui_file(path))
+        file_path: str = os.path.join(path, ui_file)
         file_name_without_extension = file_path.split(os.sep)[-1].removesuffix('.ui')
         cmd = f'pyside6-uic {file_path} -o {path}{os.sep}{file_name_without_extension}_class.py'
         try:

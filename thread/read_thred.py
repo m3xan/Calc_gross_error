@@ -4,7 +4,7 @@
 
 from PySide6.QtCore import QThread, Signal
 
-from excel import excel
+from functions.excel import excel
 
 class ReadThread(QThread):
     """

@@ -7,10 +7,10 @@ from window.data_class_for_window.dataclass import BaseDataclassWindows
 from data_base.test_orm import autorisation
 from data_base.test_orm import select_image, add_user
 
-from settings.settings import load_theme
+from functions.settings.settings import load_theme
 
-from new_file.create_settings import create_settngs
-from walidation.walid_password import check_password_strength
+from functions.new_file.create_settings import create_settngs
+from functions.walidation.walid_password import check_password_strength
 
 class InternalRegistrationWindow(QMainWindow):
     autorisation: Signal = Signal(bool)

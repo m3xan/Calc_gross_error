@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QDialog
 from window.second_windows.load_window.load_window_class import Ui_Dialog
 from window.data_class_for_window.dataclass import BaseDataclassWindows
 
-from settings.settings import load_theme
+from functions.settings.settings import load_theme
 
 class LoadDialog(QDialog):
     """
