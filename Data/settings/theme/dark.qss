@@ -956,7 +956,7 @@ QProgressBar::chunk
 
 QApplication 
 {
-	color: lightgray;
+	color: transparent;
 	background-color: transparent;
 
 }
