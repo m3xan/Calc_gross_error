@@ -45,4 +45,6 @@ class AuthorizationWindow(AbstractWindow):
             self.deleteLater()
 
     def __str__(self) -> str:
-        return super().__str__()
+        _reg = self.reg_win.isVisible()
+        _aut = self.aut_win.isVisible()
+        return f'visible registration window {_reg}, visible autofication window {_aut}'
