@@ -24,7 +24,7 @@ def with_json(path, mode = 'r'):
         return wrapper
     return decorator
 
-@with_json(f'{os.getcwd()}\\Data\\settings\\json')
+@with_json('Data\\settings\\json')
 def load_json(file):
     """
     заглушка
@@ -37,12 +37,12 @@ def load_category_json(categor:str, user_id = None):
 def load_attribute(categor: str, attribute: str, user_id = None):
     return load_category_json(categor, user_id)[attribute]
 
-@with_json(f'{os.getcwd()}\\Data\\settings\\json', 'w+')
+@with_json('Data\\settings\\json', 'w+')
 def save_json(file: TextIOWrapper, data = None):
     """
     переделать
     """
-    file.write(json.dumps(data, indent=2))
+    file.write(json.dumps(data, indent= 2))
 
 def save_data_json(categor: str, attribute: str | None, data: str, user_id = None):
     """
@@ -64,8 +64,9 @@ def load_theme(self, user_id: str = None) -> str | None:
     заглушка
     """
     category = load_category_json('window', user_id)
-    qss_file_path = f"{os.getcwd()}/Data/settings/theme/{category['theme']}.qss"
-    style_file = QFile(qss_file_path)
+    style_file = QFile(
+        f'Data/settings/theme/{category['theme']}.qss'
+    )
     if style_file.open(QFile.ReadOnly | QFile.Text):
         self.stream = QTextStream(style_file)
         self.setStyleSheet(self.stream.readAll())

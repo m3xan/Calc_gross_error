@@ -56,8 +56,6 @@ class UserSettingsDialog(QDialog):
         self.__save_user()
 
     def __save_image(self):
-        # потои переделать с исключениями
-
         if self.image is not None:
             img = Image.open(self.image[0])
             img = img.convert('RGB')
@@ -72,7 +70,6 @@ class UserSettingsDialog(QDialog):
         return None
 
     def __save_user(self):
-
         user: User = select_User(user_id= self.user_id)
         user_name = None
         password = None

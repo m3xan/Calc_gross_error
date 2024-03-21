@@ -20,7 +20,7 @@ def autorisation(session: Session, input_username, input_password):
             User.username == input_username, User.password == input_password
         )
     )
-    result:tuple[User, ...] = session.execute(stmt).first()
+    result: tuple[User, ...] | None = session.execute(stmt).first()
     if result is not None:
         return result[0].id
     return result
@@ -31,7 +31,7 @@ def select_image(session: Session, input_username) -> str | None:
         select(User)
         .where(User.username == input_username)
     )
-    result:tuple[User, ...] = session.execute(stmt).first()
+    result: tuple[User, ...] | None = session.execute(stmt).first()
     if result is not None:
         return result[0]
     return result
@@ -44,7 +44,7 @@ def select_User(session: Session, user_id: int) -> User | None:
             User.id == user_id
         )
     )
-    result:tuple[User, ...] = session.execute(stmt).first()
+    result: tuple[User, ...] | None = session.execute(stmt).first()
     if result is not None:
         return result[0]
     return result
@@ -59,7 +59,7 @@ def update_image(session: Session, user_id: int, image = None):
                 User.id == user_id
             )
         )
-        result:tuple[User, ...] = session.execute(stmt).first()
+        result: tuple[User, ...] | None = session.execute(stmt).first()
         if result is not None:
             result[0].image = image
             return result[0]
@@ -74,7 +74,7 @@ def update_user(session: Session, user_id: int, username= None, password= None):
             User.id == user_id
         )
     )
-    result:tuple[User, ...] = session.execute(stmt).first()
+    result: tuple[User, ...] | None= session.execute(stmt).first()
     if result is not None:
         if username is not None:
             result[0].username = username
@@ -147,10 +147,3 @@ def test_select_2(session: Session, user_id: int):
         for val in answer_values:
             data[(i[0], i[1])][1].append(float(val[0]))
     return data
-
-
-if __name__ =='__main__':
-    print(test_select_2(user_id= 1))
-    # add_user('user', 'qwerty')
-    # # images = select_image('admin')
-    # # print(images)

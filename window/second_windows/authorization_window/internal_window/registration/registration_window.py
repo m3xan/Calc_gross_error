@@ -34,6 +34,7 @@ class InternalRegistrationWindow(AbstractWindow):
         self.ui.line_edit_password_check.setEnabled(False)
 
     def __check_login(self):
+        # TODO chack login
         if self.ui.line_edit_login.text() == '':
             pass
         elif select_image(input_username= self.ui.line_edit_login.text()) is not None:
@@ -49,16 +50,20 @@ class InternalRegistrationWindow(AbstractWindow):
             self.ui.label_error.clear()
 
     def __check_password(self):
-        password_chesk = check_password_strength(self.ui.line_edit_password_main.text())
-        if password_chesk[0]:
+        if (password_chesk := check_password_strength(
+            self.ui.line_edit_password_main.text()
+        ))[0]:
             self.ui.line_edit_password_check.setEnabled(True)
             self.check_password_user = True
         self.ui.label_error.setText(password_chesk[1])
 
     def __fin_registration(self):
-
-        rigth_pass = self.ui.line_edit_password_main.text() == self.ui.line_edit_password_check.text()
-        if self.ui.line_edit_login.text() != '' and rigth_pass and self.check_password_user and self.check_login_user:
+        if all(
+            self.ui.line_edit_login.text() != '',
+            self.ui.line_edit_password_main.text() == self.ui.line_edit_password_check.text(),
+            self.check_password_user,
+            self.check_login_user
+        ):
             add_user(
                 username= self.ui.line_edit_login.text(),
                 password= self.ui.line_edit_password_main.text()

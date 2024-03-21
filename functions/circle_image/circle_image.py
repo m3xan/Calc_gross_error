@@ -30,7 +30,6 @@ def setCircleImage(image_path, desired_size):
             sx = (orig_pixmap.size().width() - orig_pixmap.size().height()) /2
             sy = 0
 
-
         target_pixmap = QPixmap(desired_size, desired_size)
         target_pixmap.fill(Qt.transparent)
 
@@ -42,3 +41,4 @@ def setCircleImage(image_path, desired_size):
         painter.drawPixmap(0, 0, orig_pixmap, sx , sy, desired_size, desired_size)
         painter.end()
         return target_pixmap
+    return None

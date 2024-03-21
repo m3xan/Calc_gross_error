@@ -39,7 +39,6 @@ class Ui_MainWindow(object):
         icon.addFile(u":/calculator-Freepik.png", QSize(), QIcon.Normal, QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setAutoFillBackground(False)
-        MainWindow.setStyleSheet(u"QMainWindow::title {background-color: red;}")
         MainWindow.setInputMethodHints(Qt.ImhNone)
         self.action_info = QAction(MainWindow)
         self.action_info.setObjectName(u"action_info")
@@ -53,12 +52,7 @@ class Ui_MainWindow(object):
         self.action_save.setChecked(False)
         self.action_save.setEnabled(False)
         icon2 = QIcon()
-        iconThemeName = u"document-new"
-        if QIcon.hasThemeIcon(iconThemeName):
-            icon2 = QIcon.fromTheme(iconThemeName)
-        else:
-            icon2.addFile(u":/save.png", QSize(), QIcon.Normal, QIcon.Off)
-
+        icon2.addFile(u":/action/save.png", QSize(), QIcon.Normal, QIcon.Off)
         self.action_save.setIcon(icon2)
         self.action_esc = QAction(MainWindow)
         self.action_esc.setObjectName(u"action_esc")
@@ -68,12 +62,7 @@ class Ui_MainWindow(object):
         self.action_excel = QAction(MainWindow)
         self.action_excel.setObjectName(u"action_excel")
         icon4 = QIcon()
-        iconThemeName = u"accessories-calculator"
-        if QIcon.hasThemeIcon(iconThemeName):
-            icon4 = QIcon.fromTheme(iconThemeName)
-        else:
-            icon4.addFile(u":/exel.png", QSize(), QIcon.Normal, QIcon.Off)
-
+        icon4.addFile(u":/action/exel.png", QSize(), QIcon.Normal, QIcon.Off)
         self.action_excel.setIcon(icon4)
         self.action_bd = QAction(MainWindow)
         self.action_bd.setObjectName(u"action_bd")
@@ -83,12 +72,7 @@ class Ui_MainWindow(object):
         self.action_help = QAction(MainWindow)
         self.action_help.setObjectName(u"action_help")
         icon6 = QIcon()
-        iconThemeName = u"accessories-calculator"
-        if QIcon.hasThemeIcon(iconThemeName):
-            icon6 = QIcon.fromTheme(iconThemeName)
-        else:
-            icon6.addFile(u":/-help-outline_89965.ico", QSize(), QIcon.Normal, QIcon.Off)
-
+        icon6.addFile(u":/action/-help-outline_89965.ico", QSize(), QIcon.Normal, QIcon.Off)
         self.action_help.setIcon(icon6)
         self.action_save_as = QAction(MainWindow)
         self.action_save_as.setObjectName(u"action_save_as")
@@ -123,8 +107,6 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setSizeConstraint(QLayout.SetMinimumSize)
         self.horizontalLayout.setContentsMargins(9, -1, 6, -1)
-        self.verticalLayout_2 = QVBoxLayout()
-        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.frame = QFrame(self.centralwidget)
         self.frame.setObjectName(u"frame")
         self.frame.setMinimumSize(QSize(500, 500))
@@ -132,10 +114,7 @@ class Ui_MainWindow(object):
         self.frame.setFrameShape(QFrame.Box)
         self.frame.setFrameShadow(QFrame.Sunken)
 
-        self.verticalLayout_2.addWidget(self.frame)
-
-
-        self.horizontalLayout.addLayout(self.verticalLayout_2)
+        self.horizontalLayout.addWidget(self.frame)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.dockWidget = QDockWidget(MainWindow)

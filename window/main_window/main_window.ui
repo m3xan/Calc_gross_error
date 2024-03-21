@@ -29,9 +29,6 @@
   <property name="autoFillBackground">
    <bool>false</bool>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QMainWindow::title {background-color: red;}</string>
-  </property>
   <property name="inputMethodHints">
    <set>Qt::ImhNone</set>
   </property>
@@ -56,27 +53,23 @@
      <number>6</number>
     </property>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QFrame" name="frame">
-        <property name="minimumSize">
-         <size>
-          <width>500</width>
-          <height>500</height>
-         </size>
-        </property>
-        <property name="contextMenuPolicy">
-         <enum>Qt::NoContextMenu</enum>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::Box</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Sunken</enum>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <widget class="QFrame" name="frame">
+      <property name="minimumSize">
+       <size>
+        <width>500</width>
+        <height>500</height>
+       </size>
+      </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::NoContextMenu</enum>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Box</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -418,8 +411,8 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset theme="document-new" resource="../../icon/res.qrc">
-     <normaloff>:/save.png</normaloff>:/save.png</iconset>
+    <iconset resource="../../icon/res.qrc">
+     <normaloff>:/action/save.png</normaloff>:/action/save.png</iconset>
    </property>
    <property name="text">
     <string>Сохранить </string>
@@ -439,8 +432,8 @@
   </action>
   <action name="action_excel">
    <property name="icon">
-    <iconset theme="accessories-calculator" resource="../../icon/res.qrc">
-     <normaloff>:/exel.png</normaloff>:/exel.png</iconset>
+    <iconset resource="../../icon/res.qrc">
+     <normaloff>:/action/exel.png</normaloff>:/action/exel.png</iconset>
    </property>
    <property name="text">
     <string>Excel</string>
@@ -463,8 +456,8 @@
   </action>
   <action name="action_help">
    <property name="icon">
-    <iconset theme="accessories-calculator" resource="../../icon/res.qrc">
-     <normaloff>:/-help-outline_89965.ico</normaloff>:/-help-outline_89965.ico</iconset>
+    <iconset resource="../../icon/res.qrc">
+     <normaloff>:/action/-help-outline_89965.ico</normaloff>:/action/-help-outline_89965.ico</iconset>
    </property>
    <property name="text">
     <string>Информация</string>

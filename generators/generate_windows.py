@@ -58,7 +58,6 @@ def generate_class_ui2py(path: str):
 
 def generate_res_rc():
     """
-    Переделать
     Заглушка
     """
     command = 'pyside6-rcc icon\\res.qrc -o window\\main_window\\res_rc.py'
