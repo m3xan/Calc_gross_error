@@ -44,9 +44,10 @@ class UserSettingsDialog(QDialog):
 
     def __chose_image(self):
         filedialog = QFileDialog()
-        # тут доделать параметры
-        self.image = filedialog.getOpenFileName(caption='Выбрать файл'
-                                                    )
+        self.image = filedialog.getOpenFileName(
+            caption='Выбрать файл',
+            filter= 'Image File (*.png;*.jpg;*.gif;*.svg)'
+        )
 
         if self.image != ('', ''):
             self.__circle_image(self.image[0])
@@ -95,7 +96,9 @@ class UserSettingsDialog(QDialog):
                     f"<p style='color: red'>{check_password[1]}</p>"
                 )
 
-        if any(_obj is None for _obj in (user_name, password)):
+        if any(
+            _obj is not None for _obj in (user_name, password)
+        ):
             update_user(
                 user_id= self.user_id,
                 username= user_name,
