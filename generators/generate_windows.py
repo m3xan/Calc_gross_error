@@ -27,12 +27,14 @@ WINDOW_PATH = [
 
 def find_ui_file(path: str):
     """Находит .ui файл в директории"""
-    files = os.listdir(path)
-    pattern = re.compile(r'.*\.ui')
-    for file in files:
-        if pattern.match(file):
-            return file
-    return None
+    try:
+        pattern = re.compile(r'.*\.ui')
+        for file in os.listdir(path):
+            if pattern.match(file):
+                return file
+        return None
+    except FileNotFoundError:
+        return None
 
 def generate_class_ui2py(path: str):
     """
