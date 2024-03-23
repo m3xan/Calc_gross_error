@@ -32,9 +32,15 @@ def load_json(file):
     return json.load(file)
 
 def load_category_json(categor:str, user_id = None):
+    """
+    заглушка
+    """
     return load_json(id= user_id)[categor]
 
 def load_attribute(categor: str, attribute: str, user_id = None):
+    """
+    заглушка
+    """
     return load_category_json(categor, user_id)[attribute]
 
 @with_json('Data\\settings\\json', 'w+')
@@ -64,13 +70,14 @@ def load_theme(self, user_id: str = None) -> str | None:
     заглушка
     """
     category = load_category_json('window', user_id)
-    style_file = QFile(
-        f'Data/settings/theme/{category['theme']}.qss'
-    )
-    if style_file.open(QFile.ReadOnly | QFile.Text):
-        self.stream = QTextStream(style_file)
-        self.setStyleSheet(self.stream.readAll())
-        style_file.close()
-        return category['theme'], category['canvas']
-    print("Не удалось загрузить файл стилей")
-    return None
+    # Загрузка категории из кэша или выполнение операции, если данные не найдены в кэше
+    style_file_path = f'Data/settings/theme/{category['theme']}.qss'
+
+    try:
+        with open(style_file_path, 'r') as style_file:
+            style_content = style_file.read()
+            self.setStyleSheet(style_content)
+            return category['theme'], category['canvas']
+    except FileNotFoundError:
+        print("Не удалось найти файл стилей")
+        return None

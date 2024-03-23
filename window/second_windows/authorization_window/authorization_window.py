@@ -14,6 +14,7 @@ class AuthorizationWindow(AbstractWindow):
         super().__init__()
         self.ui = Ui_AuthorizationWindow()
         self.ui.setupUi(self)
+        self.main_window = None
 
         self.aut_win = InternalAutorizationWindow()
         self.aut_win.registrarion.connect(self.__set_window)
