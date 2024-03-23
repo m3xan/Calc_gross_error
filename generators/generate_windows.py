@@ -25,17 +25,6 @@ WINDOW_PATH = [
     'window\\second_windows\\authorization_window\\internal_window\\registration',
 ]
 
-def find_ui_file(path: str):
-    """Находит .ui файл в директории"""
-    try:
-        pattern = re.compile(r'.*\.ui')
-        for file in os.listdir(path):
-            if pattern.match(file):
-                return file
-        return None
-    except FileNotFoundError:
-        return None
-
 def generate_class_ui2py(path: str):
     """
     Заглушка
@@ -57,6 +46,17 @@ def generate_class_ui2py(path: str):
             print('Ошибка при генерации файла')
             raise e
     return None
+
+def find_ui_file(path: str):
+    """Находит .ui файл в директории"""
+    try:
+        pattern = re.compile(r'.*\.ui')
+        for file in os.listdir(path):
+            if pattern.match(file):
+                return file
+        return None
+    except FileNotFoundError:
+        return None
 
 def generate_res_rc():
     """
