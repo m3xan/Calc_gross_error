@@ -181,6 +181,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QLineEdit" name="line_edit_metod">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QListWidget" name="list_widget_answer">
        <property name="enabled">
         <bool>false</bool>

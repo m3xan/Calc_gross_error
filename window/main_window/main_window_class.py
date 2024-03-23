@@ -17,9 +17,9 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QComboBox, QDockWidget, QFrame,
-    QHBoxLayout, QLayout, QListWidget, QListWidgetItem,
-    QMainWindow, QMenu, QMenuBar, QPushButton,
-    QSizePolicy, QVBoxLayout, QWidget)
+    QHBoxLayout, QLayout, QLineEdit, QListWidget,
+    QListWidgetItem, QMainWindow, QMenu, QMenuBar,
+    QPushButton, QSizePolicy, QVBoxLayout, QWidget)
 from window.main_window import res_rc
 
 from functions.settings.settings import load_attribute
@@ -162,6 +162,12 @@ class Ui_MainWindow(object):
         self.list_widget_value.setContextMenuPolicy(Qt.CustomContextMenu)
 
         self.verticalLayout.addWidget(self.list_widget_value)
+
+        self.line_edit_metod = QLineEdit(self.dockWidgetContents)
+        self.line_edit_metod.setObjectName(u"line_edit_metod")
+        self.line_edit_metod.setReadOnly(True)
+
+        self.verticalLayout.addWidget(self.line_edit_metod)
 
         self.list_widget_answer = QListWidget(self.dockWidgetContents)
         self.list_widget_answer.setObjectName(u"list_widget_answer")
