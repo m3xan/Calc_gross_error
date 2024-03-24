@@ -17,6 +17,8 @@ from functions.circle_image.circle_image import setCircleImage
 from functions.settings.settings import load_theme
 from functions.walidation.walid_password import check_password_strength
 
+from global_param import STANDART_IMAGE
+
 class UserSettingsDialog(QDialog):
     """
     Класс окна настроек интерфейса
@@ -39,8 +41,12 @@ class UserSettingsDialog(QDialog):
     def __start(self):
         user: User = select_User(user_id= self.user_id)
         self.ui.linedit_username.setText(user.username)
-        if user.image is not None:
+        if user.image is not None and os.path.isfile(user.image):
             self.__circle_image(user.image)
+        else:
+            self.__circle_image(
+                STANDART_IMAGE
+            )
 
     def __chose_image(self):
         filedialog = QFileDialog()
@@ -77,11 +83,11 @@ class UserSettingsDialog(QDialog):
         if self.ui.linedit_username.text() != user.username:
             user_name = self.ui.linedit_username.text()
 
-        if all(
+        if all((
             empty := (self.ui.linedit_password.text() != ''),
             old_password := (self.ui.linedit_password.text() != user.password),
             (check_password := check_password_strength(self.ui.linedit_password.text()))[0]
-        ):
+        )):
             password= self.ui.linedit_password.text()
             self.ui.label_walidation_password.setText(
                 'Пароль сохронён'

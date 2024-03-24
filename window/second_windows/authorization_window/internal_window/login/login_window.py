@@ -14,6 +14,8 @@ from data_base.models import User
 from functions.settings.settings import load_theme
 from functions.circle_image.circle_image import setCircleImage
 
+from global_param import STANDART_IMAGE
+
 class InternalAutorizationWindow(AbstractWindow):
     """Внутреннее окно авторизации"""
     registrarion:Signal = Signal(bool)
@@ -25,9 +27,10 @@ class InternalAutorizationWindow(AbstractWindow):
 
         self.state = DataclassAutWindow(
             theme= load_theme(self),
-            standard_image= r'Data\Data_base\image\8hOlH9yPHi7DbakNO6XafkdRmjw3DANbj2ojvQqw.jpg'
+            standard_image= STANDART_IMAGE
         )
-        # TODO add close_eye, open_eye
+
+        # TODO add close_eye, open_eye, del self.state.standard_image
         self.close_eye = QIcon(':/button/free-icon-eye-4621498.png')
         self.open_eye = QIcon(':/button/free-icon-open-eye-829117.png')
 
