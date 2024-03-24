@@ -32,6 +32,7 @@ class DataclassMainWindow(DataclassAddWindow):
     add_mod: bool | None
     auto_save_time: dict
     user_id: int
+    clearance_level: int
 
 @dataclass
 class DataclassSettingsWindow(BaseDataclassWindows):

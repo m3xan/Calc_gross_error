@@ -1,4 +1,6 @@
 
+from PySide6.QtCore import Slot
+
 from window.main_window.main_window import MainWindow
 from window.second_windows.authorization_window.authorization_window_class import Ui_AuthorizationWindow
 from window.second_windows.authorization_window.internal_window.login.login_window import InternalAutorizationWindow
@@ -28,18 +30,23 @@ class AuthorizationWindow(AbstractWindow):
         self.ui.horizontalLayout.addWidget(self.reg_win)
         self.reg_win.setVisible(False)
 
-    def __set_window(self, signall):
+    @Slot(bool)
+    def __set_window(self, signall: bool):
         if signall:
             if self.aut_win.isVisible():
                 self.reg_win.setVisible(True)
                 self.aut_win.setVisible(False)
                 self.setWindowTitle('Регистрация')
-            else:
+                return True
+            if self.reg_win.isVisible():
                 self.reg_win.setVisible(False)
                 self.aut_win.setVisible(True)
                 self.setWindowTitle('Авторизация')
+                return True
+        return None
 
-    def __open_mainwindow(self, signall):
+    @Slot(int)
+    def __open_mainwindow(self, signall: int):
         if check_all_file():
             self.main_window = MainWindow(signall)
             self.main_window.show()
