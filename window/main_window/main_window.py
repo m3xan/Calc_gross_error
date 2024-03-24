@@ -30,6 +30,8 @@ from functions.settings.settings import save_data_json, load_theme, load_categor
 from functions.decorator.timer import timer_decorator
 from functions.decorator.printing import print_return
 
+from functions.loger.log import change_loger
+
 @timer_decorator
 #TODO переделать заполнение лист виджета
 class MainWindow(AbstractWindow):
@@ -59,10 +61,10 @@ class MainWindow(AbstractWindow):
             self.__init_timer()
 
         if self.state.clearance_level > 1:
-            logging.root.setLevel(logging.DEBUG)
+            change_loger(str(user_id), logging.DEBUG)
             self.__add_notion()
         else:
-            logging.root.setLevel(logging.ERROR)
+            change_loger(str(user_id), logging.ERROR)
 
         self.__init_reaction()
 
