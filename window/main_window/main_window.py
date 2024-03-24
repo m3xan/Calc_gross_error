@@ -2,6 +2,7 @@
 Главное окно
 """
 from functools import partial
+import logging
 
 import numpy as np
 from matplotlib.backends.backend_qt import NavigationToolbar2QT
@@ -19,6 +20,7 @@ from window.second_windows.settings.main_settings.setting_window import Settings
 from window.second_windows.load_window.load_window import LoadDialog
 
 from data_base.test_orm import test_select_2
+from data_base.test_orm import select_User
 from functions.calcul import calc
 
 from functions.graph import graph
@@ -47,6 +49,7 @@ class MainWindow(AbstractWindow):
             change_mode= False,
             add_mod= False,
             user_id= user_id,
+            clearance_level = select_User(user_id).clearance_level,
             auto_save_time= load_category_json('auto_save', user_id),
             theme= load_theme(self, user_id),
         )
@@ -54,6 +57,12 @@ class MainWindow(AbstractWindow):
         self.__init_graph()
         if self.state.auto_save_time['switched']:
             self.__init_timer()
+
+        if self.state.clearance_level > 1:
+            logging.root.setLevel(logging.DEBUG)
+            self.__add_notion()
+        else:
+            logging.root.setLevel(logging.ERROR)
 
         self.__init_reaction()
 
@@ -302,6 +311,10 @@ class MainWindow(AbstractWindow):
         self.__init_main_combobox()
         self.__init_main_list_widget_value()
 
+    @print_return
+    def __add_notion(self):
+        return 'сделать что-то'
+
     # helpfull
     def __update_ui(self, signal):
 
@@ -364,6 +377,7 @@ class MainWindow(AbstractWindow):
         заглушка
         """
         self.save_settings()
+        logging.info('main window close')
 
         print("Окно закрывается")
         event.accept()  # Подтверждаем закрытие окна
@@ -421,7 +435,7 @@ class MainWindow(AbstractWindow):
         заглушка
         """
 
-        # переделать меньше переиспользовать код
+        # ПЕРЕПИСАТЬ ВСЮ ФУНКЦИ
         if self.state.data:
             index = self.ui.combo_box_selection_data.count()
             last_index = self.ui.combo_box_selection_data.itemData(index-1)[0]
@@ -430,25 +444,26 @@ class MainWindow(AbstractWindow):
             self.state.data[m] = full_data.get(c)
             if index:
                 self.ui.combo_box_selection_data.addItem(
-                                                        c,
-                                                        m
-                                                        )
+                    c,
+                    m
+                )
                 self.fill_listWidget()
             else:
                 self.ui.combo_box_selection_data.addItem(
-                                                        c,
-                                                        m
-                                                        )
+                    c,
+                    m
+                )
                 self.fill_listWidget()
 
         else:
+            # переделать
             c = get_name_column(1, full_data)
             m = 1, c , False, ()
             self.state.data[m] = full_data.get(c)
             self.ui.combo_box_selection_data.addItem(
-                                                    c,
-                                                    m
-                                                    )
+                c,
+                m
+            )
             # self.fill_listWidget()
         self.enable_ui(True)
         self.state.save_data_mode = False
