@@ -87,7 +87,7 @@ def add_admin(session: Session):
     new_user = User(
         username='admin',
         password='Admin123!',
-        access_level=3,
+        clearance_level=3,
         image = r'Data\Data_base\image\EWQPps7VnkI.jpg'
     )
     session.add(new_user)
@@ -98,7 +98,7 @@ def add_user(session: Session, username: str, password: str):
     new_user = User(
         username= username,
         password= password,
-        access_level=1,
+        clearance_level=1,
         image = r'Data\Data_base\image\8hOlH9yPHi7DbakNO6XafkdRmjw3DANbj2ojvQqw.jpg'
     )
     session.add(new_user)
@@ -147,3 +147,10 @@ def test_select_2(session: Session, user_id: int):
         for val in answer_values:
             data[(i[0], i[1])][1].append(float(val[0]))
     return data
+
+if __name__ == '__main__':
+    add_admin()
+    add_user(
+        'user',
+        'qwerty'
+    )

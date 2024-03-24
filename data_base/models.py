@@ -17,13 +17,13 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement= True)
     username: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str]
-    access_level: Mapped[int]
+    clearance_level: Mapped[int]
     image: Mapped[str] = mapped_column(nullable= True)
     calculations: Mapped[List["Calculation"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
     def __repr__(self) -> str:
-        return f"User(id={self.id!r}, name={self.username!r}, fullname={self.password!r}, access_level={self.access_level!r}, image={self.image!r})"
+        return f"User(id={self.id!r}, name={self.username!r}, fullname={self.password!r}, clearance_level={self.clearance_level!r}, image={self.image!r})"
 
 class Calculation(Base):
     __tablename__ = "calculation"
