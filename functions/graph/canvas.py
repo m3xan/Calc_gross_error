@@ -31,4 +31,3 @@ class Canvas(FigureCanvasQTAgg):
         self.ax.set()
         self.ax.grid(True)
         self.ax.set_facecolor(color_fig)
-        # self.draw()
