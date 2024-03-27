@@ -51,8 +51,8 @@ class SettingDialog(QDialog):
 
     def push_button_restart_clicked(self):
         self.push_button_save_clicked()
-        self.state.theme= load_theme(self, self.user_id)
         self.change_theme.emit(True)
+        self.state.theme= load_theme(self, self.user_id)
 
     def start(self):
         self.comdo_box = []

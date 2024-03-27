@@ -62,8 +62,8 @@ class SettingsDialog(QDialog):
         self.layout.addWidget(setting_window)
 
     def send_signal_to_MainWindow(self, signal):
-        self.state.theme = load_theme(self, self.state.user_id)
         self.change_theme.emit(signal)
+        self.state.theme = load_theme(self, self.state.user_id)
 
     def __clear(self):
         for i in reversed(range(self.layout.count())):
