@@ -31,6 +31,8 @@ class Ui_GraphWindow(object):
         GraphWindow.setWindowOpacity(0.000000000000000)
         self.action_create_graph = QAction(GraphWindow)
         self.action_create_graph.setObjectName(u"action_create_graph")
+        self.action_create_graph.setCheckable(False)
+        self.action_create_graph.setEnabled(False)
         self.action_create_graph.setMenuRole(QAction.NoRole)
         self.centralwidget = QWidget(GraphWindow)
         self.centralwidget.setObjectName(u"centralwidget")

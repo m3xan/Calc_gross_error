@@ -180,35 +180,36 @@ class MainWindow(AbstractWindow):
         """
         Create graph
         """
+        push_button.push_button_create_graph_click()
+        self.plt_tool_bar.update()
+        self.sc.ax.clear()
+        hist = self.state.data[self.ui.combo_box_selection_data.currentData()][0]
+        n, bins, _ = self.sc.ax.hist(hist, rwidth=0.8, color='#ff8921', label= 'Распределение')
 
-        if self.state.data:
-            # self.sc.ax.clear()
-            push_button.push_button_create_graph_click()
-            self.plt_tool_bar.update()
-            self.sc.ax.clear()
-            hist = self.state.data[self.ui.combo_box_selection_data.currentData()][0]
-            # hist = np.random.normal(0, 2, 500)
-            n, bins, _ = self.sc.ax.hist(hist, rwidth=0.8, color='#ff8921', label= 'Распределение')
+        bin_centers = 0.5 * (bins[:-1] + bins[1:])
 
-            bin_centers = 0.5 * (bins[:-1] + bins[1:])
+        window_size = 5  # Размер окна для усреднения, можно добавить изменение в настройки измерения
+        weights = np.ones(window_size) / window_size  # Веса для усреднения значений
 
-            window_size = 5  # Размер окна для усреднения
-            weights = np.ones(window_size) / window_size  # Веса для усреднения значений
+        smoothed_hist = np.convolve(n, weights, mode='same')  # Применение усреднения по скользящему окну
 
-            smoothed_hist = np.convolve(n, weights, mode='same')  # Применение усреднения по скользящему окну
+        aligned_bin_centers = bin_centers[:len(smoothed_hist)]
+        self.sc.ax.plot(aligned_bin_centers, smoothed_hist, '-o', label='Прямая')
 
-            aligned_bin_centers = bin_centers[:len(smoothed_hist)]
-            self.sc.ax.plot(aligned_bin_centers, smoothed_hist, '-o', label='Прямая')
-
-            self.sc.update_collor(self.state.theme[1]['canvas'], self.state.theme[1]['text'])
-            self.sc.ax.legend()
-            self.sc.draw()
+        self.sc.update_collor(
+            self.state.theme[1]['canvas'],
+            self.state.theme[1]['text']
+        )
+        self.sc.ax.legend()
+        self.sc.draw()
 
     def push_button_create_calc_click(self):
         """
         create_calc
         """
-        answers = calc.calc_roman_metod(self.state.data[self.ui.combo_box_selection_data.currentData()][0])
+        answers = calc.calc_roman_metod(
+            self.state.data[self.ui.combo_box_selection_data.currentData()][0]
+        )
         self.ui.list_widget_answer.clear()
         for answer in answers:
             self.ui.list_widget_answer.addItem(str(answer))
@@ -233,7 +234,6 @@ class MainWindow(AbstractWindow):
                 self.state.save_data_mode = False
                 return f'self.state.save_data_mode = {self.state.save_data_mode}'
         return None
-
 
     # combobox
     def combo_box_selection_data_changed(self):
@@ -360,6 +360,7 @@ class MainWindow(AbstractWindow):
         """
         self.__enabled_action(enable)
         self.__enabled_dock_widget(enable)
+        self.graphwindow.graph.action_create_graph.setEnabled(enable)
 
     def add_item(self):
         """
@@ -418,7 +419,6 @@ class MainWindow(AbstractWindow):
 
         return None
 
-
     def add_elem_on_list_winget(self):
         """
         заглушка
@@ -430,7 +430,6 @@ class MainWindow(AbstractWindow):
             return True
         except KeyError as err:
             raise err
-
 
     def add_selection_data(self, full_data): # ПЕРЕСМОТЕРТЬ
         """
