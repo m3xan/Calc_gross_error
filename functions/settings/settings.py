@@ -70,14 +70,16 @@ def load_theme(self, user_id: str = None) -> str | None:
     заглушка
     """
     category = load_category_json('window', user_id)
-    # Загрузка категории из кэша или выполнение операции, если данные не найдены в кэше
-    style_file_path = f'Data/settings/theme/{category['theme']}.qss'
+    theme_name = category['theme']
 
     try:
-        with open(style_file_path, 'r') as style_file:
+        with open(
+            f'Data/settings/theme/{theme_name}.qss',
+            encoding= 'utf-8'
+        ) as style_file:
             style_content = style_file.read()
             self.setStyleSheet(style_content)
-            return category['theme'], category['canvas']
+            return theme_name, category['canvas']
     except FileNotFoundError:
         print("Не удалось найти файл стилей")
         return None

@@ -1,5 +1,5 @@
 
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Signal, Slot
 
 # TODO do module second widow, main window
 from window.second_windows.authorization_window.internal_window.registration.registration_window_class import Ui_Registration
@@ -33,8 +33,9 @@ class InternalRegistrationWindow(AbstractWindow):
         self.ui.push_button_login.clicked.connect(self.__set_login_window)
         self.ui.line_edit_password_check.setEnabled(False)
 
+    @Slot()
     def __check_login(self):
-        # TODO chack login
+        # TODO check login
         if self.ui.line_edit_login.text() == '':
             pass
         elif select_image(input_username= self.ui.line_edit_login.text()) is not None:
@@ -49,6 +50,7 @@ class InternalRegistrationWindow(AbstractWindow):
             self.check_login_user = True
             self.ui.label_error.clear()
 
+    @Slot()
     def __check_password(self):
         if (password_chesk := check_password_strength(
             self.ui.line_edit_password_main.text()
@@ -57,13 +59,14 @@ class InternalRegistrationWindow(AbstractWindow):
             self.check_password_user = True
         self.ui.label_error.setText(password_chesk[1])
 
+    @Slot()
     def __fin_registration(self):
-        if all(
+        if all((
             self.ui.line_edit_login.text() != '',
             self.ui.line_edit_password_main.text() == self.ui.line_edit_password_check.text(),
             self.check_password_user,
             self.check_login_user
-        ):
+        )):
             add_user(
                 username= self.ui.line_edit_login.text(),
                 password= self.ui.line_edit_password_main.text()
@@ -72,5 +75,6 @@ class InternalRegistrationWindow(AbstractWindow):
             create_settngs(new_user_id)
             self.change_theme(new_user_id)
 
+    @Slot()
     def __set_login_window(self):
         self.autorisation.emit(True)

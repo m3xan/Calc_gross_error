@@ -34,13 +34,12 @@ class AddDialog(QDialog):
         self.ui.push_button_esc.clicked.connect(self.push_button_esc_click)
 
         # listWidget
-        self.ui.list_widget.itemDoubleClicked.connect(self.editValue)
         self.ui.list_widget.itemDoubleClicked.connect(self.change_stat)
+        self.ui.list_widget.itemDoubleClicked.connect(self.editValue)
 
         # start
         self.add_item()
         # начинает цикл запроса данных
-
 
     def add_item(self):
 
@@ -55,13 +54,14 @@ class AddDialog(QDialog):
         self.state.change_mode = True
 
     def editValue(self, item):
-        index = self.ui.list_widget.row(item)
-        edit = QLineEdit(self)
-        edit.setText(item.text())
-        edit.returnPressed.connect(lambda: self.saveValue(item, index, edit))
-        self.ui.list_widget.setItemWidget(item, edit)
-        edit.setFocus()
-        self.state.save_data_mode = False
+        if not self.state.change_mode:
+            index = self.ui.list_widget.row(item)
+            edit = QLineEdit(self)
+            edit.setText(item.text())
+            edit.returnPressed.connect(lambda: self.saveValue(item, index, edit))
+            self.ui.list_widget.setItemWidget(item, edit)
+            edit.setFocus()
+            self.state.save_data_mode = False
 
     def saveValue(self, item, index, edit):
         new_value = edit.text()

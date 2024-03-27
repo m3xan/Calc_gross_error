@@ -1,6 +1,6 @@
 
 from PySide6.QtWidgets import QLineEdit, QHBoxLayout, QPushButton
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtGui import QIcon
 
 from window.second_windows.authorization_window.internal_window.login.login_window_class import Ui_Autorization
@@ -61,9 +61,11 @@ class InternalAutorizationWindow(AbstractWindow):
         self.show_button.clicked.connect(self.__password_visibility)
         self.ui.push_button_registration.clicked.connect(self.__set_signall)
 
+    @Slot()
     def __set_signall(self):
         self.registrarion.emit(True)
 
+    @Slot()
     def __password_visibility(self):
         if self.ui.line_edit_password.echoMode() == QLineEdit.Password:
             self.ui.line_edit_password.setEchoMode(QLineEdit.Normal)
@@ -72,6 +74,7 @@ class InternalAutorizationWindow(AbstractWindow):
             self.ui.line_edit_password.setEchoMode(QLineEdit.Password)
             self.show_button.setIcon(self.open_eye)
 
+    @Slot()
     def __ckick(self):
         if self.ui.line_edit_password.text() != '':
             user_id = autorisation(
@@ -84,6 +87,7 @@ class InternalAutorizationWindow(AbstractWindow):
             return 'Неверный логин или пароль'
         return None
 
+    @Slot()
     def __load_image(self):
         if self.ui.line_edit_login.text() != '':
             user: User = select_image(self.ui.line_edit_login.text())

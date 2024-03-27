@@ -9,13 +9,13 @@ class AbstractWindow(QMainWindow):
 
     def change_theme(self, user_id: int):
         """change theme on window and do signall ThemeChange"""
-        load_theme(self, user_id)
         self.windowThemeChanged.emit(user_id)
+        return load_theme(self, user_id)
 
 class AbstractDialog(QDialog):
     windowThemeChanged: Signal = Signal(int)
 
     def change_theme(self, user_id: int):
         """change theme on window and do signall ThemeChange"""
-        load_theme(self, user_id)
         self.windowThemeChanged.emit(user_id)
+        return load_theme(self, user_id)
