@@ -13,11 +13,11 @@ def main() -> None:
     Открывает приложение
     """
     # TODO add logging
-    start_loger()
-    app = QApplication(sys.orig_argv)
-    window = AuthorizationWindow()
-    window.show()
-    sys.exit(app.exec())
+    if start_loger():
+        app = QApplication(sys.orig_argv)
+        window = AuthorizationWindow()
+        window.show()
+        sys.exit(app.exec())
 
 if __name__ == "__main__":
     main()

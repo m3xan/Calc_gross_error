@@ -3,6 +3,7 @@
 """
 
 import os
+import logging
 import concurrent.futures
 
 FILE_PATHS = [
@@ -16,7 +17,9 @@ def check_file(file_name: str) -> bool:
     заглушка
     """
     file_exists = os.path.exists(file_name)
-    print(f'Файл {file_name} {"найден" if file_exists else "не найден"}')
+    file_hand = f'File {file_name} {"found" if file_exists else "not found"}'
+    logging.info(file_hand)
+    print(file_hand)
     return file_exists
 
 def check_all_file() -> bool:
