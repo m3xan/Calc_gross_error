@@ -12,6 +12,8 @@ from data_base.engine import engine
 from data_base.decorator import with_session
 from data_base.decorator import commit_
 
+from global_param import STANDART_IMAGE
+
 @with_session(engine)
 def autorisation(session: Session, input_username, input_password):
     stmt = (
@@ -26,7 +28,7 @@ def autorisation(session: Session, input_username, input_password):
     return result
 
 @with_session(engine)
-def select_image(session: Session, input_username) -> str | None:
+def select_image(session: Session, input_username) -> User | None:
     stmt = (
         select(User)
         .where(User.username == input_username)
@@ -99,7 +101,7 @@ def add_user(session: Session, username: str, password: str):
         username= username,
         password= password,
         clearance_level=1,
-        image = r'Data\Data_base\image\8hOlH9yPHi7DbakNO6XafkdRmjw3DANbj2ojvQqw.jpg'
+        image = STANDART_IMAGE
     )
     session.add(new_user)
 
