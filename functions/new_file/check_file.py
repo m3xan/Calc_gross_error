@@ -5,21 +5,14 @@
 import os
 import logging
 import concurrent.futures
-
-FILE_PATHS = [
-    r'Data\Data_base',
-    r'Документация\Докуметация пользовательская.docx',
-    r'Data\settings\json\default.json'
-]
+from global_param import FILE_PATHS
 
 def check_file(file_name: str) -> bool:
     """
     заглушка
     """
     file_exists = os.path.exists(file_name)
-    file_hand = f'File {file_name} {"found" if file_exists else "not found"}'
-    logging.info(file_hand)
-    print(file_hand)
+    logging.info('File %s %s', file_name, 'found' if file_exists else 'not found')
     return file_exists
 
 def check_all_file() -> bool:
