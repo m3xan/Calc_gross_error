@@ -11,7 +11,6 @@ from data_base.test_orm import autorisation
 from data_base.test_orm import select_image
 from data_base.models import User
 
-from functions.settings.settings import load_theme
 from functions.circle_image.circle_image import setCircleImage
 
 from global_param import STANDART_IMAGE
@@ -19,6 +18,7 @@ from global_param import STANDART_IMAGE
 class InternalAutorizationWindow(AbstractWindow):
     """Внутреннее окно авторизации"""
     registrarion:Signal = Signal(bool)
+    open_mainwindow:Signal = Signal(int)
 
     def __init__(self):
         super().__init__()
@@ -26,7 +26,7 @@ class InternalAutorizationWindow(AbstractWindow):
         self.ui.setupUi(self)
 
         self.state = DataclassAutWindow(
-            theme= load_theme(self),
+            theme= self.change_theme(self),
             standard_image= STANDART_IMAGE
         )
 
@@ -82,7 +82,7 @@ class InternalAutorizationWindow(AbstractWindow):
                 self.ui.line_edit_password.text()
             )
             if user_id is not None:
-                self.change_theme(user_id)
+                self.open_mainwindow.emit(user_id)
                 return user_id
             return 'Неверный логин или пароль'
         return None
@@ -92,9 +92,6 @@ class InternalAutorizationWindow(AbstractWindow):
         if self.ui.line_edit_login.text() != '':
             user: User = select_image(self.ui.line_edit_login.text())
             if user is not None:
-                self.state.theme = load_theme(self, user.id)
-                self.setWindowTitle(str(user.id))
+                self.state.theme = self.change_theme(user.id)
+                # self.setWindowTitle(str(user.id))
                 self.__set_image(user.image)
-
-    def __str__(self) -> str:
-        return self.state.__str__()

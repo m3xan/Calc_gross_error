@@ -19,11 +19,11 @@ class AuthorizationWindow(AbstractWindow):
 
         self.aut_win = InternalAutorizationWindow()
         self.aut_win.registrarion.connect(self.__set_window)
-        self.aut_win.windowThemeChanged.connect(self.__open_mainwindow)
+        self.aut_win.open_mainwindow.connect(self.__open_mainwindow)
 
         self.reg_win = InternalRegistrationWindow()
         self.reg_win.autorisation.connect(self.__set_window)
-        self.reg_win.windowThemeChanged.connect(self.__open_mainwindow)
+        self.reg_win.open_mainwindow.connect(self.__open_mainwindow)
 
         self.ui.horizontalLayout.addWidget(self.aut_win)
         self.ui.horizontalLayout.addWidget(self.reg_win)

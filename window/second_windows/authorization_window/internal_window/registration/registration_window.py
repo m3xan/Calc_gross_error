@@ -15,6 +15,8 @@ from functions.walidation.walid_password import check_password_strength
 
 class InternalRegistrationWindow(AbstractWindow):
     autorisation: Signal = Signal(bool)
+    open_mainwindow:Signal = Signal(int)
+
     def __init__(self):
         super().__init__()
         self.ui = Ui_Registration()
@@ -71,9 +73,12 @@ class InternalRegistrationWindow(AbstractWindow):
                 username= self.ui.line_edit_login.text(),
                 password= self.ui.line_edit_password_main.text()
             )
-            new_user_id = autorisation(self.ui.line_edit_login.text(), self.ui.line_edit_password_main.text())
+            new_user_id = autorisation(
+                self.ui.line_edit_login.text(),
+                self.ui.line_edit_password_main.text()
+            )
             create_settngs(new_user_id)
-            self.change_theme(new_user_id)
+            self.open_mainwindow.emit(new_user_id)
 
     @Slot()
     def __set_login_window(self):
