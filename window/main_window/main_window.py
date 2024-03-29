@@ -30,7 +30,7 @@ from functions.settings.settings import save_data_json, load_theme, load_categor
 from functions.decorator.timer import timer_decorator
 from functions.decorator.printing import print_return
 
-from functions.loger.log import change_loger
+from functions.loger import Logger
 
 @timer_decorator
 #TODO переделать заполнение лист виджета
@@ -61,10 +61,10 @@ class MainWindow(AbstractWindow):
             self.__init_timer()
 
         if self.state.clearance_level > 1:
-            change_loger(str(user_id), logging.DEBUG)
+            Logger().change_logger(user_id, logging.INFO)
             self.__add_notion()
         else:
-            change_loger(str(user_id), logging.ERROR)
+            Logger().change_logger(user_id)
 
         self.__init_reaction()
 
@@ -381,8 +381,6 @@ class MainWindow(AbstractWindow):
         """
         self.save_settings()
         logging.info('main window close')
-
-        print("Окно закрывается")
         event.accept()  # Подтверждаем закрытие окна
 
     @print_return
@@ -429,7 +427,7 @@ class MainWindow(AbstractWindow):
                 self.ui.list_widget_value.addItem(str(numder))
             return True
         except KeyError as err:
-            raise err
+            logging.error(err, exc_info= True)
 
     def add_selection_data(self, full_data): # ПЕРЕСМОТЕРТЬ
         """

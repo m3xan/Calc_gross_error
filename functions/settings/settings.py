@@ -6,10 +6,12 @@ import os
 import json
 import functools
 from  io import TextIOWrapper
-
-from PySide6.QtCore import QFile, QTextStream
+import logging
 
 def with_json(path, mode = 'r'):
+    """
+    заглушка
+    """
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -71,7 +73,6 @@ def load_theme(self, user_id: str = None) -> str | None:
     """
     category = load_category_json('window', user_id)
     theme_name = category['theme']
-
     try:
         with open(
             f'Data/settings/theme/{theme_name}.qss',
@@ -79,7 +80,8 @@ def load_theme(self, user_id: str = None) -> str | None:
         ) as style_file:
             style_content = style_file.read()
             self.setStyleSheet(style_content)
+            logging.info('load theme: %s %s', theme_name, category['canvas'])
             return theme_name, category['canvas']
     except FileNotFoundError:
-        print("Не удалось найти файл стилей")
+        logging.warning('Не удалось найти файл стилей')
         return None
