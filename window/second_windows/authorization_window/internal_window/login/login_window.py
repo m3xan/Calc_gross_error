@@ -93,5 +93,4 @@ class InternalAutorizationWindow(AbstractWindow):
             user: User = select_image(self.ui.line_edit_login.text())
             if user is not None:
                 self.state.theme = self.change_theme(user.id)
-                # self.setWindowTitle(str(user.id))
                 self.__set_image(user.image)

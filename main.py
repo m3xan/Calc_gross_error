@@ -4,7 +4,7 @@
 import sys
 import logging
 
-from window.Application import QApplicationWithLogging
+from window.application import QApplicationWithLogging
 from window.second_windows.authorization_window.authorization_window import AuthorizationWindow
 
 def main() -> None:
@@ -17,6 +17,8 @@ def main() -> None:
         window = AuthorizationWindow()
         window.show()
         sys.exit(app.exec())
+    except FileNotFoundError as err:
+        raise err
     except Exception as err:
         logging.critical(err, exc_info= True)
         raise err

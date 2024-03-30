@@ -25,7 +25,7 @@ from functions.calcul import calc
 
 from functions.graph import graph
 from functions.excel.excel import get_name_column
-from functions.settings.settings import save_data_json, load_theme, load_category_json, load_attribute
+from functions.settings.settings import save_data_json, load_category_json, load_attribute
 
 from functions.decorator.timer import timer_decorator
 from functions.decorator.printing import print_return
@@ -53,7 +53,7 @@ class MainWindow(AbstractWindow):
             user_id= user_id,
             clearance_level = select_User(user_id).clearance_level,
             auto_save_time= load_category_json('auto_save', user_id),
-            theme= load_theme(self, user_id),
+            theme= self.change_theme(user_id),
         )
 
         self.__init_graph()
@@ -320,7 +320,7 @@ class MainWindow(AbstractWindow):
     # helpfull
     def __update_ui(self, signal):
 
-        self.state.theme = load_theme(self, self.state.user_id)
+        self.state.theme = self.change_theme(self.state.user_id)
 
         self.graphwindow.addToolBar(
             eval(load_attribute('window', 'toolBar', self.state.user_id)),

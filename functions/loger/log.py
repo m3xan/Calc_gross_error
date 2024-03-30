@@ -1,10 +1,9 @@
 import logging
 import os
 
-from functions.loger.singeton import Singleton
+from global_param import FORMAT, SQLLOGER, START_LOGER, LOG_PATH
 
-from global_param import FORMAT, SQLLOGER
-
+from .singeton import Singleton
 
 class Logger(Singleton):
 
@@ -24,23 +23,19 @@ class Logger(Singleton):
                 return True
             except Exception as err:
                 raise err
-        if not self._echo:
-            sqlalchemy_logger = logging.getLogger(SQLLOGER)
-            sqlalchemy_logger.propagate = False
-            return True
-        return False
+        return True
 
     @staticmethod
     def __add_directory():
-        if not os.path.isdir('Data/logging'):
-            os.mkdir('Data/logging')
+        if not os.path.isdir(LOG_PATH):
+            os.mkdir(LOG_PATH)
 
     def __init_start_log(self):
         self._logger = logging.getLogger()
         self._logger.setLevel(logging.INFO)
 
         file_handler = self.__add_file_logger(
-            r'Data\logging\start.log',
+            START_LOGER,
             logging.INFO
         )
         console_handler = self.__add_terminal_logger()
@@ -73,7 +68,7 @@ class Logger(Singleton):
                 if level <= 20:
                     logging.getLogger(SQLLOGER).propagate = True
                 new_file_handler = self.__add_file_logger(
-                    f'Data/logging/{user_id}.log',
+                    f'{LOG_PATH}/{user_id}.log',
                     level
                 )
                 self._logger.addHandler(new_file_handler)
