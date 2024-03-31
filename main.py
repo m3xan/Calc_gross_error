@@ -23,5 +23,5 @@ def main() -> None:
         logging.critical(err, exc_info= True)
         raise err
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
