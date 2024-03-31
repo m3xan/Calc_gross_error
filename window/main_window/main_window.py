@@ -78,7 +78,7 @@ class MainWindow(AbstractWindow):
         self.windows.show()
         self.state.data = test_select_2(user_id= self.state.user_id)
         self.windows.close()
-        menu_bar.action_bd.action_bd_click()
+        menu_bar.action_bd_click()
         self.enable_ui(True)
         if any(self.state.data):
             self.ui.combo_box_selection_data.clear()
@@ -96,7 +96,7 @@ class MainWindow(AbstractWindow):
         """
         on excel bd clicked
         """
-        if menu_bar.action_excel.action_excel_click(self):
+        if menu_bar.action_excel_click(self):
             # change
             self.state.active_mod = 'excel'
             self.timer.start(self.state.auto_save_time['time'])
@@ -114,13 +114,13 @@ class MainWindow(AbstractWindow):
             match self.state.active_mod:
 
                 case 'excel':
-                    menu_bar.action_save.action_save_excel_click(self)
+                    menu_bar.action_save_excel_click(self)
                     # change
                     self.state.save_data_mode = True
                     return self.state.save_data_mode
 
                 case 'bd':
-                    menu_bar.action_save.action_save_bd_click()
+                    menu_bar.action_save_bd_click()
                     # change
                     self.state.save_data_mode = True
                     return self.state.save_data_mode
@@ -133,20 +133,20 @@ class MainWindow(AbstractWindow):
         on esc clicked
         переписать не используя QMessageBox
         """
-        return menu_bar.action_esc.action_esc_click(self)
+        return menu_bar.action_esc_click(self)
 
     def action_info_click(self):
         """
         Открывает окно "О нас"
         """
-        return menu_bar.action_info.action_info_click(self)
+        return menu_bar.action_info_click(self)
 
     @staticmethod
     def action_help_click(): # ДОДЕЛАНО
         """
         Открывает пользовательскую документацию
         """
-        return menu_bar.action_help.action_help_click()
+        return menu_bar.action_help_click()
 
     def action_new_click(self):
         """
@@ -163,7 +163,7 @@ class MainWindow(AbstractWindow):
         on save_as clicked
         """
         if self.state.data:
-            return menu_bar.action_save_as.save_as_click(self)
+            return menu_bar.save_as_click(self)
         return None
 
 
@@ -471,7 +471,7 @@ class MainWindow(AbstractWindow):
         """
         заглушка
         """
-        menu_bar.action_excel.on_change(self, read_excel_signal)
+        menu_bar.on_change(self, read_excel_signal)
 
     def editValue(self, item):
         """
