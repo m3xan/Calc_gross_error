@@ -1,7 +1,7 @@
 {
   "window": {
     "dockWidget": "Qt.RightDockWidgetArea",
-    "toolBar": "Qt.TopToolBarArea",
+    "toolBar": "Qt.BottomToolBarArea",
     "theme": "dark",
     "canvas": {
       "text": "white",
@@ -10,6 +10,6 @@
   },
   "auto_save": {
     "switched": true,
-    "time": 120000
+    "time": 420000
   }
 }
