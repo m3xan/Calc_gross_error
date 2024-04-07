@@ -159,14 +159,6 @@ def get_name_column(number_column: int,
     """
     return tuple(data.keys())[number_column - 1]
 
-# def get_data(number_column: int,
-#              data: dict[[tuple[int,str]]: list[int|float]]
-#              )-> tuple:
-#     """
-#     Заглушка
-#     """
-#     return data.values()[number_column - 1]
-
 if __name__ == '__main__':
     c = read_file_excel(r'D:/calculator/test — копия.xlsx')
     print(c)

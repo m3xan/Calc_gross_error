@@ -150,18 +150,8 @@ class MainWindow(AbstractWindow):
             )
             if result == QMessageBox.StandardButton.Ok:
                 #  ДОПИЛИТЬ СОХРАНЕНИЕ
-                if self.state.active_mod == 'excel':
-                    try:
-                        # excel.save_result_calc_excel(self.state.excel_path[0], self.state.data)
-                        self.close()
-                    except PermissionError as err:
-                        return err
-                elif self.state.active_mod == 'bd':
-                    try:
-                        # save_bd TODO
-                        self.close()
-                    except FileNotFoundError:
-                        pass
+                # TODO
+                ...
 
     def action_info_click(self):
         """
@@ -231,17 +221,14 @@ class MainWindow(AbstractWindow):
         self.sc.ax.clear()
         hist = self.state.data[self.ui.combo_box_selection_data.currentData()][0]
         n, bins, _ = self.sc.ax.hist(hist, rwidth=0.8, color='#ff8921', label= 'Распределение')
-
         bin_centers = 0.5 * (bins[:-1] + bins[1:])
 
         window_size = 5  # Размер окна для усреднения, можно добавить изменение в настройки измерения
         weights = np.ones(window_size) / window_size  # Веса для усреднения значений
-
         smoothed_hist = np.convolve(n, weights, mode='same')  # Применение усреднения по скользящему окну
 
         aligned_bin_centers = bin_centers[:len(smoothed_hist)]
         self.sc.ax.plot(aligned_bin_centers, smoothed_hist, '-o', label='Прямая')
-
         self.sc.update_collor(
             self.state.theme[1]['canvas'],
             self.state.theme[1]['text']
@@ -277,8 +264,8 @@ class MainWindow(AbstractWindow):
         delite carent element
         """
         if self.state.active_mod is not None:
-            currentIndex = self.ui.list_widget_value.currentRow()
-            item = self.ui.list_widget_value.item(currentIndex)
+            current_index = self.ui.list_widget_value.currentRow()
+            item = self.ui.list_widget_value.item(current_index)
             question = QMessageBox.question(
                 self,
                 'Удалить значение',
@@ -286,28 +273,13 @@ class MainWindow(AbstractWindow):
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
             )
             if question == QMessageBox.StandardButton.Yes:
-                self.ui.list_widget_value.takeItem(currentIndex)
+                self.ui.list_widget_value.takeItem(current_index)
                 self.state.data[
                     self.ui.combo_box_selection_data.currentData()
-                ][0].pop(currentIndex)
+                ][0].pop(current_index)
                 self.state.save_data_mode = False
             return f'self.state.save_data_mode = {self.state.save_data_mode}'
         return None
-
-    # combobox
-    def combo_box_selection_data_changed(self):
-        """
-        заглушка
-        """
-        self.fill_listWidget()
-
-    # contextmenu
-    def custom_context_menu_open(self, pos):
-        """
-        заглушка
-        """
-        if self.state.active_mod:
-            self.menu(pos)
 
     # __init__
     def __init_graph(self):
@@ -337,10 +309,10 @@ class MainWindow(AbstractWindow):
     def __init_main_list_widget_value(self):
         self.ui.list_widget_value.itemDoubleClicked.connect(self.editValue)
         self.ui.list_widget_value.itemDoubleClicked.connect(self.change_stat)
-        self.ui.list_widget_value.customContextMenuRequested.connect(self.custom_context_menu_open)
+        self.ui.list_widget_value.customContextMenuRequested.connect(self.menu)
 
     def __init_main_combobox(self):
-        self.ui.combo_box_selection_data.currentIndexChanged.connect(self.combo_box_selection_data_changed)
+        self.ui.combo_box_selection_data.currentIndexChanged.connect(self.fill_listWidget)
 
     def __init_main_button(self):
         self.ui.push_button_create_calc.clicked.connect(self.push_button_create_calc_click)
@@ -581,32 +553,25 @@ class MainWindow(AbstractWindow):
         self.state.change_mode = True
 
     def menu(self, pos):
-        selected_item = self.ui.list_widget_value.indexAt(pos)
-        context_menu = QMenu(self)
-
-        if selected_item.row() != -1:
-            # Клик произошел на элементе списка
-            add_action = context_menu.addAction('Добавить')
-            change_action = context_menu.addAction('Изменить')
-            del_action = context_menu.addAction('Удалить')
-
-            action = context_menu.exec(self.ui.list_widget_value.mapToGlobal(pos))
-
-            if action == add_action:
-                self.add_item()
-
-            elif action == change_action:
-                self.change_stat()
-                self.editValue(self.ui.list_widget_value.currentItem())
-
-            elif action == del_action:
-                self.push_button_delite_data_click()
-
-        else:
-            # Клик произошел вне элементов списка
-            some_action = context_menu.addAction('Добавить')
-
-            action = context_menu.exec(self.ui.list_widget_value.mapToGlobal(pos))
-
-            if action == some_action:
-                self.add_item()
+        if self.state.active_mod:
+            selected_item = self.ui.list_widget_value.indexAt(pos)
+            context_menu = QMenu(self)
+            if selected_item.row() != -1:
+                # Клик произошел на элементе списка
+                add_action = context_menu.addAction('Добавить')
+                change_action = context_menu.addAction('Изменить')
+                del_action = context_menu.addAction('Удалить')
+                action = context_menu.exec(self.ui.list_widget_value.mapToGlobal(pos))
+                if action == add_action:
+                    self.add_item()
+                elif action == change_action:
+                    self.change_stat()
+                    self.editValue(self.ui.list_widget_value.currentItem())
+                elif action == del_action:
+                    self.push_button_delite_data_click()
+            else:
+                # Клик произошел вне элементов списка
+                some_action = context_menu.addAction('Добавить')
+                action = context_menu.exec(self.ui.list_widget_value.mapToGlobal(pos))
+                if action == some_action:
+                    self.add_item()
