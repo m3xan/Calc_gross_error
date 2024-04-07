@@ -19,10 +19,10 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
 from PySide6.QtWidgets import (QApplication, QMainWindow, QSizePolicy, QToolBar,
     QWidget)
 
-from functions.settings.settings import load_attribute
+from functions.settings.settings import JsonSettings
 
 class Ui_GraphWindow(object):
-    def setupUi(self, GraphWindow, user_name):
+    def setupUi(self, GraphWindow):
         if not GraphWindow.objectName():
             GraphWindow.setObjectName(u"GraphWindow")
         GraphWindow.setWindowModality(Qt.ApplicationModal)
@@ -42,7 +42,7 @@ class Ui_GraphWindow(object):
         self.toolBar.setContextMenuPolicy(Qt.NoContextMenu)
         self.toolBar.setAllowedAreas(Qt.BottomToolBarArea|Qt.TopToolBarArea)
         self.toolBar.setFloatable(False)
-        GraphWindow.addToolBar(eval(load_attribute('window', 'toolBar', user_name)), self.toolBar)
+        GraphWindow.addToolBar(eval(JsonSettings().load_attribute('window', 'toolBar')), self.toolBar)
 
         self.toolBar.addAction(self.action_create_graph)
 

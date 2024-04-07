@@ -8,7 +8,7 @@ from io import TextIOWrapper
 
 RES_IMPORT = r'from window.main_window import res_rc'
 STANDART_RES_IMPORT = r'import res_rc'
-ATREBUTE_IMPORT = r'from functions.settings.settings import load_attribute'
+ATREBUTE_IMPORT = r'from functions.settings.settings import JsonSettings'
 
 def with_open(mode:str = 'r'):
     def decorator(func):

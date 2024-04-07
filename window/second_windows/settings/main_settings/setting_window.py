@@ -3,19 +3,16 @@
 """
 
 from PySide6.QtWidgets import QVBoxLayout
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
 
+from window.abstract_model.models import AbstractDialog
 from window.data_class_for_window.dataclass import DataclassSettingsDialog
-
-from window.second_windows.settings.main_settings.settings_class import Ui_Dialog, QDialog
+from window.second_windows.settings.main_settings.settings_class import Ui_Dialog
 from window.second_windows.settings.auto_save_window.auto_save_window import AutoSaveWindow
 from window.second_windows.settings.setting_window.settings_window import SettingDialog
 from window.second_windows.settings.user_setting.user_setting_window import UserSettingsDialog
 
-from functions.settings.settings import load_theme
-
-class SettingsDialog(QDialog):
-    change_theme = Signal(bool)
+class SettingsDialog(AbstractDialog):
     """
     Класс окна настроек интерфейса
     """
@@ -25,7 +22,7 @@ class SettingsDialog(QDialog):
         self.ui.setupUi(self)
 
         self.state = DataclassSettingsDialog(
-            theme= load_theme(self, user_id),
+            theme= self.change_theme(user_id),
             user_id= user_id
         )
 
@@ -58,12 +55,12 @@ class SettingsDialog(QDialog):
     def set_widow_setting(self):
         self.__clear()
         setting_window = SettingDialog(self.state.user_id)
-        setting_window.change_theme.connect(self.send_signal_to_MainWindow)
+        setting_window.windowThemeChanged.connect(self.send_signal_to_MainWindow)
         self.layout.addWidget(setting_window)
 
+    @Slot(int)
     def send_signal_to_MainWindow(self, signal):
-        self.change_theme.emit(signal)
-        self.state.theme = load_theme(self, self.state.user_id)
+        self.state.theme = self.change_theme(signal)
 
     def __clear(self):
         for i in reversed(range(self.layout.count())):

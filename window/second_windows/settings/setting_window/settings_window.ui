@@ -13,10 +13,6 @@
   <property name="windowTitle">
    <string>Настройки</string>
   </property>
-  <property name="windowIcon">
-   <iconset resource="../../../icon/res.qrc">
-    <normaloff>:/icon/calculator-Freepik.png</normaloff>:/icon/calculator-Freepik.png</iconset>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QScrollArea" name="scrollArea">
@@ -66,14 +62,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="push_button_esc">
-       <property name="text">
-        <string>Выйти</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="push_button_restart">
+      <widget class="QPushButton" name="push_button_apply">
        <property name="text">
         <string>Применить</string>
        </property>
@@ -83,8 +72,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../../icon/res.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

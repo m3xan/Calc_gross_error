@@ -154,7 +154,9 @@ disable=raw-checker-failed,
         E0611,
         R0904,
         R0902,
-        E1120
+        E1120,
+        W1203,
+        W0123
       ;   C0116,
       ;   C0115,
       ;   C0114,
@@ -446,7 +448,7 @@ preferred-modules=
 
 # The type of string formatting that logging methods do. `old` means using %
 # formatting, `new` is for `{}` formatting.
-logging-format-style=old
+logging-format-style=new
 
 # Logging modules to check that the string format arguments are in logging
 # function parameter format.

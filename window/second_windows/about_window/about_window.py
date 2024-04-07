@@ -1,15 +1,14 @@
 """
 Заглушка
 """
-from PySide6.QtWidgets import QDialog
 
+from window.abstract_model.models import AbstractDialog
 from window.second_windows.about_window.about_window_class import Ui_Dialog
 from window.data_class_for_window.dataclass import BaseDataclassWindows
 from window.second_windows.about_window.snake_game import SnakeGame
 
-from functions.settings.settings import load_theme
 
-class AboutDialog(QDialog):
+class AboutDialog(AbstractDialog):
     """
     Класс окна "о нас"
     """
@@ -19,7 +18,7 @@ class AboutDialog(QDialog):
         self.ui.setupUi(self)
         self.user_id = user_id
         self.state = BaseDataclassWindows(
-            theme= load_theme(self, user_id)
+            theme= self.change_theme(user_id)
         )
 
         self.key_sequence = []

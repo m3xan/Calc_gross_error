@@ -8,18 +8,18 @@ from PySide6.QtWidgets import QFileDialog
 from PIL import Image
 
 from window.data_class_for_window.dataclass import BaseDataclassWindows
-from window.second_windows.settings.user_setting.user_class import Ui_Dialog, QDialog
+from window.second_windows.settings.user_setting.user_class import Ui_Dialog
+from window.abstract_model.models import AbstractDialog
 
-from data_base.test_orm import update_image, update_user, select_User
+from data_base.test_orm import DatabaseUsersHandler
 from data_base.models import User
 
-from functions.circle_image.circle_image import setCircleImage
-from functions.settings.settings import load_theme
+from functions.circle_image.circle_image import ImageChanger
 from functions.walidation.walid_password import check_password_strength
 
 from global_param import STANDART_IMAGE
 
-class UserSettingsDialog(QDialog):
+class UserSettingsDialog(AbstractDialog):
     """
     Класс окна настроек интерфейса
     """
@@ -29,9 +29,10 @@ class UserSettingsDialog(QDialog):
         self.ui.setupUi(self)
 
         self.state = BaseDataclassWindows(
-            theme= load_theme(self)
+            theme= self.change_theme(user_id)
         )
         #TODO user_id, image
+        self.bd = DatabaseUsersHandler(user_id)
         self.user_id = user_id
         self.image = None
         self.__start()
@@ -39,7 +40,7 @@ class UserSettingsDialog(QDialog):
         self.ui.push_button_save.clicked.connect(self.__save)
 
     def __start(self):
-        user: User = select_User(user_id= self.user_id)
+        user: User = self.bd.select_user()
         self.ui.linedit_username.setText(user.username)
         if user.image is not None and os.path.isfile(user.image):
             self.__circle_image(user.image)
@@ -69,15 +70,12 @@ class UserSettingsDialog(QDialog):
             path = f'Data\\Data_base\\image\\{os.path.splitext(os.path.basename(self.image[0]))[0]}.jpg'
             img.save(path, 'JPEG', quality=80)
 
-            update_image(
-                    user_id= self.user_id,
-                    image = path
-                )
+            self.bd.update_image(path)
             return True
         return None
 
     def __save_user(self):
-        user: User = select_User(user_id= self.user_id)
+        user: User = self.bd.select_user()
         user_name = None
         password = None
         if self.ui.linedit_username.text() != user.username:
@@ -105,15 +103,13 @@ class UserSettingsDialog(QDialog):
         if any(
             _obj is not None for _obj in (user_name, password)
         ):
-            update_user(
-                user_id= self.user_id,
+            self.bd.update_user(
                 username= user_name,
                 password= password
             )
 
     def __circle_image(self, image_path):
-        target_pixmap = setCircleImage(
-            image_path,
+        target_pixmap = ImageChanger(image_path).setCircleImage(
             self.ui.label_image.size().height()
         )
         self.ui.label_image.setPixmap(target_pixmap)

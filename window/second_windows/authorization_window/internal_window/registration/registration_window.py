@@ -6,10 +6,9 @@ from window.second_windows.authorization_window.internal_window.registration.reg
 from window.data_class_for_window.dataclass import BaseDataclassWindows
 from window.abstract_model.models import AbstractWindow
 
-from data_base.test_orm import autorisation
-from data_base.test_orm import select_image, add_user
+from data_base.test_orm import DatabaseUsersHandler
 
-from functions.settings.settings import load_theme
+from functions.settings.settings import JsonSettings
 from functions.new_file.create_settings import create_settngs
 from functions.walidation.walid_password import check_password_strength
 
@@ -23,8 +22,9 @@ class InternalRegistrationWindow(AbstractWindow):
         self.ui.setupUi(self)
 
         self.state = BaseDataclassWindows(
-            theme= load_theme(self),
+            theme= JsonSettings().load_theme(self),
         )
+        self.bd = DatabaseUsersHandler()
         self.check_login_user = False
         self.check_password_user = False
         # TODO do dataclass
@@ -40,7 +40,7 @@ class InternalRegistrationWindow(AbstractWindow):
         # TODO check login
         if self.ui.line_edit_login.text() == '':
             pass
-        elif select_image(input_username= self.ui.line_edit_login.text()) is not None:
+        elif self.bd.select_image(self.ui.line_edit_login.text()) is not None:
             self.ui.label_error.setText(
                 'Данный логин уже занят'
             )
@@ -69,11 +69,11 @@ class InternalRegistrationWindow(AbstractWindow):
             self.check_password_user,
             self.check_login_user
         )):
-            add_user(
-                username= self.ui.line_edit_login.text(),
-                password= self.ui.line_edit_password_main.text()
+            self.bd.add_user(
+                self.ui.line_edit_login.text(),
+                self.ui.line_edit_password_main.text()
             )
-            new_user_id = autorisation(
+            new_user_id = self.bd.autorisation(
                 self.ui.line_edit_login.text(),
                 self.ui.line_edit_password_main.text()
             )

@@ -78,16 +78,11 @@ def generate_main_window_class():
     """
     path = generate_class_ui2py('window\\main_window')
     time.sleep(1)
-    write_customisation(path,
-                  r'MainWindow.addDockWidget\(Qt.RightDockWidgetArea, self.dockWidget\)',
-                  "MainWindow.addDockWidget(eval(load_attribute('window','dockWidget', user_name)), self.dockWidget)",
-                  )
-    time.sleep(1)
-    write_customisation(path,
-                  r'def setupUi\(self, MainWindow\):',
-                  'def setupUi(self, MainWindow, user_name):',
-                  )
-
+    write_customisation(
+        path,
+        r'MainWindow.addDockWidget\(Qt.RightDockWidgetArea, self.dockWidget\)',
+        "MainWindow.addDockWidget(eval(JsonSettings().load_attribute('window','dockWidget')), self.dockWidget)",
+    )
 
 def generate_graph_window_class():
     """
@@ -95,13 +90,11 @@ def generate_graph_window_class():
     """
     path = generate_class_ui2py('window\\main_window\\interior_window\\graph_window')
     time.sleep(1)
-    write_customisation(path,
-                  r'GraphWindow.addToolBar\(Qt.TopToolBarArea, self.toolBar\)',
-                  "GraphWindow.addToolBar(eval(load_attribute('window', 'toolBar', user_name)), self.toolBar)")
-    write_customisation(path,
-                  r'def setupUi\(self, GraphWindow\):',
-                  'def setupUi(self, GraphWindow, user_name):',
-                  )
+    write_customisation(
+        path,
+        r'GraphWindow.addToolBar\(Qt.TopToolBarArea, self.toolBar\)',
+        "GraphWindow.addToolBar(eval(JsonSettings().load_attribute('window', 'toolBar')), self.toolBar)"
+    )
 
 def generate_window(path: list):
     """делает файлики окон из директорий"""

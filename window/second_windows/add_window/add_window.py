@@ -3,16 +3,15 @@ add_window
 """
 from datetime import datetime
 
-from PySide6.QtWidgets import QDialog, QInputDialog, QLineEdit, QMessageBox, QListWidgetItem
+from PySide6.QtWidgets import QInputDialog, QLineEdit, QMessageBox, QListWidgetItem
 from PySide6.QtCore import Qt, Signal
 
+from window.abstract_model.models import AbstractDialog
 from window.second_windows.add_window import add_push_button
 from window.second_windows.add_window.add_window_class import Ui_Dialog
 from window.data_class_for_window.dataclass import DataclassAddWindow
 
-from functions.settings.settings import load_theme
-
-class AddDialog(QDialog):
+class AddDialog(AbstractDialog):
     """
     class add_window
     """
@@ -25,7 +24,7 @@ class AddDialog(QDialog):
         self.state = DataclassAddWindow(
             change_mode= False,
             save_data_mode= True,
-            theme= load_theme(self, user_id)
+            theme= self.change_theme(user_id)
         )
 
         # button

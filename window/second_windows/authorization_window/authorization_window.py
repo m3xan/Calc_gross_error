@@ -7,7 +7,9 @@ from window.second_windows.authorization_window.authorization_window_class impor
 from window.second_windows.authorization_window.internal_window.login.login_window import InternalAutorizationWindow
 from window.second_windows.authorization_window.internal_window.registration.registration_window import InternalRegistrationWindow
 
-from functions.new_file.check_file import check_all_file
+from functions.new_file.check_file import FileChecker
+
+from global_param import FILE_PATHS
 
 class AuthorizationWindow(AbstractWindow):
     """autorization window"""
@@ -46,7 +48,7 @@ class AuthorizationWindow(AbstractWindow):
 
     @Slot(int)
     def __open_mainwindow(self, signall: int):
-        if check_all_file():
+        if FileChecker(FILE_PATHS).check_all():
             self.main_window = MainWindow(signall)
             self.main_window.show()
             self.deleteLater()

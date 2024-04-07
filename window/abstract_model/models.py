@@ -4,7 +4,7 @@ from typing import overload
 from PySide6.QtWidgets import QMainWindow, QDialog
 from PySide6.QtCore import Signal
 
-from functions.settings.settings import load_theme
+from functions.settings.settings import JsonSettings
 
 class AbstractThemeChanger:
     """
@@ -26,16 +26,12 @@ class AbstractThemeChanger:
         return self.__load_theme(user_id)
 
     def __load_theme(self, user_id):
+        settings = JsonSettings()
         if user_id is not None:
-            return load_theme(self, user_id)
-        return load_theme(self)
+            settings.set_user_id(user_id)
+            return settings.load_theme(self)
+        return settings.load_theme(self)
 
-class AbstractWindow(QMainWindow, AbstractThemeChanger):
-    """
-    заглушка
-    """
+class AbstractWindow(QMainWindow, AbstractThemeChanger): """заглушка"""
 
-class AbstractDialog(QDialog, AbstractThemeChanger):
-    """
-    заглушка
-    """
+class AbstractDialog(QDialog, AbstractThemeChanger): """заглушка"""
