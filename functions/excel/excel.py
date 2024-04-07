@@ -22,9 +22,10 @@ def load_excel_book(path: str) -> openpyxl.workbook.workbook.Workbook:
     """
     return openpyxl.load_workbook(path)
 
-def get_excel_sheet(book: openpyxl.workbook.workbook.Workbook,
-                    worksheets:int = 0
-                    ) -> openpyxl.worksheet.worksheet.Worksheet:
+def get_excel_sheet(
+        book: openpyxl.workbook.workbook.Workbook,
+        worksheets:int = 0
+    ) -> openpyxl.worksheet.worksheet.Worksheet:
     """
     Заглушка
     """
@@ -42,7 +43,7 @@ def extract_data_from_sheet(sheet: openpyxl.worksheet.worksheet.Worksheet) -> di
         _list = list((filter(lambda x: x is not None, _column_values)))
         if _list:
             if "Результат" in  _list:
-                result =  _list[ _list.index("Результат")+1:]
+                result =  _list[_list.index("Результат")+1:]
                 datalist =  _list[1: _list.index("Результат")]
                 _datalist = to_float_list(datalist)
                 data[index_column,  _list[0]] = [_datalist, result]
@@ -158,13 +159,13 @@ def get_name_column(number_column: int,
     """
     return tuple(data.keys())[number_column - 1]
 
-def get_data(number_column: int,
-             data: dict[[tuple[int,str]]: list[int|float]]
-             )-> tuple:
-    """
-    Заглушка
-    """
-    return data.values()[number_column - 1]
+# def get_data(number_column: int,
+#              data: dict[[tuple[int,str]]: list[int|float]]
+#              )-> tuple:
+#     """
+#     Заглушка
+#     """
+#     return data.values()[number_column - 1]
 
 if __name__ == '__main__':
     c = read_file_excel(r'D:/calculator/test — копия.xlsx')

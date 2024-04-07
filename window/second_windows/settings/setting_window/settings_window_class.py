@@ -17,16 +17,12 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QPushButton,
     QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
-from window.main_window import res_rc
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         if not Dialog.objectName():
             Dialog.setObjectName(u"Dialog")
         Dialog.resize(371, 176)
-        icon = QIcon()
-        icon.addFile(u":/icon/calculator-Freepik.png", QSize(), QIcon.Normal, QIcon.Off)
-        Dialog.setWindowIcon(icon)
         self.verticalLayout = QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.scrollArea = QScrollArea(Dialog)
@@ -55,15 +51,10 @@ class Ui_Dialog(object):
 
         self.horizontalLayout.addWidget(self.push_button_save)
 
-        self.push_button_esc = QPushButton(Dialog)
-        self.push_button_esc.setObjectName(u"push_button_esc")
+        self.push_button_apply = QPushButton(Dialog)
+        self.push_button_apply.setObjectName(u"push_button_apply")
 
-        self.horizontalLayout.addWidget(self.push_button_esc)
-
-        self.push_button_restart = QPushButton(Dialog)
-        self.push_button_restart.setObjectName(u"push_button_restart")
-
-        self.horizontalLayout.addWidget(self.push_button_restart)
+        self.horizontalLayout.addWidget(self.push_button_apply)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -77,7 +68,6 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438", None))
         self.push_button_save.setText(QCoreApplication.translate("Dialog", u"\u0421\u043e\u0445\u0440\u043e\u043d\u0438\u0442\u044c", None))
-        self.push_button_esc.setText(QCoreApplication.translate("Dialog", u"\u0412\u044b\u0439\u0442\u0438", None))
-        self.push_button_restart.setText(QCoreApplication.translate("Dialog", u"\u041f\u0440\u0438\u043c\u0435\u043d\u0438\u0442\u044c", None))
+        self.push_button_apply.setText(QCoreApplication.translate("Dialog", u"\u041f\u0440\u0438\u043c\u0435\u043d\u0438\u0442\u044c", None))
     # retranslateUi
 

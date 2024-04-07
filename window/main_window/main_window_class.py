@@ -22,10 +22,10 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QDockWidget, QFrame,
     QPushButton, QSizePolicy, QVBoxLayout, QWidget)
 from window.main_window import res_rc
 
-from functions.settings.settings import load_attribute
+from functions.settings.settings import JsonSettings
 
 class Ui_MainWindow(object):
-    def setupUi(self, MainWindow, user_name):
+    def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(839, 542)
@@ -224,7 +224,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.push_button_create_calc)
 
         self.dockWidget.setWidget(self.dockWidgetContents)
-        MainWindow.addDockWidget(eval(load_attribute('window','dockWidget', user_name)), self.dockWidget)
+        MainWindow.addDockWidget(eval(JsonSettings().load_attribute('window','dockWidget')), self.dockWidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 839, 22))

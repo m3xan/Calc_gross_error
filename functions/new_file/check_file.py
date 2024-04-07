@@ -5,20 +5,46 @@
 import os
 import logging
 import concurrent.futures
-from global_param import FILE_PATHS
+from typing import overload
 
-def check_file(file_name: str) -> bool:
-    """
-    заглушка
-    """
-    file_exists = os.path.exists(file_name)
-    logging.info('File %s %s', file_name, 'found' if file_exists else 'not found')
-    return file_exists
+class FileChecker:
+    @overload
+    def __init__(self) -> None: ...
+    @overload
+    def __init__(self, file_path) -> None: ...
 
-def check_all_file() -> bool:
-    """
-    True когда все файлы для работы найдены.
-    False когда какой либо файл не найден.
-    """
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        return all(executor.map(check_file, FILE_PATHS))
+    def __init__(self, file_path = None) ->  None:
+        if file_path is not None:
+            self.set_file_path(file_path)
+        else:
+            self._file_path = None
+
+    def set_file_path(self, file_path: list[str]) -> bool:
+        if all((
+            isinstance(file_path, list),
+            (isinstance(file, str) for file in file_path)
+        )):
+            self._file_path = file_path
+            return True
+        return False
+
+    def get_file_path(self):
+        return self._file_path
+
+    def __check_file(self, file_name: str) -> bool:
+        """
+        заглушка
+        """
+        file_exists = os.path.exists(file_name)
+        logging.info(f'File {file_name} {'found' if file_exists else 'not found'}')
+        return file_exists
+
+    def check_all(self) -> bool:
+        """
+        True когда все файлы для работы найдены.
+        False когда какой либо файл не найден.
+        """
+        if self._file_path is not None:
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                return all(executor.map(self.__check_file, self._file_path))
+        return False

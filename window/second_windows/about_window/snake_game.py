@@ -1,15 +1,16 @@
-from PySide6 import QtWidgets, QtCore, QtGui
+
 import random
+from PySide6 import QtWidgets, QtCore, QtGui
 
-from functions.settings.settings import load_theme
+from window.abstract_model.models import AbstractDialog
 
-class SnakeGame(QtWidgets.QDialog):
+class SnakeGame(AbstractDialog):
     def __init__(self, user_id):
         super().__init__()
 
         self.setWindowTitle("Змейка")
         self.setGeometry(100, 100, 600, 400)
-        load_theme(self, user_id)
+        self.change_theme(user_id)
 
         self.timer = QtCore.QBasicTimer()
         self.speed = 100

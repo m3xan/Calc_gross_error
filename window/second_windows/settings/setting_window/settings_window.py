@@ -1,22 +1,18 @@
 """
 Переделать логику
 """
+import logging
 
 from PySide6.QtWidgets import QHBoxLayout, QLabel, QComboBox, QSizePolicy
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Slot
 
-from window.second_windows.settings.setting_window.settings_window_class import Ui_Dialog, QDialog
+from window.abstract_model.models import AbstractDialog
+from window.second_windows.settings.setting_window.settings_window_class import Ui_Dialog
 from window.data_class_for_window.dataclass import BaseDataclassWindows
 
-from functions.settings.settings import save_data_json, load_theme, load_category_json, load_attribute
+from functions.settings.settings import JsonSettings
 
-def find_key(dict_: dict, search_value):
-    for key, value in dict_.items():
-        if value == search_value:
-            return key
-
-class SettingDialog(QDialog):
-    change_theme = Signal(bool)
+class SettingDialog(AbstractDialog):
     """
     Класс окна настроек интерфейса
     """
@@ -25,43 +21,46 @@ class SettingDialog(QDialog):
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
 
+        self.settings = JsonSettings()
         self.state = BaseDataclassWindows(
-            theme= load_theme(self, user_id)
+            theme= self.change_theme(user_id)
         )
         self.user_id = user_id
 
         self.start()
 
         # push_button
-        self.ui.push_button_save.clicked.connect(self.push_button_save_clicked)
-        self.ui.push_button_esc.clicked.connect(self.push_button_esc_clicked)
-        self.ui.push_button_restart.clicked.connect(self.push_button_restart_clicked)
+        self.ui.push_button_save.clicked.connect(self.__push_button_save_clicked)
+        self.ui.push_button_apply.clicked.connect(self.__push_button_apply)
 
-    def push_button_save_clicked(self):
+    @Slot()
+    def __push_button_save_clicked(self):
+        self.__save()
+
+    @Slot()
+    def __push_button_apply(self):
+        self.__save()
+        self.state.theme= self.change_theme(self.user_id)
+
+    def __save(self):
         for i in self.comdo_box:
 
             name = i.currentData()[0]
             data = i.currentData()[1]
 
-            save_data_json('window', name, data, self.user_id)
-        print('save_presed')
-
-    def push_button_esc_clicked(self):
-        self.close()
-
-    def push_button_restart_clicked(self):
-        self.push_button_save_clicked()
-        self.change_theme.emit(True)
-        self.state.theme= load_theme(self, self.user_id)
+            self.settings.save_data_json('window', data, name)
+        logging.info('save_theme')
 
     def start(self):
-        self.comdo_box = []
-        loading = load_category_json('window', 'option')
+        self.comdo_box: list[QComboBox] = []
+        settings = JsonSettings()
+        settings.set_user_id('option')
+        loading = settings.load_category_json('window')
         for name_property in loading:
             label = QLabel(loading[name_property]['name'])
-            variation = load_attribute('window', name_property, 'option')['option']
-            user_setting = load_attribute('window',name_property, self.user_id)
-            # тутдоделать что бы ставилось что у пользователя
+            variation = settings.load_attribute('window', name_property)['option']
+            user_setting = self.settings.load_attribute('window',name_property)
+
             combo_box = QComboBox()
             self.comdo_box.append(combo_box)
             for variation_name in variation:
@@ -73,7 +72,7 @@ class SettingDialog(QDialog):
             sizepolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             combo_box.setSizePolicy(sizepolicy)
             combo_box.setCurrentText(
-                find_key(variation, user_setting)
+                self.__find_key(variation, user_setting)
             )
 
             second_layout = QHBoxLayout()
@@ -81,3 +80,10 @@ class SettingDialog(QDialog):
             second_layout.addWidget(combo_box)
 
             self.ui.verticalLayout_3.addLayout(second_layout)
+        settings.set_user_id(self.user_id)
+
+    def __find_key(self, dict_: dict, search_value):
+        for key, value in dict_.items():
+            if value == search_value:
+                return key
+        return None

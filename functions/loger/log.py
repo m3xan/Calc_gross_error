@@ -72,7 +72,6 @@ class Logger(Singleton):
                     level
                 )
                 self._logger.addHandler(new_file_handler)
-                self._logger.addHandler(self.__add_terminal_logger())
                 self._logger.setLevel(level)
             except Exception as err:
                 logging.error(err, exc_info= True)

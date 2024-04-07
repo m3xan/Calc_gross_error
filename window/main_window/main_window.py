@@ -19,13 +19,12 @@ from window.second_windows.add_window.add_window import AddDialog
 from window.second_windows.settings.main_settings.setting_window import SettingsDialog
 from window.second_windows.load_window.load_window import LoadDialog
 
-from data_base.test_orm import test_select_2
-from data_base.test_orm import select_User
-from functions.calcul import calc
+from data_base.test_orm import DatabaseUsersHandler
+from functions.calcul.calc import Calculator, Romanovski
 
-from functions.graph import graph
+from functions.graph.graph import GraphicMaker
 from functions.excel.excel import get_name_column
-from functions.settings.settings import save_data_json, load_category_json, load_attribute
+from functions.settings.settings import JsonSettings
 
 from functions.decorator.timer import timer_decorator
 from functions.decorator.printing import print_return
@@ -41,7 +40,10 @@ class MainWindow(AbstractWindow):
     def __init__(self, user_id: int):
         super().__init__()
         self.ui = Ui_MainWindow()
-        self.ui.setupUi(self, user_id)
+        self.ui.setupUi(self)
+
+        self.bd = DatabaseUsersHandler(user_id)
+        self.settings = JsonSettings()
 
         self.state = DataclassMainWindow(
             active_mod= None, # данное условие писать с использование math case
@@ -51,8 +53,8 @@ class MainWindow(AbstractWindow):
             change_mode= False,
             add_mod= False,
             user_id= user_id,
-            clearance_level = select_User(user_id).clearance_level,
-            auto_save_time= load_category_json('auto_save', user_id),
+            clearance_level = self.bd.select_user().clearance_level,
+            auto_save_time= self.settings.load_category_json('auto_save'),
             theme= self.change_theme(user_id),
         )
 
@@ -76,7 +78,7 @@ class MainWindow(AbstractWindow):
         """
         self.windows = LoadDialog()
         self.windows.show()
-        self.state.data = test_select_2(user_id= self.state.user_id)
+        self.state.data = self.bd.test_select_2(user_id= self.state.user_id)
         self.windows.close()
         menu_bar.action_bd_click()
         self.enable_ui(True)
@@ -172,7 +174,7 @@ class MainWindow(AbstractWindow):
         open satting_widow
         """
         setting_widow = SettingsDialog(self.state.user_id)
-        setting_widow.change_theme.connect(self.__update_ui)
+        setting_widow.windowThemeChanged.connect(self.__update_ui)
         return setting_widow.exec()
 
     # button
@@ -207,10 +209,11 @@ class MainWindow(AbstractWindow):
         """
         create_calc
         """
-        answers = calc.calc_roman_metod(
+        self.ui.list_widget_answer.clear()
+        calculator = Calculator(Romanovski())
+        answers = calculator.calculate_with(
             self.state.data[self.ui.combo_box_selection_data.currentData()][0]
         )
-        self.ui.list_widget_answer.clear()
         for answer in answers:
             self.ui.list_widget_answer.addItem(str(answer))
         self.state.save_data_mode = False
@@ -256,12 +259,13 @@ class MainWindow(AbstractWindow):
         """
         заглушка
         """
-        self.sc = graph.empty_graph(
+        graphic_maker = GraphicMaker()
+        self.sc = graphic_maker.empty_with_axes(
             color_text= self.state.theme[1]['text'],
             color_fig= self.state.theme[1]['canvas']
         )
 
-        self.graphwindow = GraphWindow(user_id= self.state.user_id)
+        self.graphwindow = GraphWindow()
         self.plt_tool_bar = NavigationToolbar2QT(self.sc)
         self.graphwindow.graph.toolBar.insertWidget(self.graphwindow.graph.action_create_graph, self.plt_tool_bar)
         self.graphwindow.setCentralWidget(self.sc)
@@ -320,15 +324,19 @@ class MainWindow(AbstractWindow):
     # helpfull
     def __update_ui(self, signal):
 
-        self.state.theme = self.change_theme(self.state.user_id)
+        self.state.theme = self.change_theme(signal)
 
         self.graphwindow.addToolBar(
-            eval(load_attribute('window', 'toolBar', self.state.user_id)),
+            eval(
+                self.settings.load_attribute('window', 'toolBar')
+            ),
             self.graphwindow.graph.toolBar
         )
 
         self.addDockWidget(
-            eval(load_attribute('window','dockWidget', self.state.user_id)),
+            eval(
+                self.settings.load_attribute('window','dockWidget')
+            ),
             self.ui.dockWidget
         )
 
@@ -383,7 +391,6 @@ class MainWindow(AbstractWindow):
         logging.info('main window close')
         event.accept()  # Подтверждаем закрытие окна
 
-    @print_return
     def save_settings(self):
         """
         заглушка
@@ -392,11 +399,12 @@ class MainWindow(AbstractWindow):
         tool_bar_area = f'Qt.{str(self.graphwindow.toolBarArea(self.graphwindow.graph.toolBar))[12:]}'
         dock_widget_area = f'Qt.{str(self.dockWidgetArea(self.ui.dockWidget))[15:]}'
         try:
-            save_data_json('window', 'toolBar', tool_bar_area, self.state.user_id)
-            save_data_json('window', 'dockWidget', dock_widget_area, self.state.user_id)
+            self.settings.save_data_json('window', tool_bar_area, 'toolBar')
+            self.settings.save_data_json('window', dock_widget_area, 'dockWidget')
+            logging.info('save settings')
             return True
         except FileNotFoundError as err:
-            return err
+            logging.error(err, exc_info= True)
 
     def fill_listWidget(self): # ПЕРЕСМОРЕТЬ ЧТО МОЖНО УПРОСТИТЬ
         """
@@ -412,10 +420,8 @@ class MainWindow(AbstractWindow):
             case 'excel':
                 return self.add_elem_on_list_winget()
 
-            case None:
+            case _:
                 return self.add_elem_on_list_winget()
-
-        return None
 
     def add_elem_on_list_winget(self):
         """
