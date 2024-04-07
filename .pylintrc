@@ -156,7 +156,8 @@ disable=raw-checker-failed,
         R0902,
         E1120,
         W1203,
-        W0123
+        W0123,
+        W0201
       ;   C0116,
       ;   C0115,
       ;   C0114,

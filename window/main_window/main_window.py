@@ -1,23 +1,29 @@
 """
 Главное окно
 """
+import ast
+from datetime import datetime
+import os
 from functools import partial
 import logging
 
 import numpy as np
 from matplotlib.backends.backend_qt import NavigationToolbar2QT
-from PySide6.QtWidgets import QVBoxLayout, QListWidgetItem, QLineEdit
+from PySide6.QtWidgets import QVBoxLayout, QListWidgetItem, QLineEdit, QFileDialog, QMessageBox, QMenu
 from PySide6.QtCore import Qt, QTimer
 
 from window.abstract_model.models import AbstractWindow
 from window.data_class_for_window.dataclass import DataclassMainWindow
 from window.main_window.main_window_class import Ui_MainWindow
-from window.main_window.custom_context_menu import context_menu
 from window.main_window.interior_window.graph_window.graph_window import GraphWindow
-from window.main_window import menu_bar, push_button
 from window.second_windows.add_window.add_window import AddDialog
 from window.second_windows.settings.main_settings.setting_window import SettingsDialog
 from window.second_windows.load_window.load_window import LoadDialog
+from window.second_windows.about_window.about_window import AboutDialog
+
+from thread.save_excel_thread import SaveThread
+from thread.read_thred import ReadThread
+from thread.save_as_excel_thread import SaveAsThread
 
 from data_base.test_orm import DatabaseUsersHandler
 from functions.calcul.calc import Calculator, Romanovski
@@ -26,12 +32,8 @@ from functions.graph.graph import GraphicMaker
 from functions.excel.excel import get_name_column
 from functions.settings.settings import JsonSettings
 
-from functions.decorator.timer import timer_decorator
-from functions.decorator.printing import print_return
-
 from functions.loger import Logger
 
-@timer_decorator
 #TODO переделать заполнение лист виджета
 class MainWindow(AbstractWindow):
     """
@@ -64,14 +66,12 @@ class MainWindow(AbstractWindow):
 
         if self.state.clearance_level > 1:
             Logger().change_logger(user_id, logging.INFO)
-            self.__add_notion()
         else:
             Logger().change_logger(user_id)
 
         self.__init_reaction()
 
     # menubar
-    @print_return
     def action_bd_click(self):
         """
         on action bd clicked
@@ -80,7 +80,6 @@ class MainWindow(AbstractWindow):
         self.windows.show()
         self.state.data = self.bd.test_select_2(user_id= self.state.user_id)
         self.windows.close()
-        menu_bar.action_bd_click()
         self.enable_ui(True)
         if any(self.state.data):
             self.ui.combo_box_selection_data.clear()
@@ -93,12 +92,22 @@ class MainWindow(AbstractWindow):
         self.state.active_mod = 'bd'
         return f'self.state.active_mod = {self.state.active_mod}, {self.state.data}'
 
-    @print_return
     def action_excel_click(self):
         """
         on excel bd clicked
         """
-        if menu_bar.action_excel_click(self):
+        filedialog = QFileDialog()
+        self.state.excel_path = filedialog.getOpenFileName(
+            caption='Выбрать файл',
+            dir=f'{os.path.join(os.getenv("userprofile"), "Desktop")}',
+            filter= 'Excel File (*.xlsx;*.xlsm;*.xltx;*.xltm)'
+        )
+        if self.state.excel_path != ('', ''):
+            self.read_thread = ReadThread(self.state.excel_path[0])
+            self.read_thread.start()
+            self.read_thread.read_excel_signal.connect(self.on_change)
+            self.load_window = LoadDialog()
+            self.load_window.exec()
             # change
             self.state.active_mod = 'excel'
             self.timer.start(self.state.auto_save_time['time'])
@@ -106,49 +115,71 @@ class MainWindow(AbstractWindow):
             return self.state.active_mod, self.state.excel_path, self.state.data, self.timer.isActive()
         return None
 
-    @print_return
     def action_save_click(self):
         """
         on save clicked
         """
         if not self.state.save_data_mode:
-
             match self.state.active_mod:
-
                 case 'excel':
-                    menu_bar.action_save_excel_click(self)
+                    self.save_tread = SaveThread(self.state.excel_path[0], self.state.data)
+                    self.save_tread.start()
                     # change
                     self.state.save_data_mode = True
                     return self.state.save_data_mode
-
                 case 'bd':
-                    menu_bar.action_save_bd_click()
-                    # change
+                    #TODO change
                     self.state.save_data_mode = True
                     return self.state.save_data_mode
-
         return None
 
-    @print_return
     def action_esc_click(self):
         """
         on esc clicked
         переписать не используя QMessageBox
         """
-        return menu_bar.action_esc_click(self)
+        if self.state.save_data_mode is True:
+            self.close()
+        else:
+            result = QMessageBox.question(
+                self,
+                "Сохранить?",
+                "Cохранить результат?",
+                QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.No,
+                defaultButton = QMessageBox.StandardButton.Ok
+            )
+            if result == QMessageBox.StandardButton.Ok:
+                #  ДОПИЛИТЬ СОХРАНЕНИЕ
+                if self.state.active_mod == 'excel':
+                    try:
+                        # excel.save_result_calc_excel(self.state.excel_path[0], self.state.data)
+                        self.close()
+                    except PermissionError as err:
+                        return err
+                elif self.state.active_mod == 'bd':
+                    try:
+                        # save_bd TODO
+                        self.close()
+                    except FileNotFoundError:
+                        pass
 
     def action_info_click(self):
         """
         Открывает окно "О нас"
         """
-        return menu_bar.action_info_click(self)
+        dialog = AboutDialog(self.state.user_id)
+        return dialog.exec()
 
     @staticmethod
     def action_help_click(): # ДОДЕЛАНО
         """
         Открывает пользовательскую документацию
         """
-        return menu_bar.action_help_click()
+        try:
+            os.startfile(r'Документация\Докуметация пользовательская.docx')
+            return True
+        except FileNotFoundError as err:
+            raise err
 
     def action_new_click(self):
         """
@@ -165,9 +196,23 @@ class MainWindow(AbstractWindow):
         on save_as clicked
         """
         if self.state.data:
-            return menu_bar.save_as_click(self)
+            file_name = QFileDialog.getSaveFileName(
+            None,
+            'Сохранить как:',
+            f'{os.path.join(os.getenv("userprofile"),
+            f'Измерения {str(datetime.now().strftime("%d-%m-%Y %H.%M.%S"))}')}',
+            filter= """
+            Книга Excel (*.xlsx);; 
+            Книга Excel с поддержкой макросов(*.xlsm);; 
+            Шаблон Excel(*.xltx);; 
+            Шаблон Excel с поддержкой макросов (*.xltm)
+            """
+            )
+            if file_name != ('', ''):
+                self.save_as_thread = SaveAsThread(file_name[0], self.state.data)
+                self.save_as_thread.start()
+                return True
         return None
-
 
     def action_setting_window_click(self):
         """
@@ -182,7 +227,6 @@ class MainWindow(AbstractWindow):
         """
         Create graph
         """
-        push_button.push_button_create_graph_click()
         self.plt_tool_bar.update()
         self.sc.ax.clear()
         hist = self.state.data[self.ui.combo_box_selection_data.currentData()][0]
@@ -228,14 +272,26 @@ class MainWindow(AbstractWindow):
 
         return f'self.state.save_data_mode = {self.state.save_data_mode}'
 
-    def push_button_delite_data_click(self):# ПЕРЕДЕЛАТЬ
+    def push_button_delite_data_click(self):
         """
         delite carent element
         """
-        if self.state.active_mod:
-            if push_button.delite_click(self):
+        if self.state.active_mod is not None:
+            currentIndex = self.ui.list_widget_value.currentRow()
+            item = self.ui.list_widget_value.item(currentIndex)
+            question = QMessageBox.question(
+                self,
+                'Удалить значение',
+                f'Вы хотите удалить значение?\n{item.text()}',
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if question == QMessageBox.StandardButton.Yes:
+                self.ui.list_widget_value.takeItem(currentIndex)
+                self.state.data[
+                    self.ui.combo_box_selection_data.currentData()
+                ][0].pop(currentIndex)
                 self.state.save_data_mode = False
-                return f'self.state.save_data_mode = {self.state.save_data_mode}'
+            return f'self.state.save_data_mode = {self.state.save_data_mode}'
         return None
 
     # combobox
@@ -250,9 +306,8 @@ class MainWindow(AbstractWindow):
         """
         заглушка
         """
-        # сделать что бы работало только с лист виджетом
         if self.state.active_mod:
-            context_menu.menu(self, pos)
+            self.menu(pos)
 
     # __init__
     def __init_graph(self):
@@ -317,34 +372,25 @@ class MainWindow(AbstractWindow):
         self.__init_main_combobox()
         self.__init_main_list_widget_value()
 
-    @print_return
-    def __add_notion(self):
-        return 'сделать что-то'
-
     # helpfull
     def __update_ui(self, signal):
-
         self.state.theme = self.change_theme(signal)
-
         self.graphwindow.addToolBar(
             eval(
                 self.settings.load_attribute('window', 'toolBar')
             ),
             self.graphwindow.graph.toolBar
         )
-
         self.addDockWidget(
             eval(
                 self.settings.load_attribute('window','dockWidget')
             ),
             self.ui.dockWidget
         )
-
         self.sc.update_collor(
             self.state.theme[1]['canvas'],
             self.state.theme[1]['text']
         )
-
         self.sc.draw()
 
     def __enabled_action(self, enable: bool):
@@ -395,7 +441,6 @@ class MainWindow(AbstractWindow):
         """
         заглушка
         """
-
         tool_bar_area = f'Qt.{str(self.graphwindow.toolBarArea(self.graphwindow.graph.toolBar))[12:]}'
         dock_widget_area = f'Qt.{str(self.dockWidgetArea(self.ui.dockWidget))[15:]}'
         try:
@@ -435,11 +480,10 @@ class MainWindow(AbstractWindow):
         except KeyError as err:
             logging.error(err, exc_info= True)
 
-    def add_selection_data(self, full_data): # ПЕРЕСМОТЕРТЬ
+    def add_selection_data(self, full_data): # ПЕРЕСМОТЕРТЬ TODO
         """
         заглушка
         """
-
         # ПЕРЕПИСАТЬ ВСЮ ФУНКЦИ
         if self.state.data:
             index = self.ui.combo_box_selection_data.count()
@@ -477,7 +521,16 @@ class MainWindow(AbstractWindow):
         """
         заглушка
         """
-        menu_bar.on_change(self, read_excel_signal)
+        self.load_window.close()
+        self.read_thread.quit()
+        self.state.data = ast.literal_eval(read_excel_signal)
+        if self.state.data is not None:
+            self.ui.combo_box_selection_data.clear()
+            for key in self.state.data:
+                self.ui.combo_box_selection_data.addItem(
+                    key[1],
+                    key
+                )
 
     def editValue(self, item):
         """
@@ -526,3 +579,34 @@ class MainWindow(AbstractWindow):
         заглушка
         """
         self.state.change_mode = True
+
+    def menu(self, pos):
+        selected_item = self.ui.list_widget_value.indexAt(pos)
+        context_menu = QMenu(self)
+
+        if selected_item.row() != -1:
+            # Клик произошел на элементе списка
+            add_action = context_menu.addAction('Добавить')
+            change_action = context_menu.addAction('Изменить')
+            del_action = context_menu.addAction('Удалить')
+
+            action = context_menu.exec(self.ui.list_widget_value.mapToGlobal(pos))
+
+            if action == add_action:
+                self.add_item()
+
+            elif action == change_action:
+                self.change_stat()
+                self.editValue(self.ui.list_widget_value.currentItem())
+
+            elif action == del_action:
+                self.push_button_delite_data_click()
+
+        else:
+            # Клик произошел вне элементов списка
+            some_action = context_menu.addAction('Добавить')
+
+            action = context_menu.exec(self.ui.list_widget_value.mapToGlobal(pos))
+
+            if action == some_action:
+                self.add_item()
