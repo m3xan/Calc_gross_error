@@ -6,7 +6,9 @@
     "canvas": {
       "text": "#3a3a3a",
       "canvas": "white"
-    }
+    },
+    "Qt.TopToolBarArea": "toolBar",
+    "Qt.RightDockWidgetArea": "dockWidget"
   },
   "auto_save": {
     "switched": true,

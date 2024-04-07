@@ -39,14 +39,13 @@ class Calculation(Base):
         back_populates="calculation", cascade="all, delete-orphan"
     )
     id_calculated: Mapped[int] = mapped_column(ForeignKey('calculated.id'))
-    # тут связь с таблицей calculated может быть нет(1) или да(2)
     def __repr__(self) -> str:
         return f"Calculation(id={self.id!r}, name_calculation={self.name_calculation!r}, user_id={self.id_user!r}, value={self.values!r}, answer={self.answer!r})"
 
 class Calculated(Base):
     __tablename__ = "calculated"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement= True)
-    metod_name: Mapped[str] = mapped_column(String(3))
+    metod_name: Mapped[bool] = mapped_column(unique=True)
     def __repr__(self) -> str:
         return f"Calculated(id={self.id!r}, name_metod={self.metod_name!r})"
 
