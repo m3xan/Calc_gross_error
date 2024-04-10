@@ -8,8 +8,8 @@ from PySide6.QtGui import QIcon, QPixmap
 from window.main_window.main_window import MainWindow
 from window.second_windows.authorization_window.authorization_window_class import QMainWindow, Ui_MainWindow
 from window.data_class_for_window.dataclass import DataclassAutWindow
-from data_base.test_orm import autorisation
-from data_base.test_orm import select_image
+from data_base.user_hanler import autorisation
+from data_base.user_hanler import select_image
 
 from settings.settings import load_theme
 from new_file.check_file import check_all_file

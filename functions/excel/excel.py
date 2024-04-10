@@ -151,14 +151,11 @@ def create_new_file(path: str, new_dict: dict[tuple[int, str, bool, tuple[float,
     write_to_file(new_dict, new_dict, sheet)
     create_new_sheet(book, path)
 
-def get_name_column(number_column: int,
-                    data: dict[[tuple[int,str]]: list[int|float]]
-                    )-> tuple:
+def get_name_column(
+        number_column: int,
+        data: dict[[tuple[int,str]]: list[int|float]]
+    )-> tuple:
     """
     Заглушка
     """
     return tuple(data.keys())[number_column - 1]
-
-if __name__ == '__main__':
-    c = read_file_excel(r'D:/calculator/test — копия.xlsx')
-    print(c)

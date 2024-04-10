@@ -22,6 +22,8 @@
     <file>Hd-n8GFDUB0.jpg</file>
   </qresource>
   <qresource prefix="action">
+    <file>free-icon-method-6040674.png</file>
+    <file>delete-file_40456.ico</file>
     <file>Settings_30027.png</file>
     <file>bd.ico</file>
     <file>exel.png</file>

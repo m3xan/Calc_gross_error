@@ -1,29 +1,45 @@
 """
 new
 """
-from typing import overload
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from data_base.models import User
-from data_base.models import Calculation
-from data_base.models import Value
-from data_base.models import Answer
-from data_base.engine import engine
+from data_base.user_models import User
+from data_base.user_models import Calculation
+from data_base.user_models import Value
+from data_base.user_models import Answer
+from data_base.engines import user_engine as engine
 
 from global_param import STANDART_IMAGE
 
 class DatabaseUsersHandler:
+    _instance = None
+    __session = Session(engine)
 
-    @overload
-    def __init__(self) -> None: ...
-    @overload
-    def __init__(self, user_id) -> None: ...
+    def __new__(cls):
+        if not isinstance(cls._instance, cls):
+            cls._instance = object.__new__(cls)
+        return cls._instance
 
-    def __init__(self, user_id = None) -> None:
-        self.__session = Session(engine)
-        self._user_id = user_id
+    def set_id(self, user_id):
+        self.__check_id(user_id)
+
+    def get_id(self):
+        return self._user_id
+
+    def __check_id(self, user_id):
+        with self.__session as session:
+            sel_u_id = (
+                select(User.id)
+                .where(
+                    User.id == user_id
+                )
+            )
+            if (result := session.execute(sel_u_id).first()) is not None:
+                self._user_id = result[0]
+                return result[0]
+            return None
 
     def autorisation(self, input_username, input_password):
         with self.__session as session:
@@ -61,7 +77,7 @@ class DatabaseUsersHandler:
             result: tuple[User, ...] | None = session.execute(stmt).first()
             if result is not None:
                 return result[0]
-            return result
+            return None
 
     def update_image(self, image = None):
         with self.__session as session:
@@ -77,8 +93,7 @@ class DatabaseUsersHandler:
                     result[0].image = image
                     self.__commit(session)
                     return result[0]
-                return result
-            
+                return result     
 
     def update_user(self, username= None, password= None):
         with self.__session as session:
@@ -97,15 +112,16 @@ class DatabaseUsersHandler:
             self.__commit(session)
 
     def add_admin(self):
-        with self.__session as session:
-            new_user = User(
-                username='admin',
-                password='Admin123!',
-                clearance_level=3,
-                image = r'Data\Data_base\image\48HgiXRHVXQ.jpg'
-            )
-            session.add(new_user)
-            self.__commit(session)
+        if self.__check_id(1) is None:
+            with self.__session as session:
+                new_user = User(
+                    username='admin',
+                    password='Admin123!',
+                    clearance_level=3,
+                    image = r'Data\Data_base\image\48HgiXRHVXQ.jpg'
+                )
+                session.add(new_user)
+                self.__commit(session)
 
     def add_user(self, username: str, password: str):
         with self.__session as session:
@@ -149,18 +165,10 @@ class DatabaseUsersHandler:
                 for val in answer_values:
                     data[(i[0], i[1])][1].append(float(val[0]))
             return data
-    
+
     def __commit(self, session: Session):
         try:
             session.commit()
         except:
             session.rollback()
             raise
-
-if __name__ == '__main__':
-    d = DatabaseUsersHandler()
-    d.add_admin()
-    d.add_user(
-        'user',
-        'qwerty'
-    )

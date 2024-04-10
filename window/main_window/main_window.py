@@ -21,16 +21,14 @@ from window.second_windows.settings.main_settings.setting_window import Settings
 from window.second_windows.load_window.load_window import LoadDialog
 from window.second_windows.about_window.about_window import AboutDialog
 
+from thread.save_as_excel_thread import SaveAsThread
 from thread.save_excel_thread import SaveThread
 from thread.read_thred import ReadThread
-from thread.save_as_excel_thread import SaveAsThread
 
-from data_base.test_orm import DatabaseUsersHandler
-from functions.calcul.calc import Calculator, Romanovski
+from functions.calcul.calc import Calculator, Romanovsky
 
 from functions.graph.graph import GraphicMaker
 from functions.excel.excel import get_name_column
-from functions.settings.settings import JsonSettings
 
 from functions.loger import Logger
 
@@ -44,9 +42,6 @@ class MainWindow(AbstractWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.bd = DatabaseUsersHandler(user_id)
-        self.settings = JsonSettings()
-
         self.state = DataclassMainWindow(
             active_mod= None, # данное условие писать с использование math case
             save_data_mode= True,
@@ -55,9 +50,9 @@ class MainWindow(AbstractWindow):
             change_mode= False,
             add_mod= False,
             user_id= user_id,
-            clearance_level = self.bd.select_user().clearance_level,
+            clearance_level = self.user_db.select_user().clearance_level,
             auto_save_time= self.settings.load_category_json('auto_save'),
-            theme= self.change_theme(user_id),
+            theme= self.change_theme(),
         )
 
         self.__init_graph()
@@ -78,7 +73,7 @@ class MainWindow(AbstractWindow):
         """
         self.windows = LoadDialog()
         self.windows.show()
-        self.state.data = self.bd.test_select_2(user_id= self.state.user_id)
+        self.state.data = self.user_db.test_select_2(self.state.user_id)
         self.windows.close()
         self.enable_ui(True)
         if any(self.state.data):
@@ -117,7 +112,7 @@ class MainWindow(AbstractWindow):
 
     def action_save_click(self):
         """
-        on save clicked
+        on save data
         """
         if not self.state.save_data_mode:
             match self.state.active_mod:
@@ -149,9 +144,8 @@ class MainWindow(AbstractWindow):
                 defaultButton = QMessageBox.StandardButton.Ok
             )
             if result == QMessageBox.StandardButton.Ok:
-                #  ДОПИЛИТЬ СОХРАНЕНИЕ
-                # TODO
-                ...
+                self.action_save_click()
+                self.save_tread.wait()
 
     def action_info_click(self):
         """
@@ -175,11 +169,9 @@ class MainWindow(AbstractWindow):
         """
         МБ переписать
         """
-        dialog = AddDialog(self.state.user_id)
+        dialog = AddDialog()
         dialog.full_data.connect(self.add_selection_data)
         return dialog.exec()
-        # change
-        # передаёт full_data
 
     def action_save_as_click(self):
         """
@@ -211,6 +203,9 @@ class MainWindow(AbstractWindow):
         setting_widow = SettingsDialog(self.state.user_id)
         setting_widow.windowThemeChanged.connect(self.__update_ui)
         return setting_widow.exec()
+    
+    def action_delite_click(self):
+        pass
 
     # button
     def push_button_create_graph_click(self):
@@ -241,7 +236,7 @@ class MainWindow(AbstractWindow):
         create_calc
         """
         self.ui.list_widget_answer.clear()
-        calculator = Calculator(Romanovski())
+        calculator = Calculator(Romanovsky())
         answers = calculator.calculate_with(
             self.state.data[self.ui.combo_box_selection_data.currentData()][0]
         )
@@ -266,19 +261,20 @@ class MainWindow(AbstractWindow):
         if self.state.active_mod is not None:
             current_index = self.ui.list_widget_value.currentRow()
             item = self.ui.list_widget_value.item(current_index)
-            question = QMessageBox.question(
-                self,
-                'Удалить значение',
-                f'Вы хотите удалить значение?\n{item.text()}',
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
-            )
-            if question == QMessageBox.StandardButton.Yes:
-                self.ui.list_widget_value.takeItem(current_index)
-                self.state.data[
-                    self.ui.combo_box_selection_data.currentData()
-                ][0].pop(current_index)
-                self.state.save_data_mode = False
-            return f'self.state.save_data_mode = {self.state.save_data_mode}'
+            if item is not None:
+                question = QMessageBox.question(
+                    self,
+                    'Удалить значение',
+                    f'Вы хотите удалить значение?\n{item.text()}',
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+                )
+                if question == QMessageBox.StandardButton.Yes:
+                    self.ui.list_widget_value.takeItem(current_index)
+                    self.state.data[
+                        self.ui.combo_box_selection_data.currentData()
+                    ][0].pop(current_index)
+                    self.state.save_data_mode = False
+                return f'self.state.save_data_mode = {self.state.save_data_mode}'
         return None
 
     # __init__
@@ -312,7 +308,7 @@ class MainWindow(AbstractWindow):
         self.ui.list_widget_value.customContextMenuRequested.connect(self.menu)
 
     def __init_main_combobox(self):
-        self.ui.combo_box_selection_data.currentIndexChanged.connect(self.fill_listWidget)
+        self.ui.combo_box_selection_data.currentIndexChanged.connect(self.fill_listwidget)
 
     def __init_main_button(self):
         self.ui.push_button_create_calc.clicked.connect(self.push_button_create_calc_click)
@@ -326,13 +322,11 @@ class MainWindow(AbstractWindow):
         self.ui.action_save.triggered.connect(self.action_save_click)
         self.ui.action_save_as.triggered.connect(self.action_save_as_click)
         self.ui.action_esc.triggered.connect(self.action_esc_click)
-
         self.ui.action_setting_window.triggered.connect(self.action_setting_window_click)
         self.ui.action_calc.triggered.connect(self.action_setting_window_click)
-
         self.ui.action_help.triggered.connect(self.action_help_click)
-
         self.ui.action_info.triggered.connect(self.action_info_click)
+        self.ui.action_delite.triggered.connect(self.action_delite_click)
 
     def __init_graph_menubar(self):
         self.graphwindow.graph.action_create_graph.triggered.connect(self.push_button_create_graph_click)
@@ -368,6 +362,8 @@ class MainWindow(AbstractWindow):
     def __enabled_action(self, enable: bool):
         self.ui.action_save.setEnabled(enable)
         self.ui.action_save_as.setEnabled(enable)
+        self.ui.action_new.setEnabled(enable)
+        self.ui.action_delite.setEnabled(enable)
 
     def __enabled_dock_widget(self, enable: bool):
         self.ui.dockWidget.setEnabled(enable)
@@ -397,7 +393,6 @@ class MainWindow(AbstractWindow):
             item = QListWidgetItem()
             item.setFlags(item.flags() | Qt.ItemIsEditable)  # Добавляем возможность редактирования значения
             self.ui.list_widget_value.addItem(item)
-
             # Выделяем новый элемент и запускаем его редактирование
             self.editValue(item)
 
@@ -423,7 +418,7 @@ class MainWindow(AbstractWindow):
         except FileNotFoundError as err:
             logging.error(err, exc_info= True)
 
-    def fill_listWidget(self): # ПЕРЕСМОРЕТЬ ЧТО МОЖНО УПРОСТИТЬ
+    def fill_listwidget(self): # ПЕРЕСМОРЕТЬ ЧТО МОЖНО УПРОСТИТЬ
         """
         При разных типах ввода разные условия и разные другие параметры
         заготовка на будещее
@@ -433,12 +428,10 @@ class MainWindow(AbstractWindow):
             case 'bd':
                 if self.state.data is not None and self.ui.combo_box_selection_data.currentData() is not None:
                     return self.add_elem_on_list_winget()
-
             case 'excel':
                 return self.add_elem_on_list_winget()
-
             case _:
-                return self.add_elem_on_list_winget()
+                pass
 
     def add_elem_on_list_winget(self):
         """
@@ -468,13 +461,13 @@ class MainWindow(AbstractWindow):
                     c,
                     m
                 )
-                self.fill_listWidget()
+                self.fill_listwidget()
             else:
                 self.ui.combo_box_selection_data.addItem(
                     c,
                     m
                 )
-                self.fill_listWidget()
+                self.fill_listwidget()
 
         else:
             # переделать
@@ -485,7 +478,7 @@ class MainWindow(AbstractWindow):
                 c,
                 m
             )
-            # self.fill_listWidget()
+            # self.fill_listwidget()
         self.enable_ui(True)
         self.state.save_data_mode = False
 

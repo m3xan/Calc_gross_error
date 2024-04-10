@@ -6,9 +6,8 @@ from window.second_windows.authorization_window.internal_window.registration.reg
 from window.data_class_for_window.dataclass import BaseDataclassWindows
 from window.abstract_model.models import AbstractWindow
 
-from data_base.test_orm import DatabaseUsersHandler
+from data_base.user_hanler import DatabaseUsersHandler
 
-from functions.settings.settings import JsonSettings
 from functions.new_file.create_settings import create_settngs
 from functions.walidation.walid_password import check_password_strength
 
@@ -22,7 +21,7 @@ class InternalRegistrationWindow(AbstractWindow):
         self.ui.setupUi(self)
 
         self.state = BaseDataclassWindows(
-            theme= JsonSettings().load_theme(self),
+            theme= self.change_theme(),
         )
         self.bd = DatabaseUsersHandler()
         self.check_login_user = False

@@ -11,8 +11,8 @@ from window.data_class_for_window.dataclass import BaseDataclassWindows
 from window.second_windows.settings.user_setting.user_class import Ui_Dialog
 from window.abstract_model.models import AbstractDialog
 
-from data_base.test_orm import DatabaseUsersHandler
-from data_base.models import User
+from data_base.user_hanler import DatabaseUsersHandler
+from data_base.user_models import User
 
 from functions.circle_image.circle_image import ImageChanger
 from functions.walidation.walid_password import check_password_strength
@@ -23,17 +23,16 @@ class UserSettingsDialog(AbstractDialog):
     """
     Класс окна настроек интерфейса
     """
-    def __init__(self, user_id: int):
+    def __init__(self):
         super().__init__()
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
 
         self.state = BaseDataclassWindows(
-            theme= self.change_theme(user_id)
+            theme= self.change_theme()
         )
         #TODO user_id, image
-        self.bd = DatabaseUsersHandler(user_id)
-        self.user_id = user_id
+        self.bd = DatabaseUsersHandler()
         self.image = None
         self.__start()
         self.ui.push_button_chose_image.clicked.connect(self.__chose_image)
@@ -93,7 +92,7 @@ class UserSettingsDialog(AbstractDialog):
         else:
             if not old_password:
                 self.ui.label_walidation_password.setText(
-                "<p style='color: red'>Укажите новый пароль</p>"
+                    "<p style='color: red'>Укажите новый пароль</p>"
             )
             elif not check_password[0] and empty:
                 self.ui.label_walidation_password.setText(
@@ -109,7 +108,7 @@ class UserSettingsDialog(AbstractDialog):
             )
 
     def __circle_image(self, image_path):
-        target_pixmap = ImageChanger(image_path).setCircleImage(
+        target_pixmap = ImageChanger(image_path).circle_image(
             self.ui.label_image.size().height()
         )
         self.ui.label_image.setPixmap(target_pixmap)

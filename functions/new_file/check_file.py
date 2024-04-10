@@ -8,6 +8,7 @@ import concurrent.futures
 from typing import overload
 
 class FileChecker:
+
     @overload
     def __init__(self) -> None: ...
     @overload

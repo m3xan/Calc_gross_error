@@ -7,10 +7,8 @@ from window.second_windows.authorization_window.internal_window.login.login_wind
 from window.data_class_for_window.dataclass import DataclassAutWindow
 from window.abstract_model.models import AbstractWindow
 
-from data_base.test_orm import DatabaseUsersHandler
-from data_base.models import User
+from data_base.user_models import User
 
-from functions.settings.settings import JsonSettings
 from functions.circle_image.circle_image import ImageChanger
 
 from global_param import STANDART_IMAGE
@@ -26,10 +24,9 @@ class InternalAutorizationWindow(AbstractWindow):
         self.ui.setupUi(self)
 
         self.state = DataclassAutWindow(
-            theme= self.change_theme(self),
+            theme= self.change_theme(),
             standard_image= STANDART_IMAGE
         )
-        self.data_base = DatabaseUsersHandler()
 
         # TODO add close_eye, open_eye, del self.state.standard_image
         self.close_eye = QIcon(':/button/free-icon-eye-4621498.png')
@@ -40,8 +37,8 @@ class InternalAutorizationWindow(AbstractWindow):
         self.__set_image(self.state.standard_image)
 
     def __set_image(self, image_path):
-        target_pixmap = ImageChanger(image_path).setCircleImage(
-            desired_size = self.ui.label_image.size().height()
+        target_pixmap = ImageChanger(image_path).circle_image(
+            self.ui.label_image.size().height()
         )
         self.ui.label_image.setPixmap(target_pixmap)
 
@@ -77,7 +74,7 @@ class InternalAutorizationWindow(AbstractWindow):
     @Slot()
     def __ckick(self):
         if self.ui.line_edit_password.text() != '':
-            user_id = self.data_base.autorisation(
+            user_id = self.user_db.autorisation(
                 self.ui.line_edit_login.text(),
                 self.ui.line_edit_password.text()
             )
@@ -90,8 +87,9 @@ class InternalAutorizationWindow(AbstractWindow):
     @Slot()
     def __load_image(self):
         if self.ui.line_edit_login.text() != '':
-            user: User = self.data_base.select_image(self.ui.line_edit_login.text())
+            user: User = self.user_db.select_image(self.ui.line_edit_login.text())
             if user is not None:
-                JsonSettings().set_user_id(user.id)
-                self.state.theme = self.change_theme(user.id)
+                self.user_db.set_id(user.id)
+                self.settings.set_user_id(user.id)
+                self.state.theme = self.change_theme()
                 self.__set_image(user.image)

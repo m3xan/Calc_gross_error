@@ -13,14 +13,14 @@ class AutoSaveWindow(AbstractDialog):
     """
     Класс окна настроек автосохронения
     """
-    def __init__(self, user_id):
+    def __init__(self):
         super().__init__()
         self.ui = Ui_DialogAutoSave()
         self.ui.setupUi(self)
 
         self.settings = JsonSettings()
         self.state = BaseDataclassWindows(
-            theme= self.change_theme(user_id)
+            theme= self.change_theme()
         )
 
         self.__set_value()

@@ -1,3 +1,4 @@
+
 import logging
 import os
 
@@ -65,13 +66,13 @@ class Logger(Singleton):
         if self._echo:
             try:
                 self._logger.handlers = []
-                if level <= 20:
-                    logging.getLogger(SQLLOGER).propagate = True
                 new_file_handler = self.__add_file_logger(
                     f'{LOG_PATH}/{user_id}.log',
                     level
                 )
+                console_handler = self.__add_terminal_logger()
                 self._logger.addHandler(new_file_handler)
+                self._logger.addHandler(console_handler)
                 self._logger.setLevel(level)
             except Exception as err:
                 logging.error(err, exc_info= True)

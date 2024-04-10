@@ -375,6 +375,7 @@
     </widget>
     <addaction name="action_new"/>
     <addaction name="menu_4"/>
+    <addaction name="action_delite"/>
     <addaction name="action_save"/>
     <addaction name="action_save_as"/>
     <addaction name="separator"/>
@@ -493,7 +494,7 @@
     <bool>false</bool>
    </property>
    <property name="enabled">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="icon">
     <iconset resource="../../icon/res.qrc">
@@ -513,8 +514,24 @@
    </property>
   </action>
   <action name="action_calc">
+   <property name="icon">
+    <iconset resource="../../icon/res.qrc">
+     <normaloff>:/action/free-icon-method-6040674.png</normaloff>:/action/free-icon-method-6040674.png</iconset>
+   </property>
    <property name="text">
     <string>Расчёт</string>
+   </property>
+  </action>
+  <action name="action_delite">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../icon/res.qrc">
+     <normaloff>:/action/delete-file_40456.ico</normaloff>:/action/delete-file_40456.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Удалить запись</string>
    </property>
   </action>
   <zorder>dockWidget</zorder>

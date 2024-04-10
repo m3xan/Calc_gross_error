@@ -7,7 +7,6 @@ from PySide6.QtWidgets import QInputDialog, QLineEdit, QMessageBox, QListWidgetI
 from PySide6.QtCore import Qt, Signal
 
 from window.abstract_model.models import AbstractDialog
-from window.second_windows.add_window import add_push_button
 from window.second_windows.add_window.add_window_class import Ui_Dialog
 from window.data_class_for_window.dataclass import DataclassAddWindow
 
@@ -16,7 +15,7 @@ class AddDialog(AbstractDialog):
     class add_window
     """
     full_data: Signal = Signal(dict)
-    def __init__(self, user_id):
+    def __init__(self):
         super().__init__()
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
@@ -24,15 +23,13 @@ class AddDialog(AbstractDialog):
         self.state = DataclassAddWindow(
             change_mode= False,
             save_data_mode= True,
-            theme= self.change_theme(user_id)
+            theme= self.change_theme()
         )
 
-        # button
         self.ui.push_button_delite_data.clicked.connect(self.push_button_delite_click)
         self.ui.push_button_ok.clicked.connect(self.push_button_ok_click)
         self.ui.push_button_esc.clicked.connect(self.push_button_esc_click)
 
-        # listWidget
         self.ui.list_widget.itemDoubleClicked.connect(self.change_stat)
         self.ui.list_widget.itemDoubleClicked.connect(self.editValue)
 
@@ -62,7 +59,7 @@ class AddDialog(AbstractDialog):
             edit.setFocus()
             self.state.save_data_mode = False
 
-    def saveValue(self, item, index, edit):
+    def saveValue(self, item: QListWidgetItem, index, edit: QLineEdit):
         new_value = edit.text()
 
         # Проверяем, заполнено ли новое значение
@@ -87,24 +84,30 @@ class AddDialog(AbstractDialog):
         currentIndex = self.ui.list_widget.currentRow()
         item = self.ui.list_widget.item(currentIndex)
         if item is not None:
-            text, ok = QInputDialog.getText(self,"Изменить запись","Новая запить",QLineEdit.Normal,item.text())
+            text, ok = QInputDialog.getText(
+                self,
+                'Изменить запись',
+                'Новая запить',
+                QLineEdit.Normal,
+                item.text()
+            )
             if text and ok is not None:
                 item.setText(text)
-        add_push_button.remove_click()
 
     def push_button_delite_click(self):
-        currentIndex = self.ui.list_widget.currentRow()
-        item = self.ui.list_widget.item(currentIndex)
+        current_index = self.ui.list_widget.currentRow()
+        item = self.ui.list_widget.item(current_index)
         if item.text() == '':
             print('Нельзя удалить пустой элемент')
         else:
-            question = QMessageBox.question(self,"Удалить ззначение",
-                                            "Вы хотите удалить значение?\n" + item.text(),
-                                            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-
+            question = QMessageBox.question(
+                self,
+                'Удалить ззначение',
+                f'Вы хотите удалить значение?\n{item.text()}',
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
             if question == QMessageBox.StandardButton.Yes:
-                item = self.ui.list_widget.takeItem(currentIndex)
-            add_push_button.delite_click()
+                item = self.ui.list_widget.takeItem(current_index)
 
     def push_button_ok_click(self):
 
@@ -112,7 +115,7 @@ class AddDialog(AbstractDialog):
         c = [[],[]]
         for i in range(0, self.ui.list_widget.count() - 1):
             c[0].append(float(self.ui.list_widget.item(i).text()))
-        if self.ui.line_edit_name.text() != '':
+        if self.ui.line_edit_name.text() != '': #TODO add len <= 50
             full_data[self.ui.line_edit_name.text()+' '+str(datetime.now())] = c
         else:
             full_data['Измерения '+ str(datetime.now())] = c
@@ -121,20 +124,18 @@ class AddDialog(AbstractDialog):
             self.state.save_data_mode = True
         else:
             self.full_data = full_data
-        add_push_button.ok_click()
 
     def push_button_esc_click(self):
         if  self.state.save_data_mode is True:
             self.close()
         elif self.state.save_data_mode is False:
-            question = QMessageBox.question(self,"Выход",
-                                            "Вы хотите сохранить прогресс перед выходом?",
-                                            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                                            )
-
+            question = QMessageBox.question(
+                self,
+                'Выход',
+                'Вы хотите сохранить прогресс перед выходом?',
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            )
             if question == QMessageBox.StandardButton.Yes:
                 self.close()
             elif question == QMessageBox.StandardButton.No:
                 print('При выходе нажато нет')
-
-    add_push_button.esc_click()

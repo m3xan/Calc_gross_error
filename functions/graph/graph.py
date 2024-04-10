@@ -8,6 +8,9 @@ version = 0.01
 from functions.graph.canvas import Canvas
 
 class GraphicMaker:
+    """
+    Fabric for making Canvas matplotlib
+    """
     def empty_with_axes(self, color_fig, color_text):
         """
         Пустой график

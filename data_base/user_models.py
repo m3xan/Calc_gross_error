@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from data_base.engine import engine
+from data_base.engines import user_engine as engine
 
 class Base(DeclarativeBase):
     pass

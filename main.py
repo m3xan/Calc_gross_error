@@ -8,6 +8,9 @@ from window.application import QApplicationWithLogging
 from window.second_windows.authorization_window.authorization_window import AuthorizationWindow
 
 class Programm:
+    """
+    class storing main (method)
+    """
     def main(self) -> None:
         """
         Открывает приложение
@@ -26,5 +29,5 @@ class Programm:
         window.show()
         sys.exit(app.exec())
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     Programm().main()

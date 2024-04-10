@@ -13,6 +13,7 @@ from global_param import SETTINGS_PATH
 
 class JsonSettings:
     _instance = None
+    __user_id = None
 
     @overload
     def save_data_json(self, categor: str, data: str) -> bool: ...
@@ -22,7 +23,6 @@ class JsonSettings:
     def __new__(cls):
         if not isinstance(cls._instance, cls):
             cls._instance = object.__new__(cls)
-            cls.__user_id = None
         return cls._instance
 
     def get_user_id(self):
@@ -105,8 +105,3 @@ class JsonSettings:
         if os.path.exists(f'{SETTINGS_PATH}\\{self.__user_id}.json'):
             return f'{SETTINGS_PATH}\\{self.__user_id}.json'
         return f'{SETTINGS_PATH}\\default.json'
-
-if __name__ == '__main__':
-    print(JsonSettings().load_category_json(
-        'window'
-    ))
