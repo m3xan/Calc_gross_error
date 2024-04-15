@@ -7,7 +7,7 @@ from window.second_windows.authorization_window.internal_window.login.login_wind
 from window.data_class_for_window.dataclass import DataclassAutWindow
 from window.abstract_model.models import AbstractWindow
 
-from data_base.user_models import User
+from data_base.user.user_models import User
 
 from functions.circle_image.circle_image import ImageChanger
 
@@ -24,17 +24,13 @@ class InternalAutorizationWindow(AbstractWindow):
         self.ui.setupUi(self)
 
         self.state = DataclassAutWindow(
-            theme= self.change_theme(),
-            standard_image= STANDART_IMAGE
+            close_eye= QIcon(':/button/free-icon-eye-4621498.png'),
+            open_eye= QIcon(':/button/free-icon-open-eye-829117.png')
         )
-
-        # TODO add close_eye, open_eye, del self.state.standard_image
-        self.close_eye = QIcon(':/button/free-icon-eye-4621498.png')
-        self.open_eye = QIcon(':/button/free-icon-open-eye-829117.png')
 
         self.__init_show_button()
         self.__init_reaction()
-        self.__set_image(self.state.standard_image)
+        self.__set_image(STANDART_IMAGE)
 
     def __set_image(self, image_path):
         target_pixmap = ImageChanger(image_path).circle_image(
@@ -46,7 +42,7 @@ class InternalAutorizationWindow(AbstractWindow):
         self.show_button = QPushButton(self)
         self.show_button.setCursor(Qt.PointingHandCursor)
         self.show_button.setStyleSheet("border: none; padding: 0;")
-        self.show_button.setIcon(self.open_eye)
+        self.show_button.setIcon(self.state.open_eye)
 
         layout = QHBoxLayout(self.ui.line_edit_password)
         layout.setContentsMargins(9, -1, 26, -1)
@@ -66,10 +62,10 @@ class InternalAutorizationWindow(AbstractWindow):
     def __password_visibility(self):
         if self.ui.line_edit_password.echoMode() == QLineEdit.Password:
             self.ui.line_edit_password.setEchoMode(QLineEdit.Normal)
-            self.show_button.setIcon(self.close_eye)
+            self.show_button.setIcon(self.state.close_eye)
         else:
             self.ui.line_edit_password.setEchoMode(QLineEdit.Password)
-            self.show_button.setIcon(self.open_eye)
+            self.show_button.setIcon(self.state.open_eye)
 
     @Slot()
     def __ckick(self):
@@ -91,5 +87,5 @@ class InternalAutorizationWindow(AbstractWindow):
             if user is not None:
                 self.user_db.set_id(user.id)
                 self.settings.set_user_id(user.id)
-                self.state.theme = self.change_theme()
+                self.change_theme()
                 self.__set_image(user.image)

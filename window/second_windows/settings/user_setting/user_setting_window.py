@@ -7,12 +7,10 @@ import os
 from PySide6.QtWidgets import QFileDialog
 from PIL import Image
 
-from window.data_class_for_window.dataclass import BaseDataclassWindows
 from window.second_windows.settings.user_setting.user_class import Ui_Dialog
 from window.abstract_model.models import AbstractDialog
 
-from data_base.user_hanler import DatabaseUsersHandler
-from data_base.user_models import User
+from data_base.user.user_models import User
 
 from functions.circle_image.circle_image import ImageChanger
 from functions.walidation.walid_password import check_password_strength
@@ -28,18 +26,15 @@ class UserSettingsDialog(AbstractDialog):
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
 
-        self.state = BaseDataclassWindows(
-            theme= self.change_theme()
-        )
-        #TODO user_id, image
-        self.bd = DatabaseUsersHandler()
+        self.change_theme()
+        #TODO image
         self.image = None
         self.__start()
         self.ui.push_button_chose_image.clicked.connect(self.__chose_image)
         self.ui.push_button_save.clicked.connect(self.__save)
 
     def __start(self):
-        user: User = self.bd.select_user()
+        user: User = self.user_db.select_user()
         self.ui.linedit_username.setText(user.username)
         if user.image is not None and os.path.isfile(user.image):
             self.__circle_image(user.image)
@@ -69,12 +64,12 @@ class UserSettingsDialog(AbstractDialog):
             path = f'Data\\Data_base\\image\\{os.path.splitext(os.path.basename(self.image[0]))[0]}.jpg'
             img.save(path, 'JPEG', quality=80)
 
-            self.bd.update_image(path)
+            self.user_db.update_image(path)
             return True
         return None
 
     def __save_user(self):
-        user: User = self.bd.select_user()
+        user: User = self.user_db.select_user()
         user_name = None
         password = None
         if self.ui.linedit_username.text() != user.username:
@@ -102,7 +97,7 @@ class UserSettingsDialog(AbstractDialog):
         if any(
             _obj is not None for _obj in (user_name, password)
         ):
-            self.bd.update_user(
+            self.user_db.update_user(
                 username= user_name,
                 password= password
             )

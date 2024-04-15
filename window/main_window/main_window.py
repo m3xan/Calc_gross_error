@@ -25,7 +25,7 @@ from thread.save_as_excel_thread import SaveAsThread
 from thread.save_excel_thread import SaveThread
 from thread.read_thred import ReadThread
 
-from functions.calcul.calc import Calculator, Romanovsky
+from functions.calcul.calc import Calculator, Romanovsky, Charlier, Dixon
 
 from functions.graph.graph import GraphicMaker
 from functions.excel.excel import get_name_column
@@ -37,7 +37,7 @@ class MainWindow(AbstractWindow):
     """
     class MainWindow
     """
-    def __init__(self, user_id: int):
+    def __init__(self):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -49,20 +49,19 @@ class MainWindow(AbstractWindow):
             excel_path= None,
             change_mode= False,
             add_mod= False,
-            user_id= user_id,
             clearance_level = self.user_db.select_user().clearance_level,
             auto_save_time= self.settings.load_category_json('auto_save'),
-            theme= self.change_theme(),
         )
+        self.change_theme()
 
         self.__init_graph()
-        if self.state.auto_save_time['switched']:
+        if self.settings.load_category_json('auto_save')['switched']:
             self.__init_timer()
 
         if self.state.clearance_level > 1:
-            Logger().change_logger(user_id, logging.INFO)
+            Logger().change_logger(self.user_db.get_id(), logging.INFO)
         else:
-            Logger().change_logger(user_id)
+            Logger().change_logger(self.user_db.get_id())
 
         self.__init_reaction()
 
@@ -73,7 +72,7 @@ class MainWindow(AbstractWindow):
         """
         self.windows = LoadDialog()
         self.windows.show()
-        self.state.data = self.user_db.test_select_2(self.state.user_id)
+        self.state.data = self.user_db.test_select_2()
         self.windows.close()
         self.enable_ui(True)
         if any(self.state.data):
@@ -85,6 +84,7 @@ class MainWindow(AbstractWindow):
                 )
         # change
         self.state.active_mod = 'bd'
+        # self.fill_listwidget()
         return f'self.state.active_mod = {self.state.active_mod}, {self.state.data}'
 
     def action_excel_click(self):
@@ -151,7 +151,7 @@ class MainWindow(AbstractWindow):
         """
         Открывает окно "О нас"
         """
-        dialog = AboutDialog(self.state.user_id)
+        dialog = AboutDialog()
         return dialog.exec()
 
     @staticmethod
@@ -200,12 +200,27 @@ class MainWindow(AbstractWindow):
         """
         open satting_widow
         """
-        setting_widow = SettingsDialog(self.state.user_id)
+        setting_widow = SettingsDialog()
         setting_widow.windowThemeChanged.connect(self.__update_ui)
         return setting_widow.exec()
-    
+
     def action_delite_click(self):
-        pass
+        item  = self.ui.combo_box_selection_data.currentData()
+        if item is not None:
+            question = QMessageBox.question(
+                self,
+                'Удалить значение',
+                f'Вы хотите удалить значение?\n{item[1]}',
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if question == QMessageBox.StandardButton.Yes:
+                del self.state.data[item]
+
+                self.ui.combo_box_selection_data.removeItem(
+                    self.ui.combo_box_selection_data.currentIndex()
+                )
+                self.state.save_data_mode = False
+            return f'self.state.save_data_mode = {self.state.save_data_mode}'
 
     # button
     def push_button_create_graph_click(self):
@@ -225,8 +240,8 @@ class MainWindow(AbstractWindow):
         aligned_bin_centers = bin_centers[:len(smoothed_hist)]
         self.sc.ax.plot(aligned_bin_centers, smoothed_hist, '-o', label='Прямая')
         self.sc.update_collor(
-            self.state.theme[1]['canvas'],
-            self.state.theme[1]['text']
+            self.settings.load_canvas()['canvas'],
+            self.settings.load_canvas()['text']
         )
         self.sc.ax.legend()
         self.sc.draw()
@@ -235,14 +250,23 @@ class MainWindow(AbstractWindow):
         """
         create_calc
         """
-        self.ui.list_widget_answer.clear()
-        calculator = Calculator(Romanovsky())
-        answers = calculator.calculate_with(
-            self.state.data[self.ui.combo_box_selection_data.currentData()][0]
-        )
-        for answer in answers:
-            self.ui.list_widget_answer.addItem(str(answer))
-        self.state.save_data_mode = False
+        if self.state.data is not None:
+            self.ui.list_widget_answer.clear()
+            user_settings = 'Romanovsky'
+            calculator = Calculator()
+            match user_settings:
+                case 'Romanovsky':
+                    calculator.set_method(Romanovsky())
+                case 'Charlier':
+                    calculator.set_method(Charlier())
+                case 'Dixon':
+                    calculator.set_method(Dixon())
+            answers, method = calculator.calculate_with(
+                self.state.data[self.ui.combo_box_selection_data.currentData()][0],
+                0.9
+            )
+            self.__set_answer(answers)
+            self.ui.line_edit_metod.setText(f'Расчёт проведён методом {method}')
         return f'self.state.save_data_mode = {self.state.save_data_mode}'
 
     def push_button_add_data_click(self):# ПЕРЕДЕЛАТЬ
@@ -284,8 +308,8 @@ class MainWindow(AbstractWindow):
         """
         graphic_maker = GraphicMaker()
         self.sc = graphic_maker.empty_with_axes(
-            color_text= self.state.theme[1]['text'],
-            color_fig= self.state.theme[1]['canvas']
+            color_text= self.settings.load_canvas()['text'],
+            color_fig= self.settings.load_canvas()['canvas']
         )
 
         self.graphwindow = GraphWindow()
@@ -339,8 +363,8 @@ class MainWindow(AbstractWindow):
         self.__init_main_list_widget_value()
 
     # helpfull
-    def __update_ui(self, signal):
-        self.state.theme = self.change_theme(signal)
+    def __update_ui(self):
+        self.change_theme()
         self.graphwindow.addToolBar(
             eval(
                 self.settings.load_attribute('window', 'toolBar')
@@ -354,8 +378,8 @@ class MainWindow(AbstractWindow):
             self.ui.dockWidget
         )
         self.sc.update_collor(
-            self.state.theme[1]['canvas'],
-            self.state.theme[1]['text']
+            self.settings.load_canvas()['canvas'],
+            self.settings.load_canvas()['text']
         )
         self.sc.draw()
 
@@ -440,7 +464,7 @@ class MainWindow(AbstractWindow):
         key = self.ui.combo_box_selection_data.currentData()
         try:
             for numder in self.state.data[key][0]:
-                self.ui.list_widget_value.addItem(str(numder))
+                self.ui.list_widget_value.addItem(str(numder[1]))
             return True
         except KeyError as err:
             logging.error(err, exc_info= True)
@@ -461,13 +485,13 @@ class MainWindow(AbstractWindow):
                     c,
                     m
                 )
-                self.fill_listwidget()
+                # self.fill_listwidget()
             else:
                 self.ui.combo_box_selection_data.addItem(
                     c,
                     m
                 )
-                self.fill_listwidget()
+                # self.fill_listwidget()
 
         else:
             # переделать
@@ -489,6 +513,7 @@ class MainWindow(AbstractWindow):
         self.load_window.close()
         self.read_thread.quit()
         self.state.data = ast.literal_eval(read_excel_signal)
+        self.read_thread.quit()
         if self.state.data is not None:
             self.ui.combo_box_selection_data.clear()
             for key in self.state.data:
@@ -496,6 +521,7 @@ class MainWindow(AbstractWindow):
                     key[1],
                     key
                 )
+        self.add_elem_on_list_winget()
 
     def editValue(self, item):
         """
@@ -520,7 +546,7 @@ class MainWindow(AbstractWindow):
             return
         if self.state.change_mode:
             b = self.ui.combo_box_selection_data.currentData()
-            self.state.data[b][0][index] = float(new_value)
+            self.state.data[b][0][index].append(0, float(new_value))
 
             edit.deleteLater()
             self.ui.list_widget_value.takeItem(index)
@@ -534,7 +560,7 @@ class MainWindow(AbstractWindow):
             item.setText(str(float(new_value)))
             self.ui.list_widget_value.insertItem(index, item)
             b = self.ui.combo_box_selection_data.currentData()
-            self.state.data[b][0].append(float(new_value))
+            self.state.data[b][0].append((0, float(new_value)))
             edit.deleteLater()
             self.state.add_mod = False
             self.state.save_data_mode = False
@@ -568,3 +594,19 @@ class MainWindow(AbstractWindow):
                 action = context_menu.exec(self.ui.list_widget_value.mapToGlobal(pos))
                 if action == some_action:
                     self.add_item()
+
+    def __set_answer(self, answers):
+        if answers is None:
+            _item = QListWidgetItem('Невозможно расчитать для данных значений')
+            _item.setFlags(_item.flags() & ~Qt.ItemIsSelectable)
+            self.ui.list_widget_answer.addItem(_item)
+        if any(answers):
+            for answer in answers:
+                _item = QListWidgetItem(str(answer))
+                _item.setFlags(_item.flags() & ~Qt.ItemIsSelectable)
+                self.ui.list_widget_answer.addItem(_item)
+            self.state.save_data_mode = False
+        else:
+            _item = QListWidgetItem('Грубых погрешностей нет!')
+            _item.setFlags(_item.flags() & ~Qt.ItemIsSelectable)
+            self.ui.list_widget_answer.addItem(_item)

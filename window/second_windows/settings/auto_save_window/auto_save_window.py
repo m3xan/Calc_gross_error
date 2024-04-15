@@ -5,9 +5,6 @@ import logging
 
 from window.abstract_model.models import AbstractDialog
 from window.second_windows.settings.auto_save_window.auto_save_class import Ui_DialogAutoSave
-from window.data_class_for_window.dataclass import BaseDataclassWindows
-
-from functions.settings.settings import JsonSettings
 
 class AutoSaveWindow(AbstractDialog):
     """
@@ -18,11 +15,7 @@ class AutoSaveWindow(AbstractDialog):
         self.ui = Ui_DialogAutoSave()
         self.ui.setupUi(self)
 
-        self.settings = JsonSettings()
-        self.state = BaseDataclassWindows(
-            theme= self.change_theme()
-        )
-
+        self.change_theme()
         self.__set_value()
         self.ui.push_button_save.clicked.connect(self.save_setting)
 

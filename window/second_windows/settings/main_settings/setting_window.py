@@ -6,7 +6,6 @@ from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtCore import Slot
 
 from window.abstract_model.models import AbstractDialog
-from window.data_class_for_window.dataclass import DataclassSettingsDialog
 from window.second_windows.settings.main_settings.settings_class import Ui_Dialog
 from window.second_windows.settings.auto_save_window.auto_save_window import AutoSaveWindow
 from window.second_windows.settings.setting_window.settings_window import SettingDialog
@@ -16,15 +15,12 @@ class SettingsDialog(AbstractDialog):
     """
     Класс окна настроек интерфейса
     """
-    def __init__(self, user_id: int):
+    def __init__(self):
         super().__init__()
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
 
-        self.state = DataclassSettingsDialog(
-            theme= self.change_theme(),
-            user_id= user_id
-        )
+        self.change_theme()
 
         self.__init_reaction()
         self.__start()
@@ -57,9 +53,9 @@ class SettingsDialog(AbstractDialog):
         setting_window.windowThemeChanged.connect(self.send_signal_to_MainWindow)
         self.layout.addWidget(setting_window)
 
-    @Slot(int)
-    def send_signal_to_MainWindow(self, signal):
-        self.state.theme = self.change_theme()
+    @Slot()
+    def send_signal_to_MainWindow(self):
+        self.change_theme()
 
     def __clear(self):
         for i in reversed(range(self.layout.count())):

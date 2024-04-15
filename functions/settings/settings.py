@@ -88,15 +88,23 @@ class JsonSettings:
         """
         category = self.load_category_json('window')
         theme_name = category['theme']
+        style_content = self.__load_data(theme_name)
+        if style_content is not None:
+            parent.setStyleSheet(style_content)
+
+    def load_canvas(self):
+        category = self.load_category_json('window')
+        return category['canvas']
+
+    def __load_data(self, theme_name):
         try:
             with open(
                 f'Data/settings/theme/{theme_name}.qss',
                 encoding= 'utf-8'
             ) as style_file:
                 style_content = style_file.read()
-                parent.setStyleSheet(style_content)
-                logging.info(f'load theme: {theme_name, category['canvas']}')
-                return theme_name, category['canvas']
+                logging.info(f'load theme: {theme_name}')
+                return style_content
         except FileNotFoundError:
             logging.warning('Не удалось найти файл стилей')
             return None

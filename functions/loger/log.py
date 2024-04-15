@@ -61,7 +61,6 @@ class Logger(Singleton):
     def change_logger(self, user_id: int, level: int = logging.ERROR):
         """
         change loger for user
-        if level <= 20 start 'sqlalchemy.engine.Engine' loger 
         """
         if self._echo:
             try:

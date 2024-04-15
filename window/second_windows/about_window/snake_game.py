@@ -5,12 +5,12 @@ from PySide6 import QtWidgets, QtCore, QtGui
 from window.abstract_model.models import AbstractDialog
 
 class SnakeGame(AbstractDialog):
-    def __init__(self, user_id):
+    def __init__(self):
         super().__init__()
 
         self.setWindowTitle("Змейка")
         self.setGeometry(100, 100, 600, 400)
-        self.change_theme(user_id)
+        self.change_theme()
 
         self.timer = QtCore.QBasicTimer()
         self.speed = 100

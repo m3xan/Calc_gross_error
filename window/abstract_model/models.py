@@ -1,11 +1,9 @@
 
-from typing import overload
-
 from PySide6.QtWidgets import QMainWindow, QDialog
 from PySide6.QtCore import Signal
 
 from functions.settings.settings import JsonSettings
-from data_base.user_hanler import DatabaseUsersHandler
+from data_base.user.user_hanler import DatabaseUsersHandler
 
 class AbstractThemeChanger:
     """
@@ -13,22 +11,14 @@ class AbstractThemeChanger:
     and param windowThemeChanged type Signal
     have JsonSettings and DatabaseUsersHandler
     """
-    windowThemeChanged: Signal = Signal(int)
+    windowThemeChanged: Signal = Signal()
     settings = JsonSettings()
     user_db = DatabaseUsersHandler()
 
-    @overload
-    def change_theme(self) -> str | None: ...
-    @overload
-    def change_theme(self, user_id: int) -> str | None: ...
-
-    def change_theme(self, user_id: int = None):
+    def change_theme(self):
         """change theme on window and do signall ThemeChange"""
-        if user_id is None:
-            self.windowThemeChanged.emit(self.settings.get_user_id())
-        else:
-            self.windowThemeChanged.emit(user_id)
-        return self.__load_theme(user_id)
+        self.windowThemeChanged.emit()
+        return self.__load_theme(self.settings.get_user_id())
 
     def __load_theme(self, user_id: int | None):
         if user_id is not None:

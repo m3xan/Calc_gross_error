@@ -4,7 +4,7 @@
 
 import os
 import logging
-import concurrent.futures
+import concurrent.futures as concur
 from typing import overload
 
 class FileChecker:
@@ -46,6 +46,6 @@ class FileChecker:
         False когда какой либо файл не найден.
         """
         if self._file_path is not None:
-            with concurrent.futures.ThreadPoolExecutor() as executor:
+            with concur.ThreadPoolExecutor() as executor:
                 return all(executor.map(self.__check_file, self._file_path))
         return False

@@ -4,16 +4,12 @@
 
 from dataclasses import dataclass
 
+from PySide6.QtGui import QIcon
+
 # переделать что бы были изначальные значения или нет
-@dataclass
-class BaseDataclassWindows:
-    """
-    Base settings for window
-    """
-    theme: tuple | None
 
 @dataclass
-class DataclassAddWindow(BaseDataclassWindows):
+class DataclassAddWindow():
     """
     settings for AddDialog
     """
@@ -31,26 +27,21 @@ class DataclassMainWindow(DataclassAddWindow):
     excel_path: str | None
     add_mod: bool | None
     auto_save_time: dict
-    user_id: int
     clearance_level: int
 
 @dataclass
-class DataclassSettingsWindow(BaseDataclassWindows):
+class DataclassSettingsWindow():
     """
     settings for SettingDialog
     """
     save_data_mode: bool
 
 @dataclass
-class DataclassAutWindow(BaseDataclassWindows):
-    """
-    settings for SettingDialog
-    """
-    standard_image: str
+class DataclassUserSettingsDialog():
+    check_login_user: bool = False
+    check_password_user: bool = False
 
 @dataclass
-class DataclassSettingsDialog(BaseDataclassWindows):
-    """
-    settings for SettingDialog
-    """
-    user_id: int
+class DataclassAutWindow():
+    close_eye: QIcon
+    open_eye: QIcon

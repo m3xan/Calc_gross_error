@@ -46,10 +46,10 @@ class AuthorizationWindow(AbstractWindow):
                 return True
         return None
 
-    @Slot(int)
-    def __open_mainwindow(self, signall: int):
+    @Slot()
+    def __open_mainwindow(self):
         if FileChecker(FILE_PATHS).check_all():
-            self.main_window = MainWindow(signall)
+            self.main_window = MainWindow()
             self.main_window.show()
             self.deleteLater()
 

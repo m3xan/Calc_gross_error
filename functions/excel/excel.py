@@ -58,9 +58,9 @@ def to_float_list(_list: list) -> list[float]:
     Заглушка
     """
     new_list = []
-    for i in _list:
+    for i, k in enumerate(_list):
         try:
-            new_list.append(float(i))
+            new_list.append((i, float(k)))
         except ValueError as err:
             #допилить что делать если в данных есть ошибка
             print(err)
@@ -103,12 +103,17 @@ def write_to_file(diff_dict: dict, new_data: dict, sheet: openpyxl.worksheet.wor
     """
     for key in diff_dict:
         row = 1
-        sheet.cell(row=row, column=key[0]).value = key[1]
 
-        for i, value in enumerate(new_data[key][0]):
-            sheet.cell(row=row+i+1, column=key[0]).value = value
+        try:
+            sheet.cell(row=row, column=key[0]).value = key[1]
+            for i, value in enumerate(new_data[key][0]):
+                sheet.cell(row=row+i+1, column=key[0]).value = value[1]
+        except KeyError:
+            sheet.cell(row=row, column=key[0]).value = None
+            for i, value in enumerate(diff_dict[key][0]):
+                sheet.cell(row=row+i+1, column=key[0]).value = None
 
-        row += len(new_data[key]) + 1
+        # row += len(new_data[key]) + 1
         # if key[-2]:
         #     sheet.cell(row=row, column=key[0]).value = "Измерения"
 
