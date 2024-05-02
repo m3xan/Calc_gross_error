@@ -9,6 +9,7 @@ class AbstractThemeChanger:
     """
     abctarct class stores method change_theme
     and param windowThemeChanged type Signal
+
     have JsonSettings and DatabaseUsersHandler
     """
     windowThemeChanged: Signal = Signal()
@@ -26,6 +27,6 @@ class AbstractThemeChanger:
             return self.settings.load_theme(self)
         return self.settings.load_theme(self)
 
-class AbstractWindow(QMainWindow, AbstractThemeChanger): """заглушка"""
+class AbstractWindow(QMainWindow, AbstractThemeChanger): """Abstract class for inheritance window"""
 
-class AbstractDialog(QDialog, AbstractThemeChanger): """заглушка"""
+class AbstractDialog(QDialog, AbstractThemeChanger): """Abstract class for inheritance dialog"""

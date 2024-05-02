@@ -6,6 +6,8 @@ from dataclasses import dataclass
 
 from PySide6.QtGui import QIcon
 
+from data_class.data import Data
+
 # переделать что бы были изначальные значения или нет
 
 @dataclass
@@ -23,7 +25,7 @@ class DataclassMainWindow(DataclassAddWindow):
     """
     active_mod: str | None
     save_data_mode: bool | None
-    data: dict | None
+    data: Data | None
     excel_path: str | None
     add_mod: bool | None
     auto_save_time: dict

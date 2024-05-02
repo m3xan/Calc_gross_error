@@ -6,6 +6,8 @@ from datetime import datetime
 
 import openpyxl
 
+from data_class.data import Data
+# TODO use Data
 def load_excel_book(path: str) -> openpyxl.workbook.workbook.Workbook:
     """
     Загружает книгу Excel из указанного пути.
@@ -36,9 +38,9 @@ def extract_data_from_sheet(sheet: openpyxl.worksheet.worksheet.Worksheet) -> di
     Заглушка
     """
     data = {}
-    index_column = 0
+    index_column = 1
     for column in sheet.iter_cols(min_row=1, max_col=sheet.max_column, values_only=True):
-        index_column +=1
+        index_column += 1
         _column_values = list(column)
         _list = list((filter(lambda x: x is not None, _column_values)))
         if _list:
@@ -46,11 +48,11 @@ def extract_data_from_sheet(sheet: openpyxl.worksheet.worksheet.Worksheet) -> di
                 result =  _list[_list.index("Результат")+1:]
                 datalist =  _list[1: _list.index("Результат")]
                 _datalist = to_float_list(datalist)
-                data[index_column,  _list[0]] = [_datalist, result]
+                data[index_column,  _list[0]] = [_datalist, result, False]
             else:
                 datalist =  _list[1:]
                 _datalist = to_float_list(datalist)
-                data[index_column,  _list[0]] = [_datalist, []]
+                data[index_column,  _list[0]] = [_datalist, [], False]
     return data
 
 def to_float_list(_list: list) -> list[float]:
@@ -93,7 +95,8 @@ def read_file_excel(path: str) -> dict[tuple[int, str, bool], tuple[float]]:
     sheet = get_excel_sheet(book)
     data = extract_data_from_sheet(sheet)
     if data:
-        return data
+        print(data)
+        return Data(data)
     return None
 
 

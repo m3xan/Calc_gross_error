@@ -10,13 +10,12 @@ from window.abstract_model.models import AbstractWindow
 from data_base.user.user_models import User
 
 from functions.circle_image.circle_image import ImageChanger
-
-from global_param import STANDART_IMAGE
+from functions.circle_image.image import Image
 
 class InternalAutorizationWindow(AbstractWindow):
     """Внутреннее окно авторизации"""
-    registrarion:Signal = Signal(bool)
-    open_mainwindow:Signal = Signal(int)
+    registrarion:Signal = Signal()
+    open_mainwindow:Signal = Signal()
 
     def __init__(self):
         super().__init__()
@@ -30,7 +29,12 @@ class InternalAutorizationWindow(AbstractWindow):
 
         self.__init_show_button()
         self.__init_reaction()
-        self.__set_image(STANDART_IMAGE)
+        if loggin := self.settings.load_start():
+            self.ui.line_edit_login.setText(loggin)
+            self.__load_image()
+        else:
+            self.__set_image(Image())
+
 
     def __set_image(self, image_path):
         target_pixmap = ImageChanger(image_path).circle_image(
@@ -56,7 +60,7 @@ class InternalAutorizationWindow(AbstractWindow):
 
     @Slot()
     def __set_signall(self):
-        self.registrarion.emit(True)
+        self.registrarion.emit()
 
     @Slot()
     def __password_visibility(self):
@@ -74,8 +78,8 @@ class InternalAutorizationWindow(AbstractWindow):
                 self.ui.line_edit_login.text(),
                 self.ui.line_edit_password.text()
             )
-            if user_id is not None:
-                self.open_mainwindow.emit(user_id)
+            if user_id:
+                self.open_mainwindow.emit()
                 return user_id
             return 'Неверный логин или пароль'
         return None
@@ -84,7 +88,7 @@ class InternalAutorizationWindow(AbstractWindow):
     def __load_image(self):
         if self.ui.line_edit_login.text() != '':
             user: User = self.user_db.select_image(self.ui.line_edit_login.text())
-            if user is not None:
+            if user:
                 self.user_db.set_id(user.id)
                 self.settings.set_user_id(user.id)
                 self.change_theme()

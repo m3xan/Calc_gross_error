@@ -15,3 +15,5 @@ CRIRICAL_FILE= [
 ]
 
 SETTINGS_PATH = 'Data\\settings\\json'
+
+FILE_EXTENSIONS = ['.png', '.jpg', '.gif', '.svg']

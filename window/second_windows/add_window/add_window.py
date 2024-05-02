@@ -10,11 +10,13 @@ from window.abstract_model.models import AbstractDialog
 from window.second_windows.add_window.add_window_class import Ui_Dialog
 from window.data_class_for_window.dataclass import DataclassAddWindow
 
+from data_class.data import Data
+
 class AddDialog(AbstractDialog):
     """
     class add_window
     """
-    full_data: Signal = Signal(dict)
+    full_data: Signal = Signal(Data)
     def __init__(self):
         super().__init__()
         self.ui = Ui_Dialog()
@@ -103,15 +105,21 @@ class AddDialog(AbstractDialog):
                 item = self.ui.list_widget.takeItem(current_index)
 
     def push_button_ok_click(self):
-        final_data = {}
-        c = [[],[]]
-        for i in range(0, self.ui.list_widget.count() - 1):
-            c[0].append(float(self.ui.list_widget.item(i).text()))
-        if (name_calc := self.ui.line_edit_name.text()) != '' and len(name_calc) <= 50:
-            final_data[f'{name_calc} {datetime.now()}'] = c
+        data = Data(metadate= True)
+        if self.ui.line_edit_name.text() != '' and len(self.ui.line_edit_name.text()) <= 50:
+            name_calc = f'{self.ui.line_edit_name.text()} {datetime.now()}'
         else:
-            final_data[f'Измерения {datetime.now()}'] = c
-        self.full_data.emit(final_data)
+            name_calc = f'Измерения {datetime.now()}'
+
+        data.append_name(name_calc)
+
+        for i in range(0, self.ui.list_widget.count() - 1):
+            data.append_value(
+                (0, name_calc),
+                float(self.ui.list_widget.item(i).text())
+            )
+
+        self.full_data.emit(data)
         self.close()
 
     def push_button_esc_click(self):

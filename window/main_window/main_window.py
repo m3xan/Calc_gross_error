@@ -1,7 +1,6 @@
 """
 Главное окно
 """
-import ast
 from datetime import datetime
 import os
 from functools import partial
@@ -10,7 +9,7 @@ import logging
 import numpy as np
 from matplotlib.backends.backend_qt import NavigationToolbar2QT
 from PySide6.QtWidgets import QVBoxLayout, QListWidgetItem, QLineEdit, QFileDialog, QMessageBox, QMenu
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer, Slot
 
 from window.abstract_model.models import AbstractWindow
 from window.data_class_for_window.dataclass import DataclassMainWindow
@@ -21,16 +20,13 @@ from window.second_windows.settings.main_settings.setting_window import Settings
 from window.second_windows.load_window.load_window import LoadDialog
 from window.second_windows.about_window.about_window import AboutDialog
 
-from thread.save_as_excel_thread import SaveAsThread
-from thread.save_excel_thread import SaveThread
-from thread.read_thred import ReadThread
+from thread import ReadThread, SaveAsThread, SaveThread
 
 from functions.calcul.calc import Calculator, Romanovsky, Charlier, Dixon
-
 from functions.graph.graph import GraphicMaker
-from functions.excel.excel import get_name_column
-
 from functions.loger import Logger
+
+from data_class.data import Data
 
 #TODO переделать заполнение лист виджета
 class MainWindow(AbstractWindow):
@@ -45,7 +41,7 @@ class MainWindow(AbstractWindow):
         self.state = DataclassMainWindow(
             active_mod= None, # данное условие писать с использование math case
             save_data_mode= True,
-            data= {},
+            data= None,
             excel_path= None,
             change_mode= False,
             add_mod= False,
@@ -70,22 +66,22 @@ class MainWindow(AbstractWindow):
         """
         on action bd clicked
         """
-        self.windows = LoadDialog()
-        self.windows.show()
-        self.state.data = self.user_db.test_select_2()
-        self.windows.close()
-        self.enable_ui(True)
-        if any(self.state.data):
-            self.ui.combo_box_selection_data.clear()
-            for key in self.state.data:
-                self.ui.combo_box_selection_data.addItem(
-                    key[1],
-                    key
-                )
+        self.read_thread = ReadThread()
+        self.read_thread.start()
+        self.read_thread.read_signal.connect(self.on_change)
+        self.load_window = LoadDialog()
+        self.load_window.exec()
         # change
         self.state.active_mod = 'bd'
-        # self.fill_listwidget()
         return f'self.state.active_mod = {self.state.active_mod}, {self.state.data}'
+
+    def fill_combo_box_selection_data(self):
+        self.ui.combo_box_selection_data.clear()
+        for key in self.state.data.name():
+            self.ui.combo_box_selection_data.addItem(
+                key[1],
+                key
+            )
 
     def action_excel_click(self):
         """
@@ -94,19 +90,19 @@ class MainWindow(AbstractWindow):
         filedialog = QFileDialog()
         self.state.excel_path = filedialog.getOpenFileName(
             caption='Выбрать файл',
-            dir=f'{os.path.join(os.getenv("userprofile"), "Desktop")}',
+            dir=os.path.join(os.getenv('userprofile')),
             filter= 'Excel File (*.xlsx;*.xlsm;*.xltx;*.xltm)'
         )
         if self.state.excel_path != ('', ''):
             self.read_thread = ReadThread(self.state.excel_path[0])
             self.read_thread.start()
-            self.read_thread.read_excel_signal.connect(self.on_change)
+            self.read_thread.read_signal.connect(self.on_change)
             self.load_window = LoadDialog()
             self.load_window.exec()
             # change
             self.state.active_mod = 'excel'
+            # TODO change добавить в on_change
             self.timer.start(self.state.auto_save_time['time'])
-            self.enable_ui(True)
             return self.state.active_mod, self.state.excel_path, self.state.data, self.timer.isActive()
         return None
 
@@ -114,18 +110,18 @@ class MainWindow(AbstractWindow):
         """
         on save data
         """
-        if not self.state.save_data_mode:
-            match self.state.active_mod:
-                case 'excel':
-                    self.save_tread = SaveThread(self.state.excel_path[0], self.state.data)
-                    self.save_tread.start()
-                    # change
-                    self.state.save_data_mode = True
-                    return self.state.save_data_mode
-                case 'bd':
-                    #TODO change
-                    self.state.save_data_mode = True
-                    return self.state.save_data_mode
+        match self.state.active_mod:
+            case 'excel':
+                self.save_tread = SaveThread(self.state.excel_path[0], self.state.data)
+                self.save_tread.start()
+                # change
+                self.state.save_data_mode = True
+                return self.state.save_data_mode
+            case 'bd':
+                self.state.data = self.user_db.save_data(self.state.data)
+
+                self.state.save_data_mode = True
+                return self.state.save_data_mode
         return None
 
     def action_esc_click(self):
@@ -145,7 +141,7 @@ class MainWindow(AbstractWindow):
             )
             if result == QMessageBox.StandardButton.Ok:
                 self.action_save_click()
-                self.save_tread.wait()
+                self.close()
 
     def action_info_click(self):
         """
@@ -181,14 +177,8 @@ class MainWindow(AbstractWindow):
             file_name = QFileDialog.getSaveFileName(
             None,
             'Сохранить как:',
-            f'{os.path.join(os.getenv("userprofile"),
-            f'Измерения {str(datetime.now().strftime("%d-%m-%Y %H.%M.%S"))}')}',
-            filter= """
-            Книга Excel (*.xlsx);; 
-            Книга Excel с поддержкой макросов(*.xlsm);; 
-            Шаблон Excel(*.xltx);; 
-            Шаблон Excel с поддержкой макросов (*.xltm)
-            """
+            f'{os.path.join(os.getenv("userprofile"), f'Измерения {datetime.now().strftime('%d-%m-%Y %H.%M.%S')}')}',
+            filter= "Книга Excel (*.xlsx)"
             )
             if file_name != ('', ''):
                 self.save_as_thread = SaveAsThread(file_name[0], self.state.data)
@@ -206,7 +196,7 @@ class MainWindow(AbstractWindow):
 
     def action_delite_click(self):
         item  = self.ui.combo_box_selection_data.currentData()
-        if item is not None:
+        if item:
             question = QMessageBox.question(
                 self,
                 'Удалить значение',
@@ -227,10 +217,14 @@ class MainWindow(AbstractWindow):
         """
         Create graph
         """
+        if not self.state.data:
+            return None
         self.plt_tool_bar.update()
-        self.sc.ax.clear()
-        hist = self.state.data[self.ui.combo_box_selection_data.currentData()][0]
-        n, bins, _ = self.sc.ax.hist(hist, rwidth=0.8, color='#ff8921', label= 'Распределение')
+        self.canvbar.ax.clear()
+        hist = [
+            data[1] for data in self.state.data[self.ui.combo_box_selection_data.currentData()][0]
+        ]
+        n, bins, _ = self.canvbar.ax.hist(hist, rwidth=0.8, color='#ff8921', label= 'Распределение')
         bin_centers = 0.5 * (bins[:-1] + bins[1:])
 
         window_size = 5  # Размер окна для усреднения, можно добавить изменение в настройки измерения
@@ -238,35 +232,38 @@ class MainWindow(AbstractWindow):
         smoothed_hist = np.convolve(n, weights, mode='same')  # Применение усреднения по скользящему окну
 
         aligned_bin_centers = bin_centers[:len(smoothed_hist)]
-        self.sc.ax.plot(aligned_bin_centers, smoothed_hist, '-o', label='Прямая')
-        self.sc.update_collor(
-            self.settings.load_canvas()['canvas'],
-            self.settings.load_canvas()['text']
+        self.canvbar.ax.plot(aligned_bin_centers, smoothed_hist, '-o', label='Прямая')
+
+        settings = self.settings.load_canvas()
+        self.canvbar.update_collor(
+            settings['canvas'],
+            settings['text']
         )
-        self.sc.ax.legend()
-        self.sc.draw()
+        self.canvbar.ax.legend()
+        self.canvbar.draw()
 
     def push_button_create_calc_click(self):
         """
         create_calc
         """
-        if self.state.data is not None:
-            self.ui.list_widget_answer.clear()
-            user_settings = 'Romanovsky'
-            calculator = Calculator()
-            match user_settings:
-                case 'Romanovsky':
-                    calculator.set_method(Romanovsky())
-                case 'Charlier':
-                    calculator.set_method(Charlier())
-                case 'Dixon':
-                    calculator.set_method(Dixon())
-            answers, method = calculator.calculate_with(
-                self.state.data[self.ui.combo_box_selection_data.currentData()][0],
-                0.9
-            )
-            self.__set_answer(answers)
-            self.ui.line_edit_metod.setText(f'Расчёт проведён методом {method}')
+        user_settings = 1
+        calculator = Calculator()
+        match user_settings:
+            case 1:
+                calculator.set_method(Romanovsky())
+            case 2:
+                calculator.set_method(Charlier())
+            case 3:
+                calculator.set_method(Dixon())
+
+        answers = calculator.calculate_with(
+            [data[1] for data in self.state.data[
+                self.ui.combo_box_selection_data.currentData()
+                ][0]
+            ],
+            0.9
+        )
+        self.__set_answer(answers)
         return f'self.state.save_data_mode = {self.state.save_data_mode}'
 
     def push_button_add_data_click(self):# ПЕРЕДЕЛАТЬ
@@ -282,10 +279,9 @@ class MainWindow(AbstractWindow):
         """
         delite carent element
         """
-        if self.state.active_mod is not None:
+        if self.state.active_mod:
             current_index = self.ui.list_widget_value.currentRow()
-            item = self.ui.list_widget_value.item(current_index)
-            if item is not None:
+            if item := self.ui.list_widget_value.item(current_index):
                 question = QMessageBox.question(
                     self,
                     'Удалить значение',
@@ -294,9 +290,10 @@ class MainWindow(AbstractWindow):
                 )
                 if question == QMessageBox.StandardButton.Yes:
                     self.ui.list_widget_value.takeItem(current_index)
-                    self.state.data[
-                        self.ui.combo_box_selection_data.currentData()
-                    ][0].pop(current_index)
+                    self.state.data.delite_value(
+                        self.ui.combo_box_selection_data.currentData(),
+                        current_index
+                    )
                     self.state.save_data_mode = False
                 return f'self.state.save_data_mode = {self.state.save_data_mode}'
         return None
@@ -307,15 +304,16 @@ class MainWindow(AbstractWindow):
         заглушка
         """
         graphic_maker = GraphicMaker()
-        self.sc = graphic_maker.empty_with_axes(
-            color_text= self.settings.load_canvas()['text'],
-            color_fig= self.settings.load_canvas()['canvas']
+        settings = self.settings.load_canvas()
+        self.canvbar = graphic_maker.empty_with_axes(
+            color_text= settings['text'],
+            color_fig= settings['canvas']
         )
 
         self.graphwindow = GraphWindow()
-        self.plt_tool_bar = NavigationToolbar2QT(self.sc)
+        self.plt_tool_bar = NavigationToolbar2QT(self.canvbar)
         self.graphwindow.graph.toolBar.insertWidget(self.graphwindow.graph.action_create_graph, self.plt_tool_bar)
-        self.graphwindow.setCentralWidget(self.sc)
+        self.graphwindow.setCentralWidget(self.canvbar)
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.insertWidget(0, self.graphwindow)
@@ -327,7 +325,7 @@ class MainWindow(AbstractWindow):
         self.timer.timeout.connect(self.action_save_click)
 
     def __init_main_list_widget_value(self):
-        self.ui.list_widget_value.itemDoubleClicked.connect(self.editValue)
+        self.ui.list_widget_value.itemDoubleClicked.connect(self.edit_value)
         self.ui.list_widget_value.itemDoubleClicked.connect(self.change_stat)
         self.ui.list_widget_value.customContextMenuRequested.connect(self.menu)
 
@@ -336,7 +334,7 @@ class MainWindow(AbstractWindow):
 
     def __init_main_button(self):
         self.ui.push_button_create_calc.clicked.connect(self.push_button_create_calc_click)
-        self.ui.push_button_add_data.clicked.connect(self.add_item)
+        self.ui.push_button_add_data.clicked.connect(self.push_button_add_data_click)
         self.ui.push_button_delite_data.clicked.connect(self.push_button_delite_data_click)
 
     def __init_main_action(self):
@@ -365,23 +363,22 @@ class MainWindow(AbstractWindow):
     # helpfull
     def __update_ui(self):
         self.change_theme()
+        setting_canvas = self.settings.load_canvas()
+        setting_window = self.settings.load_category_json('window')
+
         self.graphwindow.addToolBar(
-            eval(
-                self.settings.load_attribute('window', 'toolBar')
-            ),
+            eval(setting_window['toolBar']),
             self.graphwindow.graph.toolBar
         )
         self.addDockWidget(
-            eval(
-                self.settings.load_attribute('window','dockWidget')
-            ),
+            eval(setting_window['dockWidget']),
             self.ui.dockWidget
         )
-        self.sc.update_collor(
-            self.settings.load_canvas()['canvas'],
-            self.settings.load_canvas()['text']
+        self.canvbar.update_collor(
+            setting_canvas['canvas'],
+            setting_canvas['text']
         )
-        self.sc.draw()
+        self.canvbar.draw()
 
     def __enabled_action(self, enable: bool):
         self.ui.action_save.setEnabled(enable)
@@ -418,17 +415,17 @@ class MainWindow(AbstractWindow):
             item.setFlags(item.flags() | Qt.ItemIsEditable)  # Добавляем возможность редактирования значения
             self.ui.list_widget_value.addItem(item)
             # Выделяем новый элемент и запускаем его редактирование
-            self.editValue(item)
+            self.edit_value(item)
 
     def closeEvent(self, event):
         """
         заглушка
         """
-        self.save_settings()
+        self.__save_settings()
         logging.info('main window close')
         event.accept()  # Подтверждаем закрытие окна
 
-    def save_settings(self):
+    def __save_settings(self):
         """
         заглушка
         """
@@ -437,10 +434,14 @@ class MainWindow(AbstractWindow):
         try:
             self.settings.save_data_json('window', tool_bar_area, 'toolBar')
             self.settings.save_data_json('window', dock_widget_area, 'dockWidget')
+            self.settings.save_start(
+                self.user_db.select_user().username
+            )
             logging.info('save settings')
             return True
         except FileNotFoundError as err:
             logging.error(err, exc_info= True)
+            return False
 
     def fill_listwidget(self): # ПЕРЕСМОРЕТЬ ЧТО МОЖНО УПРОСТИТЬ
         """
@@ -448,122 +449,84 @@ class MainWindow(AbstractWindow):
         заготовка на будещее
         """
         self.ui.list_widget_value.clear()
-        match self.state.active_mod:
-            case 'bd':
-                if self.state.data is not None and self.ui.combo_box_selection_data.currentData() is not None:
-                    return self.add_elem_on_list_winget()
-            case 'excel':
-                return self.add_elem_on_list_winget()
-            case _:
-                pass
+        if self.ui.combo_box_selection_data.currentData():
+            try:
+                for numder in self.state.data.value(self.ui.combo_box_selection_data.currentData()):
+                    self.ui.list_widget_value.addItem(str(numder[1]))
+                return True
+            except KeyError as err:
+                logging.error(err, exc_info= True)
+        return False
 
-    def add_elem_on_list_winget(self):
-        """
-        заглушка
-        """
-        key = self.ui.combo_box_selection_data.currentData()
-        try:
-            for numder in self.state.data[key][0]:
-                self.ui.list_widget_value.addItem(str(numder[1]))
-            return True
-        except KeyError as err:
-            logging.error(err, exc_info= True)
-
-    def add_selection_data(self, full_data): # ПЕРЕСМОТЕРТЬ TODO
+    def add_selection_data(self, full_data): #TODO ПЕРЕСМОТЕРТЬ
         """
         заглушка
         """
         # ПЕРЕПИСАТЬ ВСЮ ФУНКЦИ
-        if self.state.data:
-            index = self.ui.combo_box_selection_data.count()
-            last_index = self.ui.combo_box_selection_data.itemData(index-1)[0]
-            c = get_name_column(1, full_data)
-            m = last_index+1, c , False, ()
-            self.state.data[m] = full_data.get(c)
-            if index:
-                self.ui.combo_box_selection_data.addItem(
-                    c,
-                    m
-                )
-                # self.fill_listwidget()
-            else:
-                self.ui.combo_box_selection_data.addItem(
-                    c,
-                    m
-                )
-                # self.fill_listwidget()
-
-        else:
-            # переделать
-            c = get_name_column(1, full_data)
-            m = 1, c , False, ()
-            self.state.data[m] = full_data.get(c)
-            self.ui.combo_box_selection_data.addItem(
-                c,
-                m
-            )
-            # self.fill_listwidget()
+        self.state.data += full_data
+        self.fill_combo_box_selection_data()
         self.enable_ui(True)
         self.state.save_data_mode = False
 
-    def on_change(self, read_excel_signal):
+    @Slot(Data)
+    def on_change(self, read_signal: Data):
         """
         заглушка
         """
         self.load_window.close()
+        self.state.data = read_signal
         self.read_thread.quit()
-        self.state.data = ast.literal_eval(read_excel_signal)
-        self.read_thread.quit()
-        if self.state.data is not None:
+        if self.state.data:
             self.ui.combo_box_selection_data.clear()
-            for key in self.state.data:
+            for key in self.state.data.name():
                 self.ui.combo_box_selection_data.addItem(
                     key[1],
                     key
                 )
-        self.add_elem_on_list_winget()
+        self.state.data.set_metadate(True)
+        self.fill_listwidget()
+        self.enable_ui(True)
 
-    def editValue(self, item):
+    def edit_value(self, item):
         """
         заглушка
         """
         index = self.ui.list_widget_value.row(item)
         edit = QLineEdit(self)
         edit.setText(item.text())
-        edit.returnPressed.connect(partial(self.saveValue, item, index, edit))
+        edit.returnPressed.connect(partial(self.save_value, item, index, edit))
         self.ui.list_widget_value.setItemWidget(item, edit)
         edit.setFocus()
         self.state.save_data_mode = False
 
-    def saveValue(self, item, index, edit):
+    def save_value(self, item, index, edit: QLineEdit):
         """
         заглушка
         """
         new_value = edit.text()
-
         # Проверяем, заполнено ли новое значение
+        # TODO проверка на валидность данных
         if new_value == '':
             return
+
+        self.ui.list_widget_value.takeItem(index)
+        item.setText(str(float(new_value)))
+        self.ui.list_widget_value.insertItem(index, item)
         if self.state.change_mode:
-            b = self.ui.combo_box_selection_data.currentData()
-            self.state.data[b][0][index].append(0, float(new_value))
-
-            edit.deleteLater()
-            self.ui.list_widget_value.takeItem(index)
-            item.setText(str(float(new_value)))
-            self.ui.list_widget_value.insertItem(index, item)
-
-            self.state.save_data_mode = False
-            self.state.change_mode = False
+            self.state.data.change_value(
+                self.ui.combo_box_selection_data.currentData(),
+                index,
+                float(new_value)
+            )
         else:
-            self.ui.list_widget_value.takeItem(index)
-            item.setText(str(float(new_value)))
-            self.ui.list_widget_value.insertItem(index, item)
-            b = self.ui.combo_box_selection_data.currentData()
-            self.state.data[b][0].append((0, float(new_value)))
-            edit.deleteLater()
-            self.state.add_mod = False
-            self.state.save_data_mode = False
+            self.state.data.append_value(
+                self.ui.combo_box_selection_data.currentData(),
+                float(new_value)
+            )
+        edit.deleteLater()
+
+        self.state.add_mod = False
+        self.state.save_data_mode = False
 
     def change_stat(self):
         """
@@ -576,37 +539,52 @@ class MainWindow(AbstractWindow):
             selected_item = self.ui.list_widget_value.indexAt(pos)
             context_menu = QMenu(self)
             if selected_item.row() != -1:
-                # Клик произошел на элементе списка
                 add_action = context_menu.addAction('Добавить')
                 change_action = context_menu.addAction('Изменить')
                 del_action = context_menu.addAction('Удалить')
                 action = context_menu.exec(self.ui.list_widget_value.mapToGlobal(pos))
                 if action == add_action:
-                    self.add_item()
+                    self.push_button_add_data_click()
                 elif action == change_action:
                     self.change_stat()
-                    self.editValue(self.ui.list_widget_value.currentItem())
+                    self.edit_value(self.ui.list_widget_value.currentItem())
                 elif action == del_action:
                     self.push_button_delite_data_click()
             else:
-                # Клик произошел вне элементов списка
                 some_action = context_menu.addAction('Добавить')
                 action = context_menu.exec(self.ui.list_widget_value.mapToGlobal(pos))
                 if action == some_action:
-                    self.add_item()
+                    self.push_button_add_data_click()
+
+    def __fill_list_widget_answer(self):
+        self.ui.list_widget_answer.clear()
+        for answers in self.state.data.answer(self.ui.combo_box_selection_data.currentData()):
+            for answer in answers:
+                if answer:
+                    _item = QListWidgetItem(str(answer[1]))
+                    _item.setFlags(_item.flags() & ~Qt.ItemIsSelectable)
+                    self.ui.list_widget_answer.addItem(_item)
 
     def __set_answer(self, answers):
-        if answers is None:
-            _item = QListWidgetItem('Невозможно расчитать для данных значений')
-            _item.setFlags(_item.flags() & ~Qt.ItemIsSelectable)
-            self.ui.list_widget_answer.addItem(_item)
-        if any(answers):
+        #TODO переделать что бы не было захардкоженого значения 1
+        if answers is not None:
             for answer in answers:
-                _item = QListWidgetItem(str(answer))
-                _item.setFlags(_item.flags() & ~Qt.ItemIsSelectable)
-                self.ui.list_widget_answer.addItem(_item)
+                self.state.data.append_answer(
+                    self.ui.combo_box_selection_data.currentData(),
+                    answer
+                )
+            self.__fill_list_widget_answer()
+            if self.ui.list_widget_answer.count() == 0:
+                self.ui.line_edit_metod.setText('Грубых погрешностей не обноруженно')
+            else:
+                self.ui.line_edit_metod.setText(
+                    f'Расчёт проведён методом {self.user_db.select_method(1)}'
+                )
+            # TODO save calc
             self.state.save_data_mode = False
         else:
-            _item = QListWidgetItem('Грубых погрешностей нет!')
-            _item.setFlags(_item.flags() & ~Qt.ItemIsSelectable)
-            self.ui.list_widget_answer.addItem(_item)
+            self.ui.line_edit_metod.setText('Для данных значений неполучиловь найти значение в таблице')
+        self.state.data.change_method(
+            self.ui.combo_box_selection_data.currentData(),
+            1
+        )

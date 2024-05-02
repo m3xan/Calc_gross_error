@@ -15,11 +15,6 @@ class JsonSettings:
     _instance = None
     __user_id = None
 
-    @overload
-    def save_data_json(self, categor: str, data: str) -> bool: ...
-    @overload
-    def save_data_json(self, categor: str, data: str, attribute: str) -> bool: ...
-
     def __new__(cls):
         if not isinstance(cls._instance, cls):
             cls._instance = object.__new__(cls)
@@ -29,7 +24,7 @@ class JsonSettings:
         return self.__user_id
 
     def set_user_id(self, user_id: int):
-        if isinstance(user_id, int)  or user_id == 'option':
+        if isinstance(user_id, int)  or user_id == 'option' or user_id == 'start':
             self.__user_id = user_id
 
     def load_json(self):
@@ -41,7 +36,10 @@ class JsonSettings:
             'r',
             encoding= 'utf-8'
         ) as file:
-            return json.load(file)
+            try:
+                return json.load(file)
+            except json.decoder.JSONDecodeError:
+                return None
 
     def save_json(self, data = None):
         """
@@ -66,6 +64,11 @@ class JsonSettings:
         """
         return self.load_category_json(categor)[attribute]
 
+    @overload
+    def save_data_json(self, categor: str, data: str) -> bool: ...
+    @overload
+    def save_data_json(self, categor: str, data: str, attribute: str) -> bool: ...
+
     def save_data_json(self, categor: str, data: str, attribute: str = None) -> bool:
         """
         заглушка
@@ -82,6 +85,10 @@ class JsonSettings:
         self.save_json(data_json)
         return True
 
+    def save_start(self, name: str):
+        self.__user_id = 'start'
+        self.save_json(name)
+
     def load_theme(self, parent: QWidget) -> str | None:
         """
         заглушка
@@ -91,10 +98,6 @@ class JsonSettings:
         style_content = self.__load_data(theme_name)
         if style_content is not None:
             parent.setStyleSheet(style_content)
-
-    def load_canvas(self):
-        category = self.load_category_json('window')
-        return category['canvas']
 
     def __load_data(self, theme_name):
         try:
@@ -108,6 +111,22 @@ class JsonSettings:
         except FileNotFoundError:
             logging.warning('Не удалось найти файл стилей')
             return None
+
+    def load_canvas(self) -> dict:
+        """
+        return theme canvas
+
+        key:
+        "text" color of the text,
+        "canvas" color of the background
+        """
+        category = self.load_category_json('window')
+        logging.info(f'canvas theme: {category['canvas']}')
+        return category['canvas']
+
+    def load_start(self):
+        self.__user_id = 'start'
+        return self.load_json()
 
     def __check_user(self) -> str:
         if os.path.exists(f'{SETTINGS_PATH}\\{self.__user_id}.json'):

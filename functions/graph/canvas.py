@@ -17,9 +17,9 @@ class Canvas(FigureCanvasQTAgg):
 
     def update_collor(self, color_fig: str, color_text: str):
         self.fig.set_facecolor(color_fig)
-        self.ax.set_title('названия у ничего', color= color_text)
-        self.ax.set_xlabel('ничего по x', color= color_text)
-        self.ax.set_ylabel('ничего по y', color= color_text)
+        self.ax.set_title('График распределения', color= color_text)
+        self.ax.set_xlabel('Величина', color= color_text)
+        self.ax.set_ylabel('Количество', color= color_text)
         self.ax.tick_params(labelcolor= color_text)
         self.ax.set()
         self.ax.grid(True)

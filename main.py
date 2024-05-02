@@ -34,7 +34,7 @@ class Programm:
             window = AuthorizationWindow()
         else:
             window = ErroWindow()
-            window.file_not_faund()
+            window.set_message('Critical file not found')
         window.show()
         sys.exit(app.exec())
 

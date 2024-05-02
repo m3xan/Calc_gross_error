@@ -12,10 +12,9 @@ from window.abstract_model.models import AbstractDialog
 
 from data_base.user.user_models import User
 
+from functions.circle_image.image import Image as ImageUser
 from functions.circle_image.circle_image import ImageChanger
 from functions.walidation.walid_password import check_password_strength
-
-from global_param import STANDART_IMAGE
 
 class UserSettingsDialog(AbstractDialog):
     """
@@ -40,7 +39,7 @@ class UserSettingsDialog(AbstractDialog):
             self.__circle_image(user.image)
         else:
             self.__circle_image(
-                STANDART_IMAGE
+                ImageUser()
             )
 
     def __chose_image(self):
@@ -63,7 +62,6 @@ class UserSettingsDialog(AbstractDialog):
             img = img.convert('RGB')
             path = f'Data\\Data_base\\image\\{os.path.splitext(os.path.basename(self.image[0]))[0]}.jpg'
             img.save(path, 'JPEG', quality=80)
-
             self.user_db.update_image(path)
             return True
         return None

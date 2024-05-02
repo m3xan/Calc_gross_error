@@ -10,8 +10,3 @@ class ErroWindow(QMessageBox):
     def set_message(self, message: str):
         if isinstance(message, str):
             self.setText(message)
-
-    def file_not_faund(self):
-        self.set_message(
-            'Critical file not found'
-        )

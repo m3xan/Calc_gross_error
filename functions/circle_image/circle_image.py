@@ -1,28 +1,43 @@
 
-import os
 from typing import overload
 
 from PySide6.QtGui import QPixmap, QPainter, QRegion, QColor
 from PySide6.QtCore import Qt
 
+from functions.circle_image.image import Image
+
 class ImageChanger:
+    __image_path = None
 
     @overload
-    def __init__(self,) -> None: ...
+    def __init__(self) -> None: ...
     @overload
     def __init__(self, image_path: str) -> None: ...
+    @overload
+    def __init__(self, image_path: Image) -> None: ...
+    @overload
+    def set_image(self, image_path: str) -> bool: ...
+    @overload
+    def set_image(self, image_path: Image) -> bool: ...
 
     def __init__(self, image_path = None) -> None:
-        self.set_image(image_path)
+        if image_path is not  None:
+            self.set_image(image_path)
 
     def get_image_path(self):
         return self.__image_path
 
-    def set_image(self, image_path: str):
-        if result := os.path.exists(image_path) and image_path is not None:
-            self.__image_path = image_path
-            return result
-        return result
+    def set_image(self, image_path):
+        if isinstance(image_path, str):
+            image = Image()
+            if image.set_image_path(image_path):
+                self.__image_path = image_path
+                return True
+        if isinstance(image_path, Image):
+            if (image := image_path.get_image_path()) is not None:
+                self.__image_path = image
+                return True
+        return False
 
     def circle_image(self, desired_size: float | int):
         orig_pixmap = QPixmap(self.__image_path)

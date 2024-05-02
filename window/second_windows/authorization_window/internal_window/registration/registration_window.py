@@ -10,8 +10,8 @@ from functions.new_file.create_settings import create_settngs
 from functions.walidation.walid_password import check_password_strength
 
 class InternalRegistrationWindow(AbstractWindow):
-    autorisation: Signal = Signal(bool)
-    open_mainwindow:Signal = Signal(int)
+    autorisation: Signal = Signal()
+    open_mainwindow:Signal = Signal()
 
     def __init__(self):
         super().__init__()
@@ -70,8 +70,9 @@ class InternalRegistrationWindow(AbstractWindow):
                 self.ui.line_edit_password_main.text()
             )
             create_settngs(new_user_id)
-            self.open_mainwindow.emit(new_user_id)
+            self.user_db.set_id(new_user_id)
+            self.open_mainwindow.emit()
 
     @Slot()
     def __set_login_window(self):
-        self.autorisation.emit(True)
+        self.autorisation.emit()

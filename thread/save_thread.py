@@ -1,5 +1,5 @@
 """
-Модуль с ядром для праллельного сохронения данных из эксель
+Модуль с ядром для праллельного сохронения данных
 """
 from PySide6.QtCore import QThread
 
@@ -7,7 +7,7 @@ from functions.excel import excel
 
 class SaveThread(QThread):
     """
-    Ядро для праллельного сохронить данных из эксель
+    Ядро для праллельного сохронить данных
     """
     def __init__(self, path: str, new_dict: dict):
         super().__init__()
