@@ -56,8 +56,3 @@ class AuthorizationWindow(AbstractWindow):
             self.main_window.set_message('All file not found')
         self.main_window.show()
         self.deleteLater()
-
-    def __str__(self) -> str:
-        _reg = self.reg_win.isVisible()
-        _aut = self.aut_win.isVisible()
-        return f'visible registration window {_reg}, visible autofication window {_aut}'

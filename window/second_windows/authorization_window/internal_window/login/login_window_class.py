@@ -50,6 +50,7 @@ class Ui_Autorization(object):
         self.line_edit_login.setSizePolicy(sizePolicy)
         self.line_edit_login.setMinimumSize(QSize(277, 35))
         self.line_edit_login.setMaximumSize(QSize(16777215, 30))
+        self.line_edit_login.setFocusPolicy(Qt.ClickFocus)
         self.line_edit_login.setClearButtonEnabled(True)
 
         self.gridLayout.addWidget(self.line_edit_login, 1, 0, 1, 2)

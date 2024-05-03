@@ -44,11 +44,3 @@ class Image:
         return self.get_image_path()
     def __len__(self):
         return len(re.findall(r'[\\]|/', self.__image))
-    def __gt__(self, other):
-        return len(self) > len(other)
-    def __lt__(self, other):
-        return len(self) < len(other)
-    def __ge__(self, other):
-        return len(self) >= len(other)
-    def __le__(self, other):
-        return len(self) <= len(other)

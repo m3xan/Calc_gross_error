@@ -33,9 +33,9 @@ class InternalAutorizationWindow(AbstractWindow):
             self.ui.line_edit_login.setText(loggin)
             self.__load_image()
         else:
-            self.__set_image(Image())
-
-
+            self.ui.line_edit_login.setFocusPolicy(Qt.StrongFocus)
+            self.__set_image(Image()) 
+        
     def __set_image(self, image_path):
         target_pixmap = ImageChanger(image_path).circle_image(
             self.ui.label_image.size().height()
