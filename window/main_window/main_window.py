@@ -28,7 +28,6 @@ from functions.loger import Logger
 
 from data_class.data import Data
 
-#TODO переделать заполнение лист виджета
 class MainWindow(AbstractWindow):
     """
     class MainWindow
@@ -119,7 +118,6 @@ class MainWindow(AbstractWindow):
                 return self.state.save_data_mode
             case 'bd':
                 self.state.data = self.user_db.save_data(self.state.data)
-
                 self.state.save_data_mode = True
                 return self.state.save_data_mode
         return None
@@ -264,6 +262,7 @@ class MainWindow(AbstractWindow):
             0.9
         )
         self.__set_answer(answers)
+        self.action_save_click()
         return f'self.state.save_data_mode = {self.state.save_data_mode}'
 
     def push_button_add_data_click(self):# ПЕРЕДЕЛАТЬ
@@ -558,32 +557,39 @@ class MainWindow(AbstractWindow):
 
     def __fill_list_widget_answer(self):
         self.ui.list_widget_answer.clear()
-        for answers in self.state.data.answer(self.ui.combo_box_selection_data.currentData()):
-            for answer in answers:
-                if answer:
-                    _item = QListWidgetItem(str(answer[1]))
-                    _item.setFlags(_item.flags() & ~Qt.ItemIsSelectable)
-                    self.ui.list_widget_answer.addItem(_item)
+        for answer in self.state.data.answer(self.ui.combo_box_selection_data.currentData()):
+            if answer:
+                _item = QListWidgetItem(str(answer[1]))
+                _item.setFlags(_item.flags() & ~Qt.ItemIsSelectable)
+                self.ui.list_widget_answer.addItem(_item)
 
     def __set_answer(self, answers):
         #TODO переделать что бы не было захардкоженого значения 1
         if answers is not None:
-            for answer in answers:
-                self.state.data.append_answer(
+            for index, answer in enumerate(answers):
+                try:
+                    self.state.data.change_answer(
                     self.ui.combo_box_selection_data.currentData(),
+                    index,
                     answer
-                )
+                    )
+                except IndexError:
+                    self.state.data.append_answer(
+                        self.ui.combo_box_selection_data.currentData(),
+                        answer
+                    )
             self.__fill_list_widget_answer()
             if self.ui.list_widget_answer.count() == 0:
-                self.ui.line_edit_metod.setText('Грубых погрешностей не обноруженно')
+                self.ui.line_edit_metod.setText(
+                    f'Грубых погрешностей не обноруженно по методу {self.user_db.select_method(1)}'
+                )
             else:
                 self.ui.line_edit_metod.setText(
                     f'Расчёт проведён методом {self.user_db.select_method(1)}'
                 )
-            # TODO save calc
             self.state.save_data_mode = False
         else:
-            self.ui.line_edit_metod.setText('Для данных значений неполучиловь найти значение в таблице')
+            self.ui.line_edit_metod.setText('Для данных неполучиловь найти значений')
         self.state.data.change_method(
             self.ui.combo_box_selection_data.currentData(),
             1

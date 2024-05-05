@@ -129,6 +129,6 @@ class Calculator:
 
     def calculate_with(self, data: list[float], _p: float):
         """calc with method"""
-        if self._method:
+        if self._method and len(data) >= 3:
             return self._method.calculate(data, _p)
         return None

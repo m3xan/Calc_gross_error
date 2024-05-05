@@ -2,27 +2,13 @@
 from typing import overload
 import functools
 
-class Calc:
-    append: int
-    change: int
+from data_class.models_data import Calc
+from data_class.models_data import Names
+from data_class.models_data import Values
+from data_class.models_data import Answers
+from data_class.models_data import Methods
 
-class Values(Calc):
-    append = 1
-    change = 2
-
-class Names(Calc):
-    append = 3
-    change = 4
-
-class Answers(Calc):
-    append = 5
-    change = 6
-
-class Methods(Calc):
-    append = 7
-    change = 8
-
-def vall_err(func):
+def vallue_error(func):
     @functools.wraps(func)
     def wrapper(*ar, **kw):
         try:
@@ -32,7 +18,7 @@ def vall_err(func):
             raise err
     return wrapper
 
-class Data(object):
+class Data:
 
     @overload
     def __init__(self, metadate: bool = False) -> None: ...
@@ -69,15 +55,6 @@ class Data(object):
                 self.append_answer(name, ans)
             self.append_method(name, values[2])
 
-    def _check_v(self, values: list) -> bool:
-        a = []
-        for value in values:
-            a.append((
-                isinstance(value[0], int),
-                isinstance(value[1], (int, float))
-            ))
-        return all(a)
-
     def append_name(self, name: tuple[int, str] | str):
         if self.meta_date:
             self.__metadate.append(
@@ -112,7 +89,7 @@ class Data(object):
     @overload
     def append_value(self, name: tuple[int, str], value: tuple[int, float]) -> None: ...
 
-    @vall_err
+    @vallue_error
     def append_value(self, name: tuple[int, str], value):
         if isinstance(value, (int, float)):
             self.__value[self.__name.index(name)].append((0, float(value)))
@@ -132,18 +109,18 @@ class Data(object):
     @overload
     def append_answer(self, name: tuple[int, str], answer: float | int) -> None: ...
 
-    @vall_err
+    @vallue_error
     def append_answer(self, name, answer):
         if isinstance(answer, (int, float)):
-            self.__answer[self.__name.index(name)].append([(0, float(answer))])
+            self.__answer[self.__name.index(name)].append((0, float(answer)))
             if self.meta_date:
-                self.__metadate[self.__name.index(name)][Answers].append((Answers.append, (0, float(answer))))
+                self.__metadate[self.__name.index(name)][Answers].append([(Answers.append, (0, float(answer)))])
         if isinstance(answer, tuple) and isinstance(answer[0], int) and isinstance(answer[1], float):
             self.__answer[self.__name.index(name)].append(answer)
             if self.meta_date:
                 self.__metadate[self.__name.index(name)][Answers].append([(Answers.append, answer)])
 
-    @vall_err
+    @vallue_error
     def append_method(self, name, method):
         if not isinstance(method, int) or method is None:
             return
@@ -153,7 +130,7 @@ class Data(object):
                 [(Methods.append, method)]
             )
 
-    @vall_err
+    @vallue_error
     def append_metadate(self, name, metadate):
         self.__metadate[self.__name.index(name)].append([metadate])
 
@@ -161,21 +138,21 @@ class Data(object):
         for value in self.__name:
             yield value
 
-    @vall_err
+    @vallue_error
     def value(self, name):
         for value in self.__value[self.__name.index(name)]:
             yield value
 
-    @vall_err
+    @vallue_error
     def answer(self, name):
         for value in self.__answer[self.__name.index(name)]:
             yield value
 
-    @vall_err
+    @vallue_error
     def method(self, name):
         return self.__method[self.__name.index(name)]
 
-    @vall_err
+    @vallue_error
     def metadate(self, name):
         for meta in self.__metadate[self.__name.index(name)].items():
             yield meta
@@ -237,34 +214,38 @@ class Data(object):
 
     def change_name(self, name, new_name):
         index = self.__name.index(name)
-        self.__name[index] = (name[0], new_name)
-        if self.meta_date:
-            self.__metadate[index][Names].append(
-                (self.__name[index], (Names.change, (name[0], new_name)))
-            )
+        if self.__name[index][1] != new_name:
+            self.__name[index] = (name[0], new_name)
+            if self.meta_date:
+                self.__metadate[index][Names].append(
+                    (self.__name[index], (Names.change, (name[0], new_name)))
+                )
 
     def change_value(self, name, index, new_value):
         old_value = self.__value[self.__name.index(name)][index]
-        self.__value[self.__name.index(name)][index] = (old_value[0], new_value)
-        if self.meta_date:
-            self.__metadate[self.__name.index(name)][Values][index].append(
-                (name, (Values.change, (old_value, new_value)))
-            )
+        if old_value[1] != new_value:
+            self.__value[self.__name.index(name)][index] = (old_value[0], new_value)
+            if self.meta_date:
+                self.__metadate[self.__name.index(name)][Values][index].append(
+                    (name, (Values.change, (old_value, new_value)))
+                )
 
     def change_answer(self, name, index, new_answer):
         old_answer = self.__answer[self.__name.index(name)][index]
-        self.__answer[self.__name.index(name)][index] = (old_answer[0], new_answer)
-        if self.meta_date:
-            self.__metadate[self.__name.index(name)][Answers][index].append(
-                (name, (Answers.change, (old_answer, new_answer)))
-            )
+        if old_answer[1] != new_answer:
+            self.__answer[self.__name.index(name)][index] = (old_answer[0], new_answer)
+            if self.meta_date:
+                self.__metadate[self.__name.index(name)][Answers][index].append(
+                    (name, (Answers.change, (old_answer, new_answer)))
+                )
 
     def change_method(self, name, new_method):
-        self.__method[self.__name.index(name)] = new_method
-        if self.meta_date:
-            self.__metadate[self.__name.index(name)][Methods].append(
-                (name, (Methods.change, new_method))
-            )
+        if self.__method[self.__name.index(name)] != new_method:
+            self.__method[self.__name.index(name)] = new_method
+            if self.meta_date:
+                self.__metadate[self.__name.index(name)][Methods].append(
+                    (name, (Methods.change, new_method))
+                )
 
     def delite_name(self, name):
         del self[name]
@@ -280,12 +261,12 @@ class Data(object):
     def __len__(self): #len()
         return len(self.__name)
 
-    @vall_err
+    @vallue_error
     def __getitem__(self, name: tuple[int, str]): #self[name]
         index = self.__name.index(name)
         return [self.__value[index], self.__answer[index], self.__method[index]]
 
-    @vall_err
+    @vallue_error
     def __delitem__(self, name): #del self[name]
         index = self.__name.index(name)
         del self.__name[index]
@@ -312,6 +293,9 @@ class Data(object):
                 self.append_method(name, other.method(name))
             self.meta_date = meta
         return self
+
+    def __bool__(self) -> bool:
+        return len(self.__name) != 0
 
     def __str__(self) -> str:
         data = {}
