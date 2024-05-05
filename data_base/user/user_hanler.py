@@ -6,7 +6,7 @@ from typing import overload
 
 from sqlalchemy import select
 
-import sys; sys.path.append('.')
+
 from data_base.user.user_models import User
 from data_base.user.calc_handler import CalculationHandler
 from data_base.user.orm_handler import OrmHandler

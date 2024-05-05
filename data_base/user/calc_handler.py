@@ -3,7 +3,7 @@ from typing import overload
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-import sys; sys.path.append('.')
+
 from data_base.user.user_models import Calculation
 from data_base.user.user_models import Value
 from data_base.user.user_models import Answer
@@ -14,7 +14,6 @@ from data_class.data import Data
 from data_class.models_data import Names
 from data_class.models_data import Values
 from data_class.models_data import Answers
-from data_class.models_data import Methods
 
 class CalculationHandler(OrmHandler):
     @overload
