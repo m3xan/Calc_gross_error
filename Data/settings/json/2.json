@@ -6,12 +6,13 @@
     "canvas": {
       "text": "#3a3a3a",
       "canvas": "white"
-    },
-    "Qt.TopToolBarArea": "toolBar",
-    "Qt.RightDockWidgetArea": "dockWidget"
+    }
   },
   "auto_save": {
-    "switched": true,
-    "time": 120000
+    "switched": false
+  },
+  "calculation":{
+    "method": 0,
+    "significance_level": 0.95
   }
 }

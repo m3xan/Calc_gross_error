@@ -2,14 +2,17 @@
   "window": {
     "dockWidget": "Qt.RightDockWidgetArea",
     "toolBar": "Qt.TopToolBarArea",
-    "theme": "dark",
+    "theme": "light",
     "canvas": {
-      "text": "white",
-      "canvas": "#3a3a3a"
+      "text": "#3a3a3a",
+      "canvas": "white"
     }
   },
   "auto_save": {
-    "switched": true,
-    "time": 120000
+    "switched": false
+  },
+  "calculation": {
+    "method": 1,
+    "significance_level": 0.95
   }
 }

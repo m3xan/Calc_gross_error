@@ -1,6 +1,5 @@
 /*-----QWidget-----*/
-QWidget
-{
+QWidget{
 	background-color: #3a3a3a;
 	color: #fff;
 	selection-background-color: #b78620;
@@ -476,4 +475,40 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
 {
     background: none;
 
+}
+
+
+QStackedWidget QWidget {
+    background-color: transparent;
+}
+
+
+QTabWidget
+{
+	background-color: #2d2d2d;
+	border: 1px solid #000;
+	color: #fff;
+
+}
+
+QTabBar::tab {
+	background-color: #2d2d2d;
+	color: #fff;
+    padding: 8px 16px;
+    border: 1px solid #cccccc;
+}
+
+QTabBar::tab:selected, QTabBar::tab:hover {
+    background-color: rgba(183, 134, 32, 20%);
+	border: 1px solid #b78620;
+	color: #fff;
+
+}
+
+
+QTabBar::QWidget{
+	background-color: #3a3a3a;
+	color: #fff;
+	selection-background-color: #b78620;
+	selection-color: #000;
 }

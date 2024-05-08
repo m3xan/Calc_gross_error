@@ -10,5 +10,9 @@
   },
   "auto_save": {
     "switched": false
+  },
+  "calculation":{
+    "method": 0,
+    "significance_level": 0.95
   }
 }
