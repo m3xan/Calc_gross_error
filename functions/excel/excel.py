@@ -138,7 +138,7 @@ def create_new_sheet(book: openpyxl.workbook.workbook.Workbook, path: str):
         ws.cell(1, 2).value = str(datetime.now())
     book.save(path)
 
-def save_result_calc_excel(path: str, new_data: dict[tuple[int, str, bool, tuple[float,...]], tuple[float]]) -> None:
+def save_result_calc_excel(path: str, new_data: dict[tuple[int, str, bool, tuple[float,...]], tuple[float]]) -> dict[tuple[int, str, bool], tuple[float]]:
     """
     Доработать функционал с множеством строк мб много листов
 
@@ -149,6 +149,7 @@ def save_result_calc_excel(path: str, new_data: dict[tuple[int, str, bool, tuple
     diff_dict = different_dict(new_data, data)
     write_to_file(diff_dict, new_data, sheet)
     create_new_sheet(book, path)
+    return read_file_excel(path)
 
 def create_new_file(path: str, new_dict: dict[tuple[int, str, bool, tuple[float,...]], tuple[float]]) -> None:
     """

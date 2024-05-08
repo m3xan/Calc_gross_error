@@ -17,6 +17,7 @@ from window.main_window.main_window_class import Ui_MainWindow
 from window.main_window.interior_window.graph_window.graph_window import GraphWindow
 from window.second_windows.add_window.add_window import AddDialog
 from window.second_windows.settings.main_settings.setting_window import SettingsDialog
+from window.second_windows.settings.method_window.method_dialog import MethodsDialog
 from window.second_windows.load_window.load_window import LoadDialog
 from window.second_windows.about_window.about_window import AboutDialog
 
@@ -112,20 +113,27 @@ class MainWindow(AbstractWindow):
         match self.state.active_mod:
             case 'excel':
                 self.save_tread = SaveThread(self.state.excel_path[0], self.state.data)
+                self.save_tread.saved.connect(self.__set_data)
                 self.save_tread.start()
                 # change
                 self.state.save_data_mode = True
                 return self.state.save_data_mode
             case 'bd':
-                self.state.data = self.user_db.save_data(self.state.data)
+                self.save_tread = SaveThread(self.state.data)
+                self.save_tread.saved.connect(self.__set_data)
+                self.save_tread.start()
                 self.state.save_data_mode = True
                 return self.state.save_data_mode
         return None
 
+    @Slot(Data)
+    def __set_data(self, data: Data):
+        self.save_tread.deleteLater()
+        self.state.data = data
+
     def action_esc_click(self):
         """
         on esc clicked
-        переписать не используя QMessageBox
         """
         if self.state.save_data_mode is True:
             self.close()
@@ -173,7 +181,7 @@ class MainWindow(AbstractWindow):
         """
         if self.state.data:
             file_name = QFileDialog.getSaveFileName(
-            None,
+            self,
             'Сохранить как:',
             f'{os.path.join(os.getenv("userprofile"), f'Измерения {datetime.now().strftime('%d-%m-%Y %H.%M.%S')}')}',
             filter= "Книга Excel (*.xlsx)"
@@ -210,6 +218,10 @@ class MainWindow(AbstractWindow):
                 self.state.save_data_mode = False
             return f'self.state.save_data_mode = {self.state.save_data_mode}'
 
+    def action_calc_click(self):
+        dialog = MethodsDialog()
+        return dialog.exec()
+
     # button
     def push_button_create_graph_click(self):
         """
@@ -244,14 +256,14 @@ class MainWindow(AbstractWindow):
         """
         create_calc
         """
-        user_settings = 1
+        user_settings = self.settings.load_category_json('calculation')
         calculator = Calculator()
-        match user_settings:
-            case 1:
+        match user_settings['method']:
+            case 0:
                 calculator.set_method(Romanovsky())
-            case 2:
+            case 1:
                 calculator.set_method(Charlier())
-            case 3:
+            case 2:
                 calculator.set_method(Dixon())
 
         answers = calculator.calculate_with(
@@ -259,10 +271,9 @@ class MainWindow(AbstractWindow):
                 self.ui.combo_box_selection_data.currentData()
                 ][0]
             ],
-            0.9
+            user_settings['significance_level']
         )
         self.__set_answer(answers)
-        self.action_save_click()
         return f'self.state.save_data_mode = {self.state.save_data_mode}'
 
     def push_button_add_data_click(self):# ПЕРЕДЕЛАТЬ
@@ -344,7 +355,7 @@ class MainWindow(AbstractWindow):
         self.ui.action_save_as.triggered.connect(self.action_save_as_click)
         self.ui.action_esc.triggered.connect(self.action_esc_click)
         self.ui.action_setting_window.triggered.connect(self.action_setting_window_click)
-        self.ui.action_calc.triggered.connect(self.action_setting_window_click)
+        self.ui.action_calc.triggered.connect(self.action_calc_click)
         self.ui.action_help.triggered.connect(self.action_help_click)
         self.ui.action_info.triggered.connect(self.action_info_click)
         self.ui.action_delite.triggered.connect(self.action_delite_click)
@@ -452,6 +463,7 @@ class MainWindow(AbstractWindow):
             try:
                 for numder in self.state.data.value(self.ui.combo_box_selection_data.currentData()):
                     self.ui.list_widget_value.addItem(str(numder[1]))
+                # self.push_button_create_calc_click()
                 return True
             except KeyError as err:
                 logging.error(err, exc_info= True)
@@ -564,7 +576,6 @@ class MainWindow(AbstractWindow):
                 self.ui.list_widget_answer.addItem(_item)
 
     def __set_answer(self, answers):
-        #TODO переделать что бы не было захардкоженого значения 1
         if answers is not None:
             for index, answer in enumerate(answers):
                 try:
@@ -581,16 +592,18 @@ class MainWindow(AbstractWindow):
             self.__fill_list_widget_answer()
             if self.ui.list_widget_answer.count() == 0:
                 self.ui.line_edit_metod.setText(
-                    f'Грубых погрешностей не обноруженно по методу {self.user_db.select_method(1)}'
+                    'Грубых погрешностей не обноруженно'
                 )
             else:
                 self.ui.line_edit_metod.setText(
-                    f'Расчёт проведён методом {self.user_db.select_method(1)}'
+                    f'Расчёт проведён методом {self.user_db.select_method(
+                        self.settings.load_attribute('calculation', 'method') + 1
+                    )}'
                 )
             self.state.save_data_mode = False
         else:
             self.ui.line_edit_metod.setText('Для данных неполучиловь найти значений')
         self.state.data.change_method(
             self.ui.combo_box_selection_data.currentData(),
-            1
+            self.settings.load_attribute('calculation', 'method') + 1
         )

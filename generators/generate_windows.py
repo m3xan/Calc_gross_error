@@ -21,6 +21,7 @@ WINDOW_PATH = [
     'window\\second_windows\\settings\\main_settings',
     'window\\second_windows\\settings\\user_setting',
     'window\\second_windows\\authorization_window',
+    'window\\second_windows\\settings\\method_window',
     'window\\second_windows\\authorization_window\\internal_window\\login',
     'window\\second_windows\\authorization_window\\internal_window\\registration',
 ]
