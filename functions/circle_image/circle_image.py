@@ -34,7 +34,7 @@ class ImageChanger:
                 self.__image_path = image_path
                 return True
         if isinstance(image_path, Image):
-            if (image := image_path.get_image_path()) is not None:
+            if image := image_path.get_image_path():
                 self.__image_path = image
                 return True
         return False

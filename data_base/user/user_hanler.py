@@ -6,7 +6,6 @@ from typing import overload
 
 from sqlalchemy import select
 
-
 from data_base.user.user_models import User
 from data_base.user.calc_handler import CalculationHandler
 from data_base.user.orm_handler import OrmHandler
@@ -147,7 +146,7 @@ class DatabaseUsersHandler(OrmHandler):
     def select_method(self, id_method: int) -> str | None:
         return CalculationHandler(self.__user_id).select_method(id_method)
 
-    def select_calculation(self):
+    def select_calculation(self) -> Data:
         return CalculationHandler(self.__user_id).select_calculation()
 
     def save_data(self, data: Data) -> Data:
@@ -155,18 +154,3 @@ class DatabaseUsersHandler(OrmHandler):
 
     def add_method(self, name: str):
         CalculationHandler().add_method(name)
-
-if __name__ =='__main__':
-    bd = DatabaseUsersHandler()
-    bd.set_id(1)
-    # print(bd.select_calculation())
-    # bd.add_data(datas)
-    datas = bd.select_calculation()
-    print(datas)
-    datas.append_value(
-        (1, 'name'),
-        78
-    )
-    datas.delite_value((1, 'name'), 2)
-
-    datas = bd.save_data(datas)

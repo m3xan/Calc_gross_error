@@ -18,7 +18,7 @@ class Method(ABC):
     @abstractmethod
     def calculate(self, data: list[float], _p: float) -> list[float | None]: """calc value with metod"""
     @abstractmethod
-    def get_value_db(self, _n: int, _p: float) -> float | None: """get table value from db Method"""
+    def _get_value_db(self, _n: int, _p: float) -> float | None: """get table value from db Method"""
 
 class Romanovsky(Method):
     def calculate(self, data, _p):
@@ -26,7 +26,7 @@ class Romanovsky(Method):
         min_ = Decimal(min(data))
         average = Decimal(stat.fmean(data))
         _answer = []
-        table_value = self.get_value_db(
+        table_value = self._get_value_db(
             len(data),
             _p
         )
@@ -42,7 +42,7 @@ class Romanovsky(Method):
             _answer.append(float(min_))
         return _answer
 
-    def get_value_db(self, _n, _p):
+    def _get_value_db(self, _n, _p):
         table_db = DatabaseTableHandler()
         for corrector in [0, +1, -1]:
             correct_n = _n + corrector
@@ -55,7 +55,7 @@ class Charlier(Method):
         _answer = []
         average = Decimal(stat.fmean(data))
         absolut_x = [abs(Decimal(val) - average) for val in data]
-        table_value = self.get_value_db(
+        table_value = self._get_value_db(
             len(data),
             _p
         )
@@ -70,7 +70,7 @@ class Charlier(Method):
                 )
         return _answer
 
-    def get_value_db(self, _n, _p):
+    def _get_value_db(self, _n, _p):
         table_db = DatabaseTableHandler()
         for corrector in [0, +1, -1]:
             correct_n = _n + corrector
@@ -83,7 +83,7 @@ class Dixon(Method):
         _answer = []
         kd = {}
         data.sort(key=float)
-        table_value = self.get_value_db(
+        table_value = self._get_value_db(
             len(data),
             _p
         )
@@ -100,7 +100,7 @@ class Dixon(Method):
                 _answer.append(key)
         return _answer
 
-    def get_value_db(self, _n, _p):
+    def _get_value_db(self, _n, _p):
         table_db = DatabaseTableHandler()
         for corrector in [0, +1, -1]:
             correct_n = _n + corrector

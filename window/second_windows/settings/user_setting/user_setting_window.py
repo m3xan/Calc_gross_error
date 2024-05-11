@@ -16,6 +16,8 @@ from functions.circle_image.image import Image as ImageUser
 from functions.circle_image.circle_image import ImageChanger
 from functions.walidation.walid_password import check_password_strength
 
+from global_param import FILE_EXTENSIONS
+
 class UserSettingsDialog(AbstractDialog):
     """
     Класс окна настроек интерфейса
@@ -26,7 +28,6 @@ class UserSettingsDialog(AbstractDialog):
         self.ui.setupUi(self)
 
         self.change_theme()
-        #TODO image
         self.image = None
         self.__start()
         self.ui.push_button_chose_image.clicked.connect(self.__chose_image)
@@ -46,7 +47,7 @@ class UserSettingsDialog(AbstractDialog):
         filedialog = QFileDialog()
         self.image = filedialog.getOpenFileName(
             caption='Выбрать файл',
-            filter= 'Image File (*.png;*.jpg;*.gif;*.svg)'
+            filter= f'Image File ({''.join([f'*{i};' for i in FILE_EXTENSIONS])})'
         )
 
         if self.image != ('', ''):

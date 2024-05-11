@@ -242,7 +242,7 @@ class MainWindow(AbstractWindow):
         smoothed_hist = np.convolve(n, weights, mode='same')  # Применение усреднения по скользящему окну
 
         aligned_bin_centers = bin_centers[:len(smoothed_hist)]
-        self.canvbar.ax.plot(aligned_bin_centers, smoothed_hist, '-o', label='Прямая')
+        self.canvbar.ax.plot(aligned_bin_centers, smoothed_hist, '-o', label='Прямая распределения')
 
         settings = self.settings.load_canvas()
         self.canvbar.update_collor(
@@ -252,6 +252,7 @@ class MainWindow(AbstractWindow):
         self.canvbar.ax.legend()
         self.canvbar.draw()
 
+    @Slot()
     def push_button_create_calc_click(self):
         """
         create_calc
@@ -267,15 +268,16 @@ class MainWindow(AbstractWindow):
                 calculator.set_method(Dixon())
 
         answers = calculator.calculate_with(
-            [data[1] for data in self.state.data[
+            [data[1] for data in self.state.data.value(
                 self.ui.combo_box_selection_data.currentData()
-                ][0]
+                )
             ],
             user_settings['significance_level']
         )
         self.__set_answer(answers)
         return f'self.state.save_data_mode = {self.state.save_data_mode}'
 
+    @Slot()
     def push_button_add_data_click(self):# ПЕРЕДЕЛАТЬ
         """
         add data

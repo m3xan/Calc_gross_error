@@ -9,7 +9,7 @@ from data_base.table_values.table_model import Dixon_Table
 
 from data_base.engines import table_engine as engine
 
-class DatabaseTableHandler(object):
+class DatabaseTableHandler:
 
     def __init__(self) -> None:
         self.__session = Session(engine)
@@ -26,8 +26,7 @@ class DatabaseTableHandler(object):
                     P_Value.p == _p
                 ).scalar_subquery()
             )
-            result = session.execute(smet).first()
-            if result:
+            if result := session.execute(smet).first():
                 return result[0]
             return None
 
@@ -61,6 +60,3 @@ class DatabaseTableHandler(object):
             if result:
                 return result[0]
             return None
-
-if __name__ == '__main__':
-    print(DatabaseTableHandler().select_dixon(15, 0.9))
