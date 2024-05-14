@@ -21,7 +21,7 @@ class CalculationHandler(OrmHandler):
     @overload
     def __init__(self, user_id: str) -> None: ...
 
-    def __init__(self, user_id = None) -> None:
+    def __init__(self, user_id = None):
         self.__user_id = user_id
 
     def set_user(self, user_id: int):

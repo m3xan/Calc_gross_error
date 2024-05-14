@@ -2,7 +2,6 @@
 new
 """
 import hashlib
-from typing import overload
 
 from sqlalchemy import select
 
@@ -80,12 +79,7 @@ class DatabaseUsersHandler(OrmHandler):
                 return result[0]
             return None
 
-    @overload
-    def update_image(self, image: str) -> User | None: ...
-    @overload
-    def update_image(self, image: Image) -> User | None: ...
-
-    def update_image(self, image):
+    def update_image(self, image: str | Image):
         if isinstance(image, Image):
             image = image.get_image_path()
         if isinstance(image, str):

@@ -6,10 +6,10 @@ https://studfile.net/preview/3569684/
 version = 0.1
 """
 from abc import ABC, abstractmethod
-from typing import overload
 from decimal import Decimal
+from typing import overload
 import statistics as stat
-import math
+from math import sqrt
 
 from data_base.table_values.table_hanler import DatabaseTableHandler
 
@@ -33,7 +33,7 @@ class Romanovsky(Method):
         if not table_value:
             return None
         data = [(Decimal(val) - average)**2 for val in data]
-        sx = Decimal(math.sqrt(sum(data)/(len(data) - 1)))
+        sx = Decimal(sqrt(sum(data)/(len(data) - 1)))
         b1 = abs(max_ - average) / sx
         b2 = abs(min_ - average) / sx
         if b1 > table_value:
@@ -62,7 +62,7 @@ class Charlier(Method):
         if not table_value:
             return None
         data_double = [(Decimal(val) - average)**2 for val in data]
-        sx = Decimal(math.sqrt(sum(data_double)/(len(data_double) - 1)))
+        sx = Decimal(sqrt(sum(data_double)/(len(data_double) - 1)))
         for x in absolut_x:
             if x > sx * Decimal(table_value):
                 _answer.append(
@@ -109,26 +109,28 @@ class Dixon(Method):
         return None
 
 class Calculator:
-    _method = None
 
     @overload
     def __init__(self) -> None: ...
     @overload
     def __init__(self, method: Method) -> None: ...
 
-    def __init__(self, method: Method = None):
+    def __init__(self, method = None):
         if method:
-            self.set_method(method)
+            self.method = method
+        self.__method = None
 
-    def get_method(self):
-        return self._method
+    @property
+    def method(self):
+        return self.__method
 
-    def set_method(self, method: Method):
+    @method.setter
+    def method(self, method: Method):
         if isinstance(method, Method):
-            self._method = method
+            self.__method = method
 
     def calculate_with(self, data: list[float], _p: float):
         """calc with method"""
-        if self._method and len(data) >= 3:
-            return self._method.calculate(data, _p)
+        if self.__method and len(data) >= 3:
+            return self.__method.calculate(data, _p)
         return None
