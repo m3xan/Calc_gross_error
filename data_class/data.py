@@ -25,7 +25,7 @@ class Data:
     @overload
     def __init__(self, _dict: dict, metadate: bool = False) -> None: ...
 
-    def __init__(self, _obj = None, metadate: bool = False):
+    def __init__(self, _obj = None, metadate = False):
         self.__name = []
         self.__value = []
         self.__answer = []
@@ -195,6 +195,7 @@ class Data:
                     Answers: [[] for _ in range(len(self.__answer[self.__name.index(name)]))],
                     Methods: []
                     }
+
     @overload
     def delite_clear(self): ...
     @overload
@@ -302,40 +303,3 @@ class Data:
         for index, name in enumerate(self.__name):
             data[name] = [self.__value[index], self.__answer[index], self.__method[index]]
         return str(data)
-
-if __name__ == '__main__':
-    datas = Data(metadate = True)
-    d = {
-        (1, 'nameasdf') : [[(1, 12.2), (2, 3.1)], [(1, 1.3456), (2, 14.5)], 1],
-        (2, 'names') : [[(1, 12), (2, 3)], [(1, 1.0)], 2],
-    }
-    datas.append(d)
-    # datas.metadate_clear()
-    # print(datas)
-    da = Data()
-    da.append({(0, 'name') : [[(0, 12.9), (0, 3.7)], [(0, 1.0)], False]})
-    # da.metadate_clear()
-    # print(da[(0, 'name')][0])
-    datas += da
-    # datas.metadate_clear()
-
-    datas.change_name((1, 'nameasdf'), 'приает')
-
-    datas.change_value((1, 'приает'), 0, 12312312)
-    datas.change_value((1, 'приает'), 0, 123)
-    datas.change_value((1, 'приает'), 0, 67869)
-
-    datas.change_answer((1, 'приает'), 0, 12312312)
-    datas.change_answer((1, 'приает'), 0, 12)
-    datas.change_answer((1, 'приает'), 0, 12314)
-
-    datas.change_method((1, 'приает'), 2)
-    datas.change_method((1, 'приает'), 3)
-    datas.change_method((1, 'приает'), 1)
-    print(datas)
-    datas.metadate_clear(Values, 12)
-    for i in datas.name():
-        for q in datas.metadate(i):
-            print(q)
-
-    # print(datas)

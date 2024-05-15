@@ -44,7 +44,7 @@ class Romanovsky(Method):
 
     def _get_value_db(self, _n, _p):
         table_db = DatabaseTableHandler()
-        for corrector in [0, +1, -1]:
+        for corrector in 0, +1, -1:
             correct_n = _n + corrector
             if _value := table_db.select_romanovsky(correct_n, _p):
                 return _value
@@ -72,7 +72,7 @@ class Charlier(Method):
 
     def _get_value_db(self, _n, _p):
         table_db = DatabaseTableHandler()
-        for corrector in [0, +1, -1]:
+        for corrector in 0, +1, -1:
             correct_n = _n + corrector
             if _value := table_db.select_charlier(correct_n, _p):
                 return _value
@@ -102,7 +102,7 @@ class Dixon(Method):
 
     def _get_value_db(self, _n, _p):
         table_db = DatabaseTableHandler()
-        for corrector in [0, +1, -1]:
+        for corrector in 0, +1, -1:
             correct_n = _n + corrector
             if _value := table_db.select_dixon(correct_n, _p):
                 return _value

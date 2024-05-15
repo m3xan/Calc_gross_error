@@ -93,11 +93,10 @@ class MainWindow(AbstractWindow):
             self.read_thread.read_signal.connect(self.on_change)
             self.load_window = LoadDialog()
             self.load_window.exec()
-            # change
-            try:
+            if self.state.auto_save_time['switched']:
                 self.timer.start(self.state.auto_save_time['time'])
-            except AttributeError:
-                logging.info('timer off')
+                logging.info('timer on')
+            # change
             self.state.active_mod = 'excel'
             return self.state.active_mod, self.state.excel_path, self.state.data
         return None
@@ -265,8 +264,10 @@ class MainWindow(AbstractWindow):
         create_calc
         """
         user_settings = self.settings.load_category_json('calculation')
+        _method = user_settings['method']
+        _settings = user_settings['significance_level']
         calculator = Calculator()
-        match user_settings['method']:
+        match _method:
             case 0:
                 calculator.method = Romanovsky()
             case 1:
@@ -277,11 +278,13 @@ class MainWindow(AbstractWindow):
         answers = calculator.calculate_with(
             [data[1] for data in self.state.data.value(
                 self.ui.combo_box_selection_data.currentData()
-                )
-            ],
-            user_settings['significance_level']
+            )],
+            _settings
         )
         self.__set_answer(answers)
+        logging.debug(
+            f'calculate with method {_method}, significance_level {_settings}'
+        )
         return f'self.state.save_data_mode = {self.state.save_data_mode}'
 
     @Slot()
