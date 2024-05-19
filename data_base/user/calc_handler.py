@@ -63,14 +63,14 @@ class CalculationHandler(OrmHandler):
                     )
                     data.append_name((calc.id, calc.name_calculation))
                     values: tuple[Value] = session.execute(stm).all()
-                    answer_values: tuple[Answer] = session.execute(st).all()
+                    answer_values: tuple[tuple[Answer]] = session.execute(st).all()
                     for value in values:
                         for val in value:
                             data.append_value((calc.id, calc.name_calculation), (val.id, val.value))
                     for answer in answer_values:
                         for ans in answer:
                             data.append_answer((calc.id, calc.name_calculation), (ans.id, ans.answer_value))
-                    data.append_method((calc.id, calc.name_calculation) ,calc.id_metod)
+                    data.append_method((calc.id, calc.name_calculation), calc.id_metod)
         data.set_metadate(True)
         return data
 

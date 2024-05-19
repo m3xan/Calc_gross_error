@@ -35,11 +35,13 @@ class SettingsDialog(AbstractDialog):
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.addWidget(windows)
+        windows.rejected.connect(self.close)
         self.ui.widget.setLayout(self.layout)
 
     def set_main_setting(self):
         self.__clear()
         windows = AutoSaveWindow()
+        windows.rejected.connect(self.close)
         self.layout.addWidget(windows)
 
     def set_profile_setting(self):
@@ -50,11 +52,11 @@ class SettingsDialog(AbstractDialog):
     def set_widow_setting(self):
         self.__clear()
         setting_window = SettingDialog()
-        setting_window.windowThemeChanged.connect(self.send_signal_to_MainWindow)
+        setting_window.windowThemeChanged.connect(self.send_signal_to_mainWindow)
         self.layout.addWidget(setting_window)
 
     @Slot()
-    def send_signal_to_MainWindow(self):
+    def send_signal_to_mainWindow(self):
         self.change_theme()
 
     def __clear(self):

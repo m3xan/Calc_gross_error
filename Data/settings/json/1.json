@@ -1,7 +1,7 @@
 {
   "window": {
     "dockWidget": "Qt.RightDockWidgetArea",
-    "toolBar": "Qt.TopToolBarArea",
+    "toolBar": "Qt.BottomToolBarArea",
     "theme": "light",
     "canvas": {
       "text": "#3a3a3a",
@@ -14,5 +14,6 @@
   "calculation": {
     "method": 1,
     "significance_level": 0.95
-  }
+  },
+  "save_user_name": true
 }

@@ -3,6 +3,7 @@
 """
 from datetime import datetime
 import os
+import typing
 from functools import partial
 import logging
 
@@ -154,6 +155,7 @@ class MainWindow(AbstractWindow):
         dialog = AboutDialog()
         return dialog.exec()
 
+    @typing.final
     @Slot()
     @staticmethod
     def action_help_click(): # ДОДЕЛАНО
@@ -228,10 +230,7 @@ class MainWindow(AbstractWindow):
 
     # button
     @Slot()
-    def push_button_create_graph_click(self):
-        """
-        Create graph
-        """
+    def _push_button_create_graph_click(self):
         if not self.state.data:
             return False
         self.plt_tool_bar.update()
@@ -239,11 +238,12 @@ class MainWindow(AbstractWindow):
         hist = [
             data[1] for data in self.state.data[self.ui.combo_box_selection_data.currentData()][0]
         ]
+        # Что бы такое реализовать надо переопределить метод __getitem__
         n, bins, _ = self.canvbar.ax.hist(hist, rwidth=0.8, color='#ff8921', label= 'Распределение')
         bin_centers = 0.5 * (bins[:-1] + bins[1:])
 
         window_size = 5  # Размер окна для усреднения, можно добавить изменение в настройки измерения
-        weights = np.ones(window_size) / window_size  # Веса для усреднения значений
+        weights = np.ones(window_size) / window_size  # Веса для усреднения значений       
         smoothed_hist = np.convolve(n, weights, mode='same')  # Применение усреднения по скользящему окну
 
         aligned_bin_centers = bin_centers[:len(smoothed_hist)]
@@ -263,28 +263,15 @@ class MainWindow(AbstractWindow):
         """
         create_calc
         """
-        user_settings = self.settings.load_category_json('calculation')
-        _method = user_settings['method']
-        _settings = user_settings['significance_level']
-        calculator = Calculator()
-        match _method:
-            case 0:
-                calculator.method = Romanovsky()
-            case 1:
-                calculator.method = Charlier()
-            case 2:
-                calculator.method = Dixon()
+        try:
+            self.__calculate_answer()
+        except Exception as err:
+            logging.error(
+                f'calculation error: {err}',
+                exc_info= True
+            )
+            raise err
 
-        answers = calculator.calculate_with(
-            [data[1] for data in self.state.data.value(
-                self.ui.combo_box_selection_data.currentData()
-            )],
-            _settings
-        )
-        self.__set_answer(answers)
-        logging.debug(
-            f'calculate with method {_method}, significance_level {_settings}'
-        )
         return f'self.state.save_data_mode = {self.state.save_data_mode}'
 
     @Slot()
@@ -343,7 +330,8 @@ class MainWindow(AbstractWindow):
     # __init__
     def __init_graph(self):
         """
-        заглушка
+        primary initialization of the chart window
+        and inserting it into the frame
         """
         graphic_maker = GraphicMaker()
         settings = self.settings.load_canvas()
@@ -354,7 +342,10 @@ class MainWindow(AbstractWindow):
 
         self.graphwindow = GraphWindow()
         self.plt_tool_bar = NavigationToolbar2QT(self.canvbar)
-        self.graphwindow.graph.toolBar.insertWidget(self.graphwindow.graph.action_create_graph, self.plt_tool_bar)
+        self.graphwindow.graph.toolBar.insertWidget(
+            self.graphwindow.graph.action_create_graph,
+            self.plt_tool_bar
+        )
         self.graphwindow.setCentralWidget(self.canvbar)
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -393,7 +384,7 @@ class MainWindow(AbstractWindow):
         self.ui.action_delite.triggered.connect(self.action_delite_click)
 
     def __init_graph_menubar(self):
-        self.graphwindow.graph.action_create_graph.triggered.connect(self.push_button_create_graph_click)
+        self.graphwindow.graph.action_create_graph.triggered.connect(self._push_button_create_graph_click)
 
     def __init_reaction(self):
         self.__init_graph_menubar()
@@ -481,9 +472,11 @@ class MainWindow(AbstractWindow):
                 'window',
                 f'Qt.{str(self.dockWidgetArea(self.ui.dockWidget))[15:]}',
                 'dockWidget')
-            self.settings.save_start(
-                self.user_db.select_user().username
-            )
+            if self.settings.load_category_json('save_user_name'):
+                save = self.user_db.select_user().username
+            else:
+                save = None
+            self.settings.save_start(save)
             logging.info('save settings')
             return True
         except FileNotFoundError as err:
@@ -587,6 +580,32 @@ class MainWindow(AbstractWindow):
                 action = context_menu.exec(self.ui.list_widget_value.mapToGlobal(pos))
                 if action == some_action:
                     self.push_button_add_data_click()
+
+    def __calculate_answer(self):
+        user_settings = self.settings.load_category_json('calculation')
+        _method = user_settings['method']
+        _settings = user_settings['significance_level']
+        calculator = Calculator()
+        match _method:
+            case 0:
+                calculator.method = Romanovsky()
+            case 1:
+                calculator.method = Charlier()
+            case 2:
+                calculator.method = Dixon()
+
+        answers = calculator.calculate_with(
+            [data[1] for data in self.state.data.value(
+                self.ui.combo_box_selection_data.currentData()
+            )],
+            _settings
+        )
+        self.__set_answer(answers)
+
+        self.state.save_data_mode = False
+        logging.debug(
+            f'calculate with method {_method}, significance_level {_settings}'
+        )
 
     def __fill_combo_box_selection_data(self):
         self.ui.combo_box_selection_data.clear()

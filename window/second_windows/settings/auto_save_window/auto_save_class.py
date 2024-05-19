@@ -24,7 +24,7 @@ class Ui_DialogAutoSave(object):
     def setupUi(self, DialogAutoSave):
         if not DialogAutoSave.objectName():
             DialogAutoSave.setObjectName(u"DialogAutoSave")
-        DialogAutoSave.resize(272, 102)
+        DialogAutoSave.resize(272, 109)
         icon = QIcon()
         icon.addFile(u":/icon/calculator-Freepik.png", QSize(), QIcon.Normal, QIcon.Off)
         DialogAutoSave.setWindowIcon(icon)
@@ -34,17 +34,17 @@ class Ui_DialogAutoSave(object):
         self.verticalLayout.setContentsMargins(3, 3, 3, 3)
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.checkBox = QCheckBox(DialogAutoSave)
-        self.checkBox.setObjectName(u"checkBox")
-        self.checkBox.setFocusPolicy(Qt.NoFocus)
-        self.checkBox.setContextMenuPolicy(Qt.NoContextMenu)
-        self.checkBox.setInputMethodHints(Qt.ImhTime)
-        self.checkBox.setChecked(False)
-        self.checkBox.setAutoRepeat(False)
-        self.checkBox.setAutoExclusive(False)
-        self.checkBox.setTristate(False)
+        self.check_box_auto_save = QCheckBox(DialogAutoSave)
+        self.check_box_auto_save.setObjectName(u"check_box_auto_save")
+        self.check_box_auto_save.setFocusPolicy(Qt.NoFocus)
+        self.check_box_auto_save.setContextMenuPolicy(Qt.NoContextMenu)
+        self.check_box_auto_save.setInputMethodHints(Qt.ImhTime)
+        self.check_box_auto_save.setChecked(False)
+        self.check_box_auto_save.setAutoRepeat(False)
+        self.check_box_auto_save.setAutoExclusive(False)
+        self.check_box_auto_save.setTristate(False)
 
-        self.horizontalLayout_2.addWidget(self.checkBox)
+        self.horizontalLayout_2.addWidget(self.check_box_auto_save)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
@@ -69,6 +69,16 @@ class Ui_DialogAutoSave(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout)
 
+        self.verticalLayout_2 = QVBoxLayout()
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.check_box_save_user_name = QCheckBox(DialogAutoSave)
+        self.check_box_save_user_name.setObjectName(u"check_box_save_user_name")
+
+        self.verticalLayout_2.addWidget(self.check_box_save_user_name)
+
+
+        self.verticalLayout.addLayout(self.verticalLayout_2)
+
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.push_button_save = QPushButton(DialogAutoSave)
@@ -92,8 +102,9 @@ class Ui_DialogAutoSave(object):
 
     def retranslateUi(self, DialogAutoSave):
         DialogAutoSave.setWindowTitle(QCoreApplication.translate("DialogAutoSave", u"\u0410\u0432\u0442\u043e \u0441\u043e\u0445\u0440\u043e\u043d\u0435\u043d\u0438\u0435", None))
-        self.checkBox.setText(QCoreApplication.translate("DialogAutoSave", u"\u0410\u0432\u0442\u043e\u0441\u043e\u0445\u0440\u043e\u043d\u0435\u043d\u0438\u0435", None))
+        self.check_box_auto_save.setText(QCoreApplication.translate("DialogAutoSave", u"\u0410\u0432\u0442\u043e\u0441\u043e\u0445\u0440\u043e\u043d\u0435\u043d\u0438\u0435", None))
         self.label.setText(QCoreApplication.translate("DialogAutoSave", u"\u0410\u0432\u0442\u043e\u0441\u043e\u0445\u0440\u043e\u043d\u0435\u043d\u0438\u0435 \u0447\u0435\u0440\u0435\u0437 \u043a\u0430\u0436\u0434\u044b\u0435(\u043c\u0438\u043d\u0443\u0442)", None))
+        self.check_box_save_user_name.setText(QCoreApplication.translate("DialogAutoSave", u"\u0417\u0430\u043f\u043e\u043c\u043d\u0438\u0442\u044c \u043c\u0435\u043d\u044f", None))
         self.push_button_save.setText(QCoreApplication.translate("DialogAutoSave", u"\u0421\u043e\u0445\u0440\u043e\u043d\u0438\u0442\u044c ", None))
         self.push_button_esc.setText(QCoreApplication.translate("DialogAutoSave", u"\u0412\u044b\u0439\u0442\u0438", None))
     # retranslateUi

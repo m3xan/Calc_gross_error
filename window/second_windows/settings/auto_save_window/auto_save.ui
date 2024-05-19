@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>272</width>
-    <height>102</height>
+    <height>109</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,7 +36,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QCheckBox" name="checkBox">
+      <widget class="QCheckBox" name="check_box_auto_save">
        <property name="focusPolicy">
         <enum>Qt::NoFocus</enum>
        </property>
@@ -90,6 +90,17 @@
        </property>
        <property name="stepType">
         <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QCheckBox" name="check_box_save_user_name">
+       <property name="text">
+        <string>Запомнить меня</string>
        </property>
       </widget>
      </item>

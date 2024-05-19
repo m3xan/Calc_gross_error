@@ -31,13 +31,16 @@ class DatabaseTableHandler:
             return None
 
     def select_charlier(self, _n: int, _p: float) -> float | None:
-        if _p != 0.95:
-            return None
         with self.__session as session:
             smet = select(
                 Charlier_Table.value
             ).where(
-                Charlier_Table.n_id == _n
+                Charlier_Table.n_id == _n,
+                Charlier_Table.p_id == select(
+                    P_Value.id
+                ).where(
+                    P_Value.p == _p
+                ).scalar_subquery()
             )
             result = session.execute(smet).first()
             if result:

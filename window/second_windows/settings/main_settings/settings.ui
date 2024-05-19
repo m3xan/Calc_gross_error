@@ -14,7 +14,7 @@
    <string>Настройки</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../../../icon/res.qrc">
+   <iconset resource="../../../../icon/res.qrc">
     <normaloff>:/icon/calculator-Freepik.png</normaloff>:/icon/calculator-Freepik.png</iconset>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
@@ -80,7 +80,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../../../icon/res.qrc"/>
+  <include location="../../../../icon/res.qrc"/>
  </resources>
  <connections/>
 </ui>

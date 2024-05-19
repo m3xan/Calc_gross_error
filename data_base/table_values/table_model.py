@@ -32,6 +32,7 @@ class Charlier_Table(Base):
     __tablename__ = 'charlier_table'
     value: Mapped[float]
     n_id: Mapped[int] = mapped_column(ForeignKey('n_value.id'))
+    p_id: Mapped[int] = mapped_column(ForeignKey('p_value.id'))
     def __repr__(self) -> str:
         return f'Charlier_Table(id={self.id!r}, value={self.value!r}, n_id={self.n_id!r})'
 

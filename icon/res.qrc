@@ -11,6 +11,11 @@
     <file>save.png</file>
     <file>-help-outline_89965.ico</file>
   </qresource>
+  <qresource prefix="method">
+    <file>charlie.jpg</file>
+    <file>dixon.jpg</file>
+    <file>romanovsky.jpg</file>
+  </qresource>
   <qresource prefix="button">
     <file>free-icon-eye-4621498.png</file>
     <file>free-icon-open-eye-829117.png</file>

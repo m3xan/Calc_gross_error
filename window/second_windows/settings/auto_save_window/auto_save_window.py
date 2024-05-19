@@ -19,32 +19,42 @@ class AutoSaveWindow(AbstractDialog):
         self.__set_value()
         self.ui.push_button_save.clicked.connect(self.save_setting)
 
-        # checkBox
-        self.ui.checkBox.toggled.connect(self.checkBox_toggled)
+        self.ui.check_box_auto_save.toggled.connect(self.check_box_auto_save_toggled)
+        self.ui.push_button_esc.clicked.connect(self.reject)
 
     def save_setting(self):
-        if self.ui.checkBox.isChecked():
+        """
+        Заглушка
+        """
+        if self.ui.check_box_auto_save.isChecked():
             data = {"switched": True, "time": self.ui.spinBox.value() * 60000}
         else:
             data  = {"switched": False}
         self.settings.save_data_json('auto_save', data)
+        self.settings.save_data_json(
+            'save_user_name',
+            self.ui.check_box_save_user_name.isChecked()
+        )
         return True
 
-    def checkBox_toggled(self):
-        self.ui.spinBox.setEnabled(self.ui.checkBox.isChecked())
+    def check_box_auto_save_toggled(self):
+        self.ui.spinBox.setEnabled(self.ui.check_box_auto_save.isChecked())
 
     def __set_value(self):
         try:
-            iseneble = self.settings.load_category_json('auto_save')['switched']
-            self.ui.checkBox.setChecked(
-                iseneble
+            iseneble_auto_save = self.settings.load_category_json('auto_save')['switched']
+            self.ui.check_box_auto_save.setChecked(
+                iseneble_auto_save
             )
             self.ui.spinBox.setEnabled(
-                iseneble
+                iseneble_auto_save
             )
-            if iseneble:
+            self.ui.check_box_save_user_name.setChecked(
+                self.settings.load_category_json('save_user_name')
+            )
+            if iseneble_auto_save:
                 self.ui.spinBox.setValue(self.settings.load_category_json('auto_save')['time']/60000)
         except TypeError as err:
             logging.error(err, exc_info=True)
-            self.ui.checkBox.setEnabled(True)
+            self.ui.check_box_auto_save.setEnabled(True)
             self.ui.spinBox.setDisabled(True)

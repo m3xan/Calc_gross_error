@@ -29,6 +29,7 @@ def fill_out_the_table():
         for i in range(1, 101):
             new_sahar = Charlier_Table(
                 n_id= i,
+                p_id = 3,
                 value = (
                     Decimal(0.3381) + Decimal(0.71441)* Decimal(math.log(i, math.e))
                     ) / (
