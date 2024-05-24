@@ -6,7 +6,7 @@ import os
 from global_param import STANDART_IMAGE, FILE_EXTENSIONS
 
 class Image:
-    __image = STANDART_IMAGE
+    standart_image = STANDART_IMAGE
 
     @overload
     def __init__(self) -> None: ...
@@ -20,6 +20,7 @@ class Image:
         if self.__check_path(image_path):
             self.__image = image_path
             return True
+        self.__image = self.standart_image
         return False
 
     def get_image_path(self) -> str:

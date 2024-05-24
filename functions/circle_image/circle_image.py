@@ -7,18 +7,13 @@ from PySide6.QtCore import Qt
 from functions.circle_image.image import Image
 
 class ImageChanger:
-    __image_path = None
 
     @overload
     def __init__(self) -> None: ...
     @overload
-    def __init__(self, image_path: str) -> None: ...
+    def __init__(self, image_path: str | Image) -> None: ...
     @overload
-    def __init__(self, image_path: Image) -> None: ...
-    @overload
-    def set_image(self, image_path: str) -> bool: ...
-    @overload
-    def set_image(self, image_path: Image) -> bool: ...
+    def set_image(self, image_path: str | Image) -> bool: ...
 
     def __init__(self, image_path = None) -> None:
         if image_path is not  None:
@@ -33,11 +28,13 @@ class ImageChanger:
             if image.set_image_path(image_path):
                 self.__image_path = image_path
                 return True
-        if isinstance(image_path, Image):
+        elif isinstance(image_path, Image):
             if image := image_path.get_image_path():
                 self.__image_path = image
                 return True
-        return False
+        else:
+            self.__image_path = None
+            return False
 
     def circle_image(self, desired_size: float | int):
         orig_pixmap = QPixmap(self.__image_path)

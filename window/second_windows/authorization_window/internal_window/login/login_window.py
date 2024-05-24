@@ -34,13 +34,14 @@ class InternalAutorizationWindow(AbstractWindow):
             self.__load_image()
         else:
             self.ui.line_edit_login.setFocusPolicy(Qt.StrongFocus)
-            self.__set_image(Image()) 
-        
+            self.__set_image(Image())
+
     def __set_image(self, image_path):
-        target_pixmap = ImageChanger(image_path).circle_image(
-            self.ui.label_image.size().height()
+        self.ui.label_image.setPixmap(
+            ImageChanger(image_path).circle_image(
+                self.ui.label_image.size().height()
+            )
         )
-        self.ui.label_image.setPixmap(target_pixmap)
 
     def __init_show_button(self):
         self.show_button = QPushButton(self)

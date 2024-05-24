@@ -1,7 +1,7 @@
 """
-Calc
+calc
 ====
-import Calc
+import calc
 https://studfile.net/preview/3569684/
 version = 0.1
 """
@@ -15,12 +15,14 @@ from data_base.table_values.table_hanler import DatabaseTableHandler
 
 class Method(ABC):
     """Abstract class for method calculation"""
+    id: int
     @abstractmethod
-    def calculate(self, data: list[float], _p: float) -> list[float | None]: """calc value with metod"""
+    def calculate(self, data: list[float, ], _p: float) -> list[float | None]: """calc value with metod"""
     @abstractmethod
     def _get_value_db(self, _n: int, _p: float) -> float | None: """get table value from db Method"""
 
 class Romanovsky(Method):
+    id = 0
     def calculate(self, data, _p):
         max_ = Decimal(max(data))
         min_ = Decimal(min(data))
@@ -50,6 +52,7 @@ class Romanovsky(Method):
         return None
 
 class Charlier(Method):
+    id = 1
     def calculate(self, data, _p):
         _answer = []
         average = Decimal(stat.fmean(data))
@@ -77,6 +80,7 @@ class Charlier(Method):
         return None
 
 class Dixon(Method):
+    id = 2
     def calculate(self, data, _p):
         _answer = []
         kd = {}

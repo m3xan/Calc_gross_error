@@ -359,7 +359,7 @@ class MainWindow(AbstractWindow):
 
     def __init_main_list_widget_value(self):
         self.ui.list_widget_value.itemDoubleClicked.connect(self.edit_value)
-        self.ui.list_widget_value.itemDoubleClicked.connect(self.change_stat)
+        self.ui.list_widget_value.itemDoubleClicked.connect(self.__change_stat)
         self.ui.list_widget_value.customContextMenuRequested.connect(self.__start_menu)
 
     def __init_main_combobox(self):
@@ -553,10 +553,7 @@ class MainWindow(AbstractWindow):
         self.state.add_mod = False
         self.state.save_data_mode = False
 
-    def change_stat(self):
-        """
-        заглушка
-        """
+    def __change_stat(self):
         self.state.change_mode = True
 
     def __start_menu(self, pos):
@@ -571,7 +568,7 @@ class MainWindow(AbstractWindow):
                 if action == add_action:
                     self.push_button_add_data_click()
                 elif action == change_action:
-                    self.change_stat()
+                    self.__change_stat()
                     self.edit_value(self.ui.list_widget_value.currentItem())
                 elif action == del_action:
                     self.push_button_delite_data_click()
@@ -587,11 +584,11 @@ class MainWindow(AbstractWindow):
         _settings = user_settings['significance_level']
         calculator = Calculator()
         match _method:
-            case 0:
+            case Romanovsky.id:
                 calculator.method = Romanovsky()
-            case 1:
+            case Charlier.id:
                 calculator.method = Charlier()
-            case 2:
+            case Dixon.id:
                 calculator.method = Dixon()
 
         answers = calculator.calculate_with(

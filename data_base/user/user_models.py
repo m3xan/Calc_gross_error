@@ -9,11 +9,11 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 class Base(DeclarativeBase):
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement= True)
+    id: Mapped[int] = mapped_column(primary_key= True, autoincrement= True)
 
 class User(Base):
     __tablename__ = 'users'
-    username: Mapped[str] = mapped_column(unique=True)
+    username: Mapped[str] = mapped_column(unique= True)
     password: Mapped[str]
     clearance_level: Mapped[int]
     image: Mapped[str] = mapped_column(nullable= True)
@@ -21,7 +21,7 @@ class User(Base):
         back_populates='user', cascade='all, delete-orphan'
     )
     def __repr__(self) -> str:
-        return f'User(id={self.id!r}, name={self.username!r}, fullname={self.password!r}, clearance_level={self.clearance_level!r}, image={self.image!r})'
+        return f'User(id={self.id!r}, name={self.username!r}, password={self.password!r}, clearance_level={self.clearance_level!r}, image={self.image!r})'
 
 class Calculation(Base):
     __tablename__ = 'calculation'
