@@ -1,5 +1,5 @@
 
-def check_password_strength(password):
+def check_password_strength(password: str) -> tuple[bool, str]:
 
     # Минимальная длина пароля
     if len(password) < 8:

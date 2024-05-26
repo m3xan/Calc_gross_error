@@ -3,8 +3,9 @@
 """
 
 from window.abstract_model.models import AbstractDialog
-from window.second_windows.about_window.about_window_class import Ui_Dialog
 from window.second_windows.about_window.snake_game import SnakeGame
+
+from .about_window_class import Ui_Dialog
 
 class AboutDialog(AbstractDialog):
     """

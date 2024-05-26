@@ -16,11 +16,11 @@ from window.abstract_model.models import AbstractWindow
 from window.data_class_for_window.dataclass import DataclassMainWindow
 from window.main_window.main_window_class import Ui_MainWindow
 from window.main_window.interior_window.graph_window.graph_window import GraphWindow
-from window.second_windows.add_window.add_window import AddDialog
-from window.second_windows.settings.main_settings.setting_window import SettingsDialog
-from window.second_windows.settings.method_window.method_dialog import MethodsDialog
-from window.second_windows.load_window.load_window import LoadDialog
-from window.second_windows.about_window.about_window import AboutDialog
+from window.second_windows import AddDialog
+from window.second_windows import SettingsDialog
+from window.second_windows import MethodsDialog
+from window.second_windows import LoadDialog
+from window.second_windows import AboutDialog
 
 from thread import ReadThread, SaveAsThread, SaveThread
 

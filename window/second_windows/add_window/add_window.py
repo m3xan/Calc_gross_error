@@ -7,10 +7,11 @@ from PySide6.QtWidgets import QInputDialog, QLineEdit, QMessageBox, QListWidgetI
 from PySide6.QtCore import Qt, Signal
 
 from window.abstract_model.models import AbstractDialog
-from window.second_windows.add_window.add_window_class import Ui_Dialog
 from window.data_class_for_window.dataclass import DataclassAddWindow
 
 from data_class.data import Data
+
+from .add_window_class import Ui_Dialog
 
 class AddDialog(AbstractDialog):
     """

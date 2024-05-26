@@ -3,7 +3,8 @@
 """
 
 from window.abstract_model.models import AbstractDialog
-from window.second_windows.load_window.load_window_class import Ui_Dialog
+
+from .load_window_class import Ui_Dialog
 
 class LoadDialog(AbstractDialog):
     """

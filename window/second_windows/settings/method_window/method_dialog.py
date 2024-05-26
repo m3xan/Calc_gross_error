@@ -1,7 +1,7 @@
 
-
 from window.abstract_model.models import AbstractDialog
-from window.second_windows.settings.method_window.method_class import Ui_Mehod_dialog
+
+from .method_class import Ui_Mehod_dialog
 
 class MethodsDialog(AbstractDialog):
     """

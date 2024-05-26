@@ -3,14 +3,14 @@ from PySide6.QtCore import Slot
 
 from window.abstract_model.models import AbstractWindow
 from window.main_window.main_window import MainWindow
-from window.second_windows.authorization_window.authorization_window_class import Ui_AuthorizationWindow
-from window.second_windows.authorization_window.internal_window.login.login_window import InternalAutorizationWindow
-from window.second_windows.authorization_window.internal_window.registration.registration_window import InternalRegistrationWindow
+from window.second_windows import InternalAutorizationWindow, InternalRegistrationWindow
 from window.message_window.error_window import ErroWindow
 
 from functions.new_file.check_file import FileChecker
 
 from global_param import FILE_PATHS
+
+from .authorization_window_class import Ui_AuthorizationWindow
 
 class AuthorizationWindow(AbstractWindow):
     """autorization window"""

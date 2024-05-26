@@ -28,7 +28,8 @@ class Programm:
             logging.critical(err, exc_info= True)
             raise err
 
-    def __start(self):
+    @staticmethod
+    def __start():
         app = QApplicationWithLogging(sys.orig_argv)
         if FileChecker(CRIRICAL_FILE).check_all():
             window = AuthorizationWindow()

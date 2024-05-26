@@ -6,10 +6,11 @@ from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtCore import Slot
 
 from window.abstract_model.models import AbstractDialog
-from window.second_windows.settings.main_settings.settings_class import Ui_Dialog
 from window.second_windows.settings.auto_save_window.auto_save_window import AutoSaveWindow
 from window.second_windows.settings.setting_window.settings_window import SettingDialog
 from window.second_windows.settings.user_setting.user_setting_window import UserSettingsDialog
+
+from .settings_class import Ui_Dialog
 
 class SettingsDialog(AbstractDialog):
     """
