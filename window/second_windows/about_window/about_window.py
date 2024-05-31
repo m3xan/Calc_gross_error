@@ -21,7 +21,7 @@ class AboutDialog(AbstractDialog):
 
     def keyPressEvent(self, event):
         key = event.text()
-        if len(self.key_sequence) > 10:
+        if key == '8':
             self.key_sequence.clear()
         self.key_sequence.append(key)
         if self.key_sequence == ['q', 'w', 'e', 'r', 't', 'y']:

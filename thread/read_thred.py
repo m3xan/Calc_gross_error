@@ -6,7 +6,7 @@ from typing import overload
 
 from PySide6.QtCore import QThread, Signal
 
-from functions.excel import excel
+from functions.excel.excel import Excel
 from data_base.user.user_hanler import DatabaseUsersHandler
 
 from data_class.data import Data
@@ -28,7 +28,7 @@ class ReadThread(QThread):
 
     def run(self):
         if self.path:
-            self.read_signal.emit(excel.read_file_excel(self.path))
+            self.read_signal.emit(Excel.FileReader(self.path).read_file())
         else:
             user_db = DatabaseUsersHandler()
             self.read_signal.emit(user_db.select_calculation())

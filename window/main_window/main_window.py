@@ -3,7 +3,6 @@
 """
 from datetime import datetime
 import os
-import typing
 from functools import partial
 import logging
 
@@ -109,17 +108,15 @@ class MainWindow(AbstractWindow):
         """
         match self.state.active_mod:
             case 'excel':
-                self.save_tread = SaveThread(self.state.excel_path[0], self.state.data)
+                self.save_tread = SaveThread(self.state.data, self.state.excel_path[0])
                 self.save_tread.saved.connect(self.__set_data)
                 self.save_tread.start()
                 # change
-                self.state.save_data_mode = True
                 return self.state.save_data_mode
             case 'bd':
                 self.save_tread = SaveThread(self.state.data)
                 self.save_tread.saved.connect(self.__set_data)
                 self.save_tread.start()
-                self.state.save_data_mode = True
                 return self.state.save_data_mode
         return None
 
@@ -127,6 +124,8 @@ class MainWindow(AbstractWindow):
     def __set_data(self, data: Data):
         self.save_tread.deleteLater()
         self.state.data = data
+        self.state.save_data_mode = True
+        return self.state.save_data_mode
 
     @Slot()
     def action_esc_click(self):
@@ -155,7 +154,6 @@ class MainWindow(AbstractWindow):
         dialog = AboutDialog()
         return dialog.exec()
 
-    @typing.final
     @Slot()
     @staticmethod
     def action_help_click(): # ДОДЕЛАНО
@@ -205,7 +203,7 @@ class MainWindow(AbstractWindow):
         return setting_widow.exec()
 
     @Slot()
-    def action_delite_click(self):
+    def __action_delite_click(self):
         item  = self.ui.combo_box_selection_data.currentData()
         if item:
             question = QMessageBox.question(
@@ -224,7 +222,7 @@ class MainWindow(AbstractWindow):
         return f'self.state.save_data_mode = {self.state.save_data_mode}'
 
     @Slot()
-    def action_calc_click(self):
+    def __action_calc_click(self):
         dialog = MethodsDialog()
         return dialog.exec()
 
@@ -243,7 +241,7 @@ class MainWindow(AbstractWindow):
         bin_centers = 0.5 * (bins[:-1] + bins[1:])
 
         window_size = 5  # Размер окна для усреднения, можно добавить изменение в настройки измерения
-        weights = np.ones(window_size) / window_size  # Веса для усреднения значений       
+        weights = np.ones(window_size) / window_size  # Веса для усреднения значений
         smoothed_hist = np.convolve(n, weights, mode='same')  # Применение усреднения по скользящему окну
 
         aligned_bin_centers = bin_centers[:len(smoothed_hist)]
@@ -272,7 +270,7 @@ class MainWindow(AbstractWindow):
             )
             raise err
 
-        return f'self.state.save_data_mode = {self.state.save_data_mode}'
+        return f'{self.state.save_data_mode=}'
 
     @Slot()
     def push_button_add_data_click(self):# ПЕРЕДЕЛАТЬ
@@ -378,10 +376,10 @@ class MainWindow(AbstractWindow):
         self.ui.action_save_as.triggered.connect(self.action_save_as_click)
         self.ui.action_esc.triggered.connect(self.action_esc_click)
         self.ui.action_setting_window.triggered.connect(self.action_setting_window_click)
-        self.ui.action_calc.triggered.connect(self.action_calc_click)
+        self.ui.action_calc.triggered.connect(self.__action_calc_click)
         self.ui.action_help.triggered.connect(self.action_help_click)
         self.ui.action_info.triggered.connect(self.action_info_click)
-        self.ui.action_delite.triggered.connect(self.action_delite_click)
+        self.ui.action_delite.triggered.connect(self.__action_delite_click)
 
     def __init_graph_menubar(self):
         self.graphwindow.graph.action_create_graph.triggered.connect(self._push_button_create_graph_click)
@@ -500,14 +498,14 @@ class MainWindow(AbstractWindow):
 
     def set_val_answer(self):
         self.fill_listwidget()
-        self.set_method()
+        self.__set_method()
 
-    def add_selection_data(self, full_data): #TODO ПЕРЕСМОТЕРТЬ
+    def add_selection_data(self, full_data):
         """
         заглушка
         """
         # ПЕРЕПИСАТЬ ВСЮ ФУНКЦИ
-        self.state.data += full_data
+        self.state.data = full_data
         self.__fill_combo_box_selection_data()
         self.enable_ui(True)
         self.state.save_data_mode = False
@@ -529,24 +527,26 @@ class MainWindow(AbstractWindow):
         заглушка
         """
         new_value = edit.text()
-        # Проверяем, заполнено ли новое значение
-        # TODO проверка на валидность данных
-        if new_value == '':
+        try:
+            if new_value == '':
+                return
+            new_value = float(new_value)
+        except ValueError:
             return
 
         self.ui.list_widget_value.takeItem(index)
-        item.setText(str(float(new_value)))
+        item.setText(str(new_value))
         self.ui.list_widget_value.insertItem(index, item)
         if self.state.change_mode:
             self.state.data.change_value(
                 self.ui.combo_box_selection_data.currentData(),
                 index,
-                float(new_value)
+                new_value
             )
         else:
             self.state.data.append_value(
                 self.ui.combo_box_selection_data.currentData(),
-                float(new_value)
+                new_value
             )
         edit.deleteLater()
 
@@ -580,10 +580,12 @@ class MainWindow(AbstractWindow):
 
     def __calculate_answer(self):
         user_settings = self.settings.load_category_json('calculation')
-        _method = user_settings['method']
-        _settings = user_settings['significance_level']
+        method_ = user_settings['method']
+        significance_level = user_settings['significance_level']
+        name_calc = self.ui.combo_box_selection_data.currentData()
+
         calculator = Calculator()
-        match _method:
+        match method_:
             case Romanovsky.id:
                 calculator.method = Romanovsky()
             case Charlier.id:
@@ -592,16 +594,14 @@ class MainWindow(AbstractWindow):
                 calculator.method = Dixon()
 
         answers = calculator.calculate_with(
-            [data[1] for data in self.state.data.value(
-                self.ui.combo_box_selection_data.currentData()
-            )],
-            _settings
+            [data[1] for data in self.state.data.value(name_calc)],
+            significance_level
         )
         self.__set_answer(answers)
 
         self.state.save_data_mode = False
         logging.debug(
-            f'calculate with method {_method}, significance_level {_settings}'
+            f'{method_=}, {significance_level=}'
         )
 
     def __fill_combo_box_selection_data(self):
@@ -652,7 +652,7 @@ class MainWindow(AbstractWindow):
             self.ui.combo_box_selection_data.currentData(),
             self.settings.load_attribute('calculation', 'method') + 1
         )
-    def set_method(self):
+    def __set_method(self):
         self.__fill_list_widget_answer()
         if self.state.data.method(self.ui.combo_box_selection_data.currentData()):
             self.ui.line_edit_metod.setText(

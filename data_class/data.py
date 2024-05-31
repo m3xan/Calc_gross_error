@@ -2,6 +2,8 @@
 from typing import overload
 import functools
 
+import pandas as pd
+
 from data_class.models_data import Calc
 from data_class.models_data import Names
 from data_class.models_data import Values
@@ -259,6 +261,15 @@ class Data:
         del self.__metadate[self.__name.index(name)][Values][index]
         self._delit[Values].append((name, (value)))
 
+    def to_dataframe(self):
+        df  = pd.DataFrame({
+            'name': [name[1] for name in self.__name],
+            'value': [[value[1] for value in values] for values in self.__value],
+            'method': self.__method,
+            'answer': [[answer[1] for answer in answers] for answers in self.__answer],
+        })
+        return df
+
     def __len__(self): #len()
         return len(self.__name)
 
@@ -299,7 +310,10 @@ class Data:
         return len(self.__name) != 0
 
     def __str__(self) -> str:
+        return str(dict(self))
+
+    def __dict__(self) -> dict:
         data = {}
         for index, name in enumerate(self.__name):
-            data[name] = [self.__value[index], self.__answer[index], self.__method[index]]
-        return str(data)
+            data[name] = [self.__method[index], self.__value[index],  self.__answer[index]]
+        return data

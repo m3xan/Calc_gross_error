@@ -16,6 +16,7 @@ from data_class.models_data import Values
 from data_class.models_data import Answers
 
 class CalculationHandler(OrmHandler):
+
     @overload
     def __init__(self) -> None: ...
     @overload
@@ -86,6 +87,7 @@ class CalculationHandler(OrmHandler):
             for name in self.__data.name():
                 index = 0
                 for meta in self.__data.metadate(name):
+                    print(f'{meta=}')
                     self.__add_calc(name, meta, index, session)
                     index += 1
             self._commit(session)
@@ -206,7 +208,8 @@ class CalculationHandler(OrmHandler):
             self.__add_answer(name, metadate, index, session)
 
     def __add_name(self, name, metadate, index, session: Session):
-        if metadate[1][0] == Names.append:
+        if metadate[0] == Names.append:
+            print(metadate)
             new = Calculation(
                 name_calculation= name,
                 id_user = self.__user_id,
@@ -215,7 +218,7 @@ class CalculationHandler(OrmHandler):
             )
             session.add(new)
             self.__data.metadate_clear(name, Names, index)
-        if metadate[1][0] == Names.change:
+        if metadate[0] == Names.change:
             result: tuple[Calculation] = session.execute(
                 select(Calculation).where(Calculation.id == name[0])
             ).first()
@@ -224,29 +227,36 @@ class CalculationHandler(OrmHandler):
             self.__data.metadate_clear(name, Names, index)
 
     def __add_value(self, name, metadate, index, session: Session):
-        if metadate[1][0] == Values.append:
-            new = Value(
-                calculation_id = name[0],
-                value = metadate[1][1][1]
-            )
-            session.add(new)
-            self.__data.metadate_clear(name, Values, index)
-        if metadate[1][0] == Values.change:
-            result: tuple[Value] = session.execute(
-                select(Value).where(Value.id == metadate[1][1][0])
-            ).first()
-            result[0].value = metadate[1][1][1]
-            self.__data.metadate_clear(name, Values, index)
+        print(f'{metadate=}')
+        print(name, index)
+        for value in metadate[1]:
+            print(f'{value=}')
+            if not any(value):
+                continue
+            for tup in value:
+                if tup[0] == Values.append:
+                    new = Value(
+                        calculation_id = name[0],
+                        value = tup[1][1]
+                    )
+                    session.add(new)
+                    self.__data.metadate_clear(name, Values, index)
+                if tup[1][0] == Values.change:
+                    result: tuple[Value] = session.execute(
+                        select(Value).where(Value.id == tup[1][1][0][0])
+                    ).first()
+                    result[0].value = tup[1][1][1]
+                    self.__data.metadate_clear(name, Values, index)
 
     def __add_answer(self, name, metadate, index, session: Session):
-        if metadate[1][0] == Answers.append:
+        if metadate[1] == Answers.append:
             new = Answer(
                 calculation_id = name[0],
-                answer_value = metadate[1][1][1]
+                answer_value = metadate[1][1]
             )
             session.add(new)
             self.__data.metadate_clear(name, Answers, index)
-        if metadate[1][0] == Answers.change:
+        if metadate[1] == Answers.change:
             result: tuple[Calculation] = session.execute(
                 select(Answer).where(Answer.id == metadate[1][1][0])
             ).first()

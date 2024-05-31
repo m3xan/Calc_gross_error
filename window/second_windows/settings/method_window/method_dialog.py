@@ -44,11 +44,11 @@ class MethodsDialog(AbstractDialog):
         match self.ui.stackedWidget.currentIndex():
             case 0:
                 self.ui.stackedWidget.setCurrentIndex(1)
-                self.setWindowTitle('Выбор метода расчёта')
+                self.setWindowTitle('Выбор уровня значимости')
             case 1:
                 self.ui.stackedWidget.setCurrentIndex(0)
-                self.setWindowTitle('Выбор уровня значимости')
-
+                self.setWindowTitle('Выбор метода расчёта')
+                
     def accept(self) -> None:
         data = {
             'method': self.ui.tabWidget.currentIndex(),

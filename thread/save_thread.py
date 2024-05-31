@@ -6,7 +6,7 @@ from typing import overload
 
 from PySide6.QtCore import QThread, Signal
 
-from functions.excel import excel
+from functions.excel.excel import Excel
 
 from data_base.user.user_hanler import DatabaseUsersHandler
 from data_class.data import Data
@@ -29,8 +29,10 @@ class SaveThread(QThread):
         self.data = data
 
     def run(self):
-        if self.path is None:
-            data = excel.save_result_calc_excel(self.path, self.data)
+        if self.path:
+            saver = Excel.FileSaver()
+            saver.data = self.data
+            data = saver.save_file(self.path)
         else:
             data = DatabaseUsersHandler().save_data(self.data)
         self.saved.emit(data)
