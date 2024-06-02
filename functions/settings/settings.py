@@ -9,6 +9,8 @@ import logging
 
 from PySide6.QtWidgets import QWidget
 
+from .pydantic_model import UserSettings
+
 from global_param import SETTINGS_PATH
 
 class JsonSettings:
@@ -27,7 +29,7 @@ class JsonSettings:
         if isinstance(user_id, int)  or user_id == 'option' or user_id == 'start':
             self.__user_id = user_id
 
-    def load_json(self):
+    def load_json(self) -> UserSettings:
         """
         заглушка
         """
@@ -37,7 +39,9 @@ class JsonSettings:
             encoding= 'utf-8'
         ) as file:
             try:
-                return json.load(file)
+                return UserSettings.model_validate(
+                    json.load(file)
+                )
             except json.decoder.JSONDecodeError:
                 return None
 
@@ -52,7 +56,7 @@ class JsonSettings:
         ) as file:
             file.write(json.dumps(data, indent= 2))
 
-    def load_category_json(self, categor:str):
+    def load_category_json(self, categor: str):
         """
         заглушка
         """
@@ -93,9 +97,10 @@ class JsonSettings:
         """
         заглушка
         """
-        category = self.load_category_json('window')
-        theme_name = category['theme']
-        style_content = self.__load_data(theme_name)
+        user_settings = self.load_json()
+        style_content = self.__load_data(
+            user_settings.window.theme
+        )
         if style_content is not None:
             parent.setStyleSheet(style_content)
 
@@ -126,7 +131,12 @@ class JsonSettings:
 
     def load_start(self):
         self.__user_id = 'start'
-        return self.load_json()
+        with open(
+            self.__check_user(),
+            'r',
+            encoding= 'utf-8'
+        ) as file:
+            return json.load(file)
 
     def __check_user(self) -> str:
         if os.path.exists(f'{SETTINGS_PATH}\\{self.__user_id}.json'):
