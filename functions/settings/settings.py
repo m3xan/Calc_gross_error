@@ -4,94 +4,125 @@
 
 import os
 import json
-from typing import overload
 import logging
+from typing import Self
 
 from PySide6.QtWidgets import QWidget
 
-from .pydantic_model import UserSettings
-
 from global_param import SETTINGS_PATH
 
+from .pydantic_model import Calculation, UserSettings, CanvasModel, Window, AutoSave
+
 class JsonSettings:
+    """for json format"""
     _instance = None
     __user_id = None
 
-    def __new__(cls):
+    def __new__(cls) -> Self:
         if not isinstance(cls._instance, cls):
             cls._instance = object.__new__(cls)
         return cls._instance
 
-    def get_user_id(self):
+    def get_user_id(self) -> None:
         return self.__user_id
 
     def set_user_id(self, user_id: int):
-        if isinstance(user_id, int)  or user_id == 'option' or user_id == 'start':
+        if isinstance(user_id, int):
             self.__user_id = user_id
 
-    def load_json(self) -> UserSettings:
+    def load_json(self) -> UserSettings | None:
         """
         заглушка
         """
-        with open(
-            self.__check_user(),
-            'r',
-            encoding= 'utf-8'
-        ) as file:
-            try:
+        try:
+            with open(
+                self.__check_user()[1],
+                encoding= 'utf-8'
+            ) as file:
                 return UserSettings.model_validate(
                     json.load(file)
                 )
-            except json.decoder.JSONDecodeError:
-                return None
+        except json.decoder.JSONDecodeError as err:
+            logging.error(f'file wasn`t read, error: {err}', exc_info= True)
+            return None
+        except Exception as err:
+            logging.critical(err, exc_info= True)
+            raise err
 
-    def save_json(self, data = None):
+    def save_json(self, data: UserSettings):
         """
         переделать
         """
-        with open(
-            self.__check_user(),
-            'w+',
-            encoding= 'utf-8'
-        ) as file:
-            file.write(json.dumps(data, indent= 2))
+        try:
+            isdefaul, path = self.__check_user()
+            if isdefaul:
+                return
+            with open(path, 'w+', encoding= 'utf-8') as file:
+                file.write(
+                    data.model_dump_json(indent= 2, exclude_none= True)
+                )
+        except json.decoder.JSONDecodeError as err:
+            logging.warning(err, exc_info= True)
+        except Exception as err:
+            logging.critical(err, exc_info= True)
+            raise err
 
-    def load_category_json(self, categor: str):
+    def load_window(self) -> Window | None:
         """
         заглушка
         """
-        return self.load_json()[categor]
+        if settings := self.load_json():
+            return settings.window
+        return None
 
-    def load_attribute(self, categor: str, attribute: str):
+    def load_auto_save(self) -> AutoSave | None:
         """
         заглушка
         """
-        return self.load_category_json(categor)[attribute]
+        if settings := self.load_json():
+            return settings.auto_save
+        return None
 
-    @overload
-    def save_data_json(self, categor: str, data: str) -> bool: ...
-    @overload
-    def save_data_json(self, categor: str, data: str, attribute: str) -> bool: ...
-
-    def save_data_json(self, categor: str, data: str, attribute: str = None) -> bool:
+    def load_calculation(self) -> Calculation | None:
         """
         заглушка
         """
-        if attribute is None:
-            # выполнять другую операцию, если атрибут не указан
-            data_json = self.load_json()
-            data_json[categor] = data
-            self.save_json(data_json)
-            return True
-        # выполнять стандартную операцию, если атрибут указан
-        data_json = self.load_json()
-        data_json[categor][attribute] = data
-        self.save_json(data_json)
-        return True
+        if settings := self.load_json():
+            return settings.calculation
+        return None
 
-    def save_start(self, name: str):
+    def load_canvas(self) -> CanvasModel | None:
+        """
+        return theme canvas
+
+        key:
+        "text" color of the text,
+        "canvas" color of the background
+        """
+        if settings := self.load_json():
+            logging.info(f'canvas theme: {settings.window.canvas}')
+            return settings.window.canvas
+        return None
+
+    def save_start(self, name: str) -> None:
+        """
+        save name in start file
+        """
+        u_id = self.__user_id
         self.__user_id = 'start'
-        self.save_json(name)
+        try:
+            isdefaul, path = self.__check_user()
+            if isdefaul:
+                return
+            with open(path, 'w+', encoding= 'utf-8') as file:
+                file.write(
+                    json.dumps(name)
+                )
+        except Exception as err:
+            logging.critical(err, exc_info=True)
+            raise err
+        finally:
+            self.__user_id = u_id
 
     def load_theme(self, parent: QWidget) -> str | None:
         """
@@ -104,7 +135,7 @@ class JsonSettings:
         if style_content is not None:
             parent.setStyleSheet(style_content)
 
-    def __load_data(self, theme_name):
+    def __load_data(self, theme_name) -> str | None:
         try:
             with open(
                 f'Data/settings/theme/{theme_name}.qss',
@@ -117,28 +148,49 @@ class JsonSettings:
             logging.warning('Не удалось найти файл стилей')
             return None
 
-    def load_canvas(self) -> dict:
+    def load_start(self) -> str | None:
         """
-        return theme canvas
-
-        key:
-        "text" color of the text,
-        "canvas" color of the background
+        load start name 
+        if swith True on last user
         """
-        category = self.load_category_json('window')
-        logging.info(f'canvas theme: {category['canvas']}')
-        return category['canvas']
+        _u_id = self.__user_id
+        try:
+            self.__user_id = 'start'
+            isdefaul, path = self.__check_user()
+            if isdefaul:
+                return
+            with open(path, encoding= 'utf-8') as file:
+                return json.load(file)
+        except json.decoder.JSONDecodeError:
+            return None
+        except Exception as err:
+            logging.critical(err, exc_info=True)
+            raise err
+        finally:
+            self.__user_id =_u_id
 
-    def load_start(self):
-        self.__user_id = 'start'
-        with open(
-            self.__check_user(),
-            'r',
-            encoding= 'utf-8'
-        ) as file:
-            return json.load(file)
+    def raw_json_loads(self) -> str | None:
+        """
+        load row data json with out validation
+        """
+        _u_id = self.__user_id
+        try:
+            self.__user_id = 'option'
+            isdefaul, path = self.__check_user()
+            if isdefaul:
+                return
+            with open(path, 'r', encoding= 'utf-8'
+            ) as file:
+                return json.load(file)
+        except json.decoder.JSONDecodeError:
+            return None
+        except Exception as err:
+            logging.critical(err, exc_info=True)
+            raise err
+        finally:
+            self.__user_id =_u_id
 
-    def __check_user(self) -> str:
+    def __check_user(self) -> tuple[bool, str]:
         if os.path.exists(f'{SETTINGS_PATH}\\{self.__user_id}.json'):
-            return f'{SETTINGS_PATH}\\{self.__user_id}.json'
-        return f'{SETTINGS_PATH}\\default.json'
+            return False, f'{SETTINGS_PATH}\\{self.__user_id}.json'
+        return True, f'{SETTINGS_PATH}\\default.json'

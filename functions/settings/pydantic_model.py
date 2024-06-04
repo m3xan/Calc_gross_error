@@ -1,36 +1,54 @@
-from pydantic import BaseModel, Field, model_validator
 
+import enum
+
+from pydantic import BaseModel, Field, model_validator, field_validator
 from PySide6.QtCore import Qt
 
-class Canvas(BaseModel):
+class MethodId(enum.Enum):
+    ROMANOVSKY = 1
+    CHARLIER = 2
+    DIXON = 3
+
+class CanvasModel(BaseModel):
     text: str
     canvas: str
 
+class MainWindowElement(BaseModel):
+    dockWidget: Qt.DockWidgetArea = Field(..., enum= Qt.DockWidgetArea)
+    toolBar: Qt.ToolBarArea = Field(..., enum= Qt.ToolBarArea)
+
 class Window(BaseModel):
-    dockWidget: Qt.DockWidgetArea = Field(..., enum=Qt.DockWidgetArea)
-    toolBar: Qt.ToolBarArea = Field(..., enum=Qt.ToolBarArea)
+    element: MainWindowElement
     theme: str
-    canvas: Canvas
+    canvas: CanvasModel
 
 class AutoSave(BaseModel):
     switched: bool
     time: int = None
 
-    @model_validator(mode='after')
-    def validate_switched(self):
-        if not self.switched:
-            if self.time is None:
-                return self
-        else:
-            if isinstance(self.time, int):
-                if self.time % 60000 == 0: #minute -> millisecond
-                    return self
-                raise ValueError('time field must be int presentation minute -> millisecond')
-        raise ValueError("The 'time' field must be set if 'switched' is True.")
+    @field_validator('time')
+    @classmethod
+    def validate_time(cls, v):
+        if isinstance(v, int | float) and v % 60000 == 0:
+            return int(v)
+        if isinstance(v, str):
+            try:
+                return int(v)
+            except ValueError as err:
+                raise ValueError('time must be int | float not') from err
+        raise ValueError('time field must be int | float presentation minute -> millisecond')
 
 class Calculation(BaseModel):
-    method: int
+    method: MethodId = Field(..., enum= MethodId)
     significance_level: float
+
+    @model_validator(mode='after')
+    def validate_significance_level(self):
+        if not self.significance_level in [0.99, 0.98, 0.95, 0.9]:
+            raise ValueError(
+                f'significance_level must be 0.99, 0.98, 0.95, 0.9 not {self.significance_level}'
+            )
+        return self
 
 class UserSettings(BaseModel):
     window: Window = Field(default_factory=Window)

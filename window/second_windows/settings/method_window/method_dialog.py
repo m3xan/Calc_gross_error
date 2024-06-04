@@ -1,5 +1,8 @@
 
+
 from window.abstract_model.models import AbstractDialog
+
+from functions.settings.pydantic_model import Calculation
 
 from .method_class import Ui_Mehod_dialog
 
@@ -25,9 +28,9 @@ class MethodsDialog(AbstractDialog):
         self.ui.push_button_close.clicked.connect(self.reject)
 
     def setstart(self):
-        data = self.settings.load_category_json('calculation')
-        self.ui.tabWidget.setCurrentIndex(data['method'])
-        self.__set_level(data['significance_level'])
+        data = self.settings.load_calculation()
+        self.ui.tabWidget.setCurrentIndex(data.method.value - 1)
+        self.__set_level(data.significance_level)
 
     def __set_level(self, _p):
         match _p:
@@ -48,14 +51,14 @@ class MethodsDialog(AbstractDialog):
             case 1:
                 self.ui.stackedWidget.setCurrentIndex(0)
                 self.setWindowTitle('Выбор метода расчёта')
-                
-    def accept(self) -> None:
-        data = {
-            'method': self.ui.tabWidget.currentIndex(),
-            'significance_level': self.__chesc_p()
-        }
-        self.settings.save_data_json('calculation', data)
 
+    def accept(self) -> None:
+        settings = self.settings.load_json()
+        settings.calculation = Calculation(
+            method= self.ui.tabWidget.currentIndex() + 1,
+            significance_level= self.__chesc_p()
+        )
+        self.settings.save_json(settings)
         return super().accept()
 
     def __chesc_p(self) -> float:

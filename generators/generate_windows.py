@@ -82,7 +82,7 @@ def generate_main_window_class():
     write_customisation(
         path,
         r'MainWindow.addDockWidget\(Qt.RightDockWidgetArea, self.dockWidget\)',
-        "MainWindow.addDockWidget(eval(JsonSettings().load_attribute('window','dockWidget')), self.dockWidget)",
+        "MainWindow.addDockWidget(JsonSettings().load_window().element.dockWidget, self.dockWidget)",
     )
 
 def generate_graph_window_class():
@@ -94,7 +94,7 @@ def generate_graph_window_class():
     write_customisation(
         path,
         r'GraphWindow.addToolBar\(Qt.TopToolBarArea, self.toolBar\)',
-        "GraphWindow.addToolBar(eval(JsonSettings().load_attribute('window', 'toolBar')), self.toolBar)"
+        "GraphWindow.addToolBar(JsonSettings().load_window().element.toolBar, self.toolBar)"
     )
 
 def generate_window(path: list):

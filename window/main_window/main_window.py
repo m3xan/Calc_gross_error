@@ -21,11 +21,12 @@ from window.second_windows import MethodsDialog
 from window.second_windows import LoadDialog
 from window.second_windows import AboutDialog
 
-from thread import ReadThread, SaveAsThread, SaveThread
-
-from functions.calcul.calc import Calculator, Romanovsky, Charlier, Dixon
+from functions.settings.pydantic_model import MainWindowElement
+from functions.calcul.calc import Calculator, method_map
 from functions.graph.graph import GraphicMaker
 from functions.loger import Logger
+
+from thread import ReadThread, SaveAsThread, SaveThread
 
 from data_class.data import Data
 
@@ -39,19 +40,19 @@ class MainWindow(AbstractWindow):
         self.ui.setupUi(self)
 
         self.state = DataclassMainWindow(
-            active_mod= None, # данное условие писать с использование math case
+            active_mod= None, # use math case
             save_data_mode= True,
             data= None,
             excel_path= None,
             change_mode= False,
             add_mod= False,
             clearance_level = self.user_db.select_user().clearance_level,
-            auto_save_time= self.settings.load_category_json('auto_save'),
+            auto_save_time= self.settings.load_json().auto_save,
         )
         self.change_theme()
 
         self.__init_graph()
-        if self.settings.load_category_json('auto_save')['switched']:
+        if self.state.auto_save_time.switched:
             self.__init_timer()
 
         if self.state.clearance_level > 1:
@@ -72,7 +73,7 @@ class MainWindow(AbstractWindow):
         self.read_thread.read_signal.connect(self.on_change)
         self.load_window = LoadDialog()
         self.load_window.exec()
-        # change
+
         self.state.active_mod = 'bd'
         return f'self.state.active_mod = {self.state.active_mod}, {self.state.data}'
 
@@ -93,10 +94,10 @@ class MainWindow(AbstractWindow):
             self.read_thread.read_signal.connect(self.on_change)
             self.load_window = LoadDialog()
             self.load_window.exec()
-            if self.state.auto_save_time['switched']:
-                self.timer.start(self.state.auto_save_time['time'])
+            if self.state.auto_save_time.switched:
+                self.timer.start(self.state.auto_save_time.time)
                 logging.info('timer on')
-            # change
+            #
             self.state.active_mod = 'excel'
             return self.state.active_mod, self.state.excel_path, self.state.data
         return None
@@ -111,7 +112,7 @@ class MainWindow(AbstractWindow):
                 self.save_tread = SaveThread(self.state.data, self.state.excel_path[0])
                 self.save_tread.saved.connect(self.__set_data)
                 self.save_tread.start()
-                # change
+                #
                 return self.state.save_data_mode
             case 'bd':
                 self.save_tread = SaveThread(self.state.data)
@@ -334,8 +335,8 @@ class MainWindow(AbstractWindow):
         graphic_maker = GraphicMaker()
         settings = self.settings.load_canvas()
         self.canvbar = graphic_maker.empty_with_axes(
-            color_text= settings['text'],
-            color_fig= settings['canvas']
+            color_text= settings.text,
+            color_fig= settings.canvas
         )
 
         self.graphwindow = GraphWindow()
@@ -395,19 +396,19 @@ class MainWindow(AbstractWindow):
     def __update_ui(self):
         self.change_theme()
         setting_canvas = self.settings.load_canvas()
-        setting_window = self.settings.load_category_json('window')
+        setting_window = self.settings.load_window()
 
         self.graphwindow.addToolBar(
-            eval(setting_window['toolBar']),
+            setting_window.element.toolBar,
             self.graphwindow.graph.toolBar
         )
         self.addDockWidget(
-            eval(setting_window['dockWidget']),
+            setting_window.element.dockWidget,
             self.ui.dockWidget
         )
         self.canvbar.update_collor(
-            setting_canvas['canvas'],
-            setting_canvas['text']
+            setting_canvas.canvas,
+            setting_canvas.text
         )
         self.canvbar.draw()
 
@@ -461,20 +462,18 @@ class MainWindow(AbstractWindow):
         заглушка
         """
         try:
-            self.settings.save_data_json(
-                'window',
-                f'Qt.{str(self.graphwindow.toolBarArea(self.graphwindow.graph.toolBar))[12:]}',
-                'toolBar'
+            settings_ = self.settings.load_json()
+            settings_.window.element = MainWindowElement(
+                dockWidget= self.dockWidgetArea(self.ui.dockWidget),
+                toolBar= self.graphwindow.toolBarArea(self.graphwindow.graph.toolBar)
             )
-            self.settings.save_data_json(
-                'window',
-                f'Qt.{str(self.dockWidgetArea(self.ui.dockWidget))[15:]}',
-                'dockWidget')
-            if self.settings.load_category_json('save_user_name'):
+            if settings_.save_user_name:
                 save = self.user_db.select_user().username
             else:
                 save = None
+
             self.settings.save_start(save)
+            self.settings.save_json(settings_)
             logging.info('save settings')
             return True
         except FileNotFoundError as err:
@@ -579,19 +578,13 @@ class MainWindow(AbstractWindow):
                     self.push_button_add_data_click()
 
     def __calculate_answer(self):
-        user_settings = self.settings.load_category_json('calculation')
-        method_ = user_settings['method']
-        significance_level = user_settings['significance_level']
+        user_settings = self.settings.load_calculation()
+        method_ = user_settings.method
+        significance_level = user_settings.significance_level
         name_calc = self.ui.combo_box_selection_data.currentData()
 
         calculator = Calculator()
-        match method_:
-            case Romanovsky.id:
-                calculator.method = Romanovsky()
-            case Charlier.id:
-                calculator.method = Charlier()
-            case Dixon.id:
-                calculator.method = Dixon()
+        calculator.method = method_map[method_]()
 
         answers = calculator.calculate_with(
             [data[1] for data in self.state.data.value(name_calc)],
@@ -600,16 +593,13 @@ class MainWindow(AbstractWindow):
         self.__set_answer(answers)
 
         self.state.save_data_mode = False
-        logging.debug(
-            f'{method_=}, {significance_level=}'
-        )
+        logging.debug(f'{method_=}, {significance_level=}')
 
     def __fill_combo_box_selection_data(self):
         self.ui.combo_box_selection_data.clear()
-        for key in self.state.data.name():
+        for name in self.state.data.name():
             self.ui.combo_box_selection_data.addItem(
-                key[1],
-                key
+                name[1], name
             )
 
     def __fill_list_widget_answer(self):
@@ -625,9 +615,9 @@ class MainWindow(AbstractWindow):
             for index, answer in enumerate(answers):
                 try:
                     self.state.data.change_answer(
-                    self.ui.combo_box_selection_data.currentData(),
-                    index,
-                    answer
+                        self.ui.combo_box_selection_data.currentData(),
+                        index,
+                        answer
                     )
                 except IndexError:
                     self.state.data.append_answer(
@@ -642,7 +632,7 @@ class MainWindow(AbstractWindow):
             else:
                 self.ui.line_edit_metod.setText(
                     f'Расчёт проведён методом {self.user_db.select_method(
-                        self.settings.load_attribute('calculation', 'method') + 1
+                        self.settings.load_calculation().method.value + 1
                     )}'
                 )
             self.state.save_data_mode = False
@@ -650,8 +640,9 @@ class MainWindow(AbstractWindow):
             self.ui.line_edit_metod.setText('Для данных неполучиловь найти значений')
         self.state.data.change_method(
             self.ui.combo_box_selection_data.currentData(),
-            self.settings.load_attribute('calculation', 'method') + 1
+            self.settings.load_calculation().method.value + 1
         )
+
     def __set_method(self):
         self.__fill_list_widget_answer()
         if self.state.data.method(self.ui.combo_box_selection_data.currentData()):

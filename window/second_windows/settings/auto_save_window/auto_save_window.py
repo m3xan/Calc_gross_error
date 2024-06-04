@@ -3,6 +3,7 @@
 """
 import logging
 
+from functions.settings.pydantic_model import AutoSave
 from window.abstract_model.models import AbstractDialog
 from window.second_windows.settings.auto_save_window.auto_save_class import Ui_DialogAutoSave
 
@@ -26,15 +27,13 @@ class AutoSaveWindow(AbstractDialog):
         """
         Заглушка
         """
-        if self.ui.check_box_auto_save.isChecked():
-            data = {"switched": True, "time": self.ui.spinBox.value() * 60000}
-        else:
-            data  = {"switched": False}
-        self.settings.save_data_json('auto_save', data)
-        self.settings.save_data_json(
-            'save_user_name',
-            self.ui.check_box_save_user_name.isChecked()
+        settings = self.settings.load_json()
+        settings.save_user_name = self.ui.check_box_save_user_name.isChecked()
+        settings.auto_save = AutoSave(
+            switched= self.ui.check_box_auto_save.isChecked(),
+            time= self.ui.spinBox.value() * 60000
         )
+        self.settings.save_json(settings)
         return True
 
     def check_box_auto_save_toggled(self):
@@ -42,18 +41,18 @@ class AutoSaveWindow(AbstractDialog):
 
     def __set_value(self):
         try:
-            iseneble_auto_save = self.settings.load_category_json('auto_save')['switched']
+            auto_save = self.settings.load_auto_save()
             self.ui.check_box_auto_save.setChecked(
-                iseneble_auto_save
+                auto_save.switched
             )
             self.ui.spinBox.setEnabled(
-                iseneble_auto_save
+                auto_save.switched
             )
             self.ui.check_box_save_user_name.setChecked(
-                self.settings.load_category_json('save_user_name')
+                self.settings.load_json().save_user_name
             )
-            if iseneble_auto_save:
-                self.ui.spinBox.setValue(self.settings.load_category_json('auto_save')['time']/60000)
+            if auto_save:
+                self.ui.spinBox.setValue(auto_save.time/60000)
         except TypeError as err:
             logging.error(err, exc_info=True)
             self.ui.check_box_auto_save.setEnabled(True)

@@ -261,7 +261,7 @@ class Data:
         del self.__metadate[self.__name.index(name)][Values][index]
         self._delit[Values].append((name, (value)))
 
-    def to_dataframe(self):
+    def to_DataFrame(self):
         df  = pd.DataFrame({
             'name': [name[1] for name in self.__name],
             'value': [[value[1] for value in values] for values in self.__value],

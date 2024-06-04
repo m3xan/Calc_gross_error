@@ -42,7 +42,7 @@ class Ui_GraphWindow(object):
         self.toolBar.setContextMenuPolicy(Qt.NoContextMenu)
         self.toolBar.setAllowedAreas(Qt.BottomToolBarArea|Qt.TopToolBarArea)
         self.toolBar.setFloatable(False)
-        GraphWindow.addToolBar(eval(JsonSettings().load_attribute('window', 'toolBar')), self.toolBar)
+        GraphWindow.addToolBar(JsonSettings().load_window().element.toolBar, self.toolBar)
 
         self.toolBar.addAction(self.action_create_graph)
 

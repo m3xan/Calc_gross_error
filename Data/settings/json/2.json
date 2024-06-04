@@ -1,7 +1,9 @@
 {
   "window": {
-    "dockWidget": "Qt.RightDockWidgetArea",
-    "toolBar": "Qt.TopToolBarArea",
+    "element":{
+      "dockWidget": 2,
+      "toolBar": 4
+    },
     "theme": "light",
     "canvas": {
       "text": "#3a3a3a",
@@ -9,11 +11,12 @@
     }
   },
   "auto_save": {
-    "switched": false
+    "switched": false,
+    "time": 120000
   },
-  "calculation":{
-    "method": 0,
-    "significance_level": 0.95
+  "calculation": {
+    "method": 1,
+    "significance_level": "0.95"
   },
   "save_user_name": true
 }

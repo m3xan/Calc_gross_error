@@ -233,7 +233,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.push_button_create_calc)
 
         self.dockWidget.setWidget(self.dockWidgetContents)
-        MainWindow.addDockWidget(eval(JsonSettings().load_attribute('window','dockWidget')), self.dockWidget)
+        MainWindow.addDockWidget(JsonSettings().load_window().element.dockWidget, self.dockWidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 839, 22))

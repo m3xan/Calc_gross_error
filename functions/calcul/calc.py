@@ -11,24 +11,38 @@ from typing import overload
 import statistics as stat
 from math import sqrt
 
+from functions.settings.pydantic_model import MethodId
+
 from data_base.table_values.table_hanler import DatabaseTableHandler
+
+from data_base.table_values import table_model
 
 class Method(ABC):
     """Abstract class for method calculation"""
-    id: int
+    id: MethodId
+
     @abstractmethod
     def calculate(self, data: list[float, ], _p: float) -> list[float | None]: """calc value with metod"""
-    @abstractmethod
-    def _get_value_db(self, _n: int, _p: float) -> float | None: """get table value from db Method"""
+
+    def _get_value_db(self, method, _n: int, _p: float) -> float | None:
+        """get table value from db Method"""
+        table_db = DatabaseTableHandler()
+        for corrector in 0, 1, -1:
+            if _value := table_db.select_method(
+                method, _n + corrector, _p
+            ):
+                return _value
+        return None
 
 class Romanovsky(Method):
-    id = 0
+    id = MethodId.ROMANOVSKY
     def calculate(self, data, _p):
         max_ = Decimal(max(data))
         min_ = Decimal(min(data))
         average = Decimal(stat.fmean(data))
         _answer = []
         table_value = self._get_value_db(
+            table_model.RomanovskyTable,
             len(data),
             _p
         )
@@ -44,20 +58,14 @@ class Romanovsky(Method):
             _answer.append(float(min_))
         return _answer
 
-    def _get_value_db(self, _n, _p):
-        table_db = DatabaseTableHandler()
-        for corrector in 0, +1, -1:
-            if _value := table_db.select_romanovsky(_n + corrector, _p):
-                return _value
-        return None
-
 class Charlier(Method):
-    id = 1
+    id = MethodId.CHARLIER
     def calculate(self, data, _p):
         _answer = []
         average = Decimal(stat.fmean(data))
         absolut_x = [abs(Decimal(val) - average) for val in data]
         table_value = self._get_value_db(
+            table_model.CharlierTable,
             len(data),
             _p
         )
@@ -72,20 +80,14 @@ class Charlier(Method):
                 )
         return _answer
 
-    def _get_value_db(self, _n, _p):
-        table_db = DatabaseTableHandler()
-        for corrector in 0, +1, -1:
-            if _value := table_db.select_charlier(_n + corrector, _p):
-                return _value
-        return None
-
 class Dixon(Method):
-    id = 2
+    id = MethodId.DIXON
     def calculate(self, data, _p):
         _answer = []
         kd = {}
         data.sort(key=float)
         table_value = self._get_value_db(
+            table_model.DixonTable,
             len(data),
             _p
         )
@@ -101,13 +103,6 @@ class Dixon(Method):
             if item > Decimal(table_value):
                 _answer.append(key)
         return _answer
-
-    def _get_value_db(self, _n, _p):
-        table_db = DatabaseTableHandler()
-        for corrector in 0, +1, -1:
-            if _value := table_db.select_dixon(_n + corrector, _p):
-                return _value
-        return None
 
 class Calculator:
 
@@ -136,3 +131,9 @@ class Calculator:
         if self.__method and len(data) >= 3:
             return self.__method.calculate(data, _p)
         return None
+#Конфигурационный словарик https://www.youtube.com/watch?v=yHckrS1lvG8&t=7024s 2:56:29
+method_map = {
+    Romanovsky.id: Romanovsky,
+    Charlier.id: Charlier,
+    Dixon.id: Dixon,
+}

@@ -9,6 +9,7 @@ from PySide6.QtCore import Slot
 from window.abstract_model.models import AbstractDialog
 from window.second_windows.settings.setting_window.settings_window_class import Ui_Dialog
 
+from functions.settings.pydantic_model import CanvasModel, MainWindowElement
 
 class SettingDialog(AbstractDialog):
     """
@@ -36,49 +37,65 @@ class SettingDialog(AbstractDialog):
         self.change_theme()
 
     def __save(self):
+        settings = self.settings.load_json()
+        element = {}
         for i in self.comdo_box:
             name = i.currentData()[0]
             data = i.currentData()[1]
-            self.settings.save_data_json('window', data, name)
+            match name:
+                case 'dockWidget':
+                    element['dockWidget'] = data
+                case 'toolBar':
+                    element['toolBar'] = data
+                case 'theme':
+                    settings.window.theme = data
+                case 'canvas':
+                    settings.window.canvas = CanvasModel(
+                        text= data['text'],
+                        canvas= data['canvas']
+                    )
+        settings.window.element = MainWindowElement.model_validate(element)
+
+        self.settings.save_json(settings)
         logging.info('save_window_theme')
 
     def start(self):
-        user_id = self.settings.get_user_id()
-        try:
-            self.comdo_box: list[QComboBox] = []
 
-            self.settings.set_user_id('option')
-            loading = self.settings.load_category_json('window')
-            self.settings.set_user_id(user_id)
-            user_settings = self.settings.load_category_json('window')
-            for name_property in loading:
+        self.comdo_box: list[QComboBox] = []
 
-                label = QLabel(loading[name_property]['name'])
-                variation = loading[name_property]['option']
+        loading = self.settings.raw_json_loads()['window']
+
+        user_settings = self.settings.load_window().model_dump()
+        for name_property in loading:
+
+            label = QLabel(loading[name_property]['name'])
+            variation = loading[name_property]['option']
+            try:
                 user_setting = user_settings[name_property]
+            except KeyError:
+                user_setting = user_settings['element'][name_property]
 
-                combo_box = QComboBox()
-                self.comdo_box.append(combo_box)
-                for variation_name in variation:
-                    combo_box.addItem(
-                        variation_name,
-                        (name_property, variation[variation_name])
-                    )
-
-                combo_box.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                combo_box.setCurrentText(
-                    self.__find_key(variation, user_setting)
+            combo_box = QComboBox()
+            self.comdo_box.append(combo_box)
+            for variation_name in variation:
+                combo_box.addItem(
+                    variation_name,
+                    (name_property, variation[variation_name])
                 )
 
-                second_layout = QHBoxLayout()
-                second_layout.addWidget(label)
-                second_layout.addWidget(combo_box)
+            combo_box.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            combo_box.setCurrentText(
+                self.__find_key(variation, user_setting)
+            )
 
-                self.ui.verticalLayout_3.addLayout(second_layout)
-        finally:
-            self.settings.set_user_id(user_id)
+            second_layout = QHBoxLayout()
+            second_layout.addWidget(label)
+            second_layout.addWidget(combo_box)
 
-    def __find_key(self, dict_: dict, search_value):
+            self.ui.verticalLayout_3.addLayout(second_layout)
+
+    @staticmethod
+    def __find_key(dict_: dict, search_value):
         for key, value in dict_.items():
             if value == search_value:
                 return key
