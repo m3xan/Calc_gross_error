@@ -7,10 +7,9 @@ from dataclasses import dataclass
 from PySide6.QtGui import QIcon
 
 from data_class.data import Data
+from functions.settings.pydantic_model import AutoSave
 
-# переделать что бы были изначальные значения или нет
-
-@dataclass
+@dataclass(slots= True)
 class DataclassAddWindow():
     """
     settings for AddDialog
@@ -18,7 +17,7 @@ class DataclassAddWindow():
     save_data_mode: bool | None
     change_mode: bool | None
 
-@dataclass
+@dataclass(slots= True)
 class DataclassMainWindow(DataclassAddWindow):
     """
     settings for MainWindow
@@ -28,22 +27,28 @@ class DataclassMainWindow(DataclassAddWindow):
     data: Data | None
     excel_path: str | None
     add_mod: bool | None
-    auto_save_time: dict
+    auto_save_time: AutoSave
     clearance_level: int
 
-@dataclass
+@dataclass(slots= True)
 class DataclassSettingsWindow():
     """
     settings for SettingDialog
     """
     save_data_mode: bool
 
-@dataclass
+@dataclass(slots= True)
 class DataclassUserSettingsDialog():
+    """
+    заглушка
+    """
     check_login_user: bool = False
     check_password_user: bool = False
 
-@dataclass
+@dataclass(slots= True)
 class DataclassAutWindow():
+    """
+    заглушка
+    """
     close_eye: QIcon
     open_eye: QIcon
