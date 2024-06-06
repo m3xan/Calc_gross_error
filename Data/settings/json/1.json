@@ -12,7 +12,7 @@
   },
   "auto_save": {
     "switched": true,
-    "time": 180000
+    "time": 120000
   },
   "calculation": {
     "method": 2,

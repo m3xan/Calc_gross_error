@@ -5,6 +5,6 @@ dist
 build
 __pycache__
 *.jpg
-test_new
+testing
 *.log
 !/icon/*

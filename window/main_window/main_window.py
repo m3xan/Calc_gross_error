@@ -21,10 +21,10 @@ from window.second_windows import MethodsDialog
 from window.second_windows import LoadDialog
 from window.second_windows import AboutDialog
 
+from functions import logger
 from functions.settings.pydantic_model import MainWindowElement
-from functions.calcul.calc import Calculator, method_map
-from functions.graph.graph import GraphicMaker
-from functions.loger import Logger
+from functions.calculate import Calculator, method_map
+from functions.graph import GraphicMaker
 
 from thread import ReadThread, SaveAsThread, SaveThread
 
@@ -46,7 +46,7 @@ class MainWindow(AbstractWindow):
             excel_path= None,
             change_mode= False,
             add_mod= False,
-            clearance_level = self.user_db.select_user().clearance_level,
+            clearance_level= self.user_db.select_user().clearance_level,
             auto_save_time= self.settings.load_json().auto_save,
         )
         self.change_theme()
@@ -56,34 +56,35 @@ class MainWindow(AbstractWindow):
             self.__init_timer()
 
         if self.state.clearance_level > 1:
-            Logger().change_logger(self.user_db.get_id(), logging.INFO)
+            logger.Logger().change_logger(self.user_db.get_id(), logging.INFO)
         else:
-            Logger().change_logger(self.user_db.get_id())
+            logger.Logger().change_logger(self.user_db.get_id())
 
         self.__init_reaction()
 
     # menubar
     @Slot()
+    @logger.info
     def action_bd_click(self):
         """
         on action bd clicked
         """
         self.read_thread = ReadThread()
-        self.read_thread.start()
         self.read_thread.read_signal.connect(self.on_change)
+        self.read_thread.start()
         self.load_window = LoadDialog()
         self.load_window.exec()
 
         self.state.active_mod = 'bd'
-        return f'self.state.active_mod = {self.state.active_mod}, {self.state.data}'
+        return f'{self.state.active_mod=}, {self.state.data=}'
 
     @Slot()
+    @logger.info
     def action_excel_click(self):
         """
         on excel bd clicked
         """
-        filedialog = QFileDialog()
-        self.state.excel_path = filedialog.getOpenFileName(
+        self.state.excel_path = QFileDialog().getOpenFileName(
             caption='Выбрать файл',
             dir=os.path.join(os.getenv('userprofile')),
             filter= 'Excel File (*.xlsx;*.xlsm;*.xltx;*.xltm)'
@@ -97,12 +98,13 @@ class MainWindow(AbstractWindow):
             if self.state.auto_save_time.switched:
                 self.timer.start(self.state.auto_save_time.time)
                 logging.info('timer on')
-            #
+
             self.state.active_mod = 'excel'
-            return self.state.active_mod, self.state.excel_path, self.state.data
+            return f'{self.state.active_mod=}, {self.state.excel_path=}, {self.state.data=}'
         return None
 
     @Slot()
+    @logger.info
     def action_save_click(self):
         """
         on save data
@@ -112,21 +114,22 @@ class MainWindow(AbstractWindow):
                 self.save_tread = SaveThread(self.state.data, self.state.excel_path[0])
                 self.save_tread.saved.connect(self.__set_data)
                 self.save_tread.start()
-                #
-                return self.state.save_data_mode
+                return f'{self.state.save_data_mode=}'
             case 'bd':
                 self.save_tread = SaveThread(self.state.data)
                 self.save_tread.saved.connect(self.__set_data)
                 self.save_tread.start()
-                return self.state.save_data_mode
-        return None
+                return f'{self.state.save_data_mode=}'
+            case _:
+                logging.critical(f'not valid file {self.state.active_mod=}')
+                return None
 
     @Slot(Data)
     def __set_data(self, data: Data):
         self.save_tread.deleteLater()
         self.state.data = data
         self.state.save_data_mode = True
-        return self.state.save_data_mode
+        return f'{self.state.save_data_mode=}'
 
     @Slot()
     def action_esc_click(self):
@@ -148,6 +151,7 @@ class MainWindow(AbstractWindow):
                 self.close()
 
     @Slot()
+    @logger.info
     def action_info_click(self):
         """
         Открывает окно "О нас"
@@ -156,6 +160,7 @@ class MainWindow(AbstractWindow):
         return dialog.exec()
 
     @Slot()
+    @logger.debug
     @staticmethod
     def action_help_click(): # ДОДЕЛАНО
         """
@@ -168,6 +173,7 @@ class MainWindow(AbstractWindow):
             raise err
 
     @Slot()
+    @logger.debug
     def action_new_click(self):
         """
         МБ переписать
@@ -177,6 +183,7 @@ class MainWindow(AbstractWindow):
         return dialog.exec()
 
     @Slot()
+    @logger.debug
     def action_save_as_click(self):
         """
         on save_as clicked
@@ -195,6 +202,7 @@ class MainWindow(AbstractWindow):
         return None
 
     @Slot()
+    @logger.debug
     def action_setting_window_click(self):
         """
         open satting_widow
@@ -204,6 +212,7 @@ class MainWindow(AbstractWindow):
         return setting_widow.exec()
 
     @Slot()
+    @logger.debug
     def __action_delite_click(self):
         item  = self.ui.combo_box_selection_data.currentData()
         if item:
@@ -220,15 +229,17 @@ class MainWindow(AbstractWindow):
                     self.ui.combo_box_selection_data.currentIndex()
                 )
                 self.state.save_data_mode = False
-        return f'self.state.save_data_mode = {self.state.save_data_mode}'
+        return f'{self.state.save_data_mode=}'
 
     @Slot()
+    @logger.debug
     def __action_calc_click(self):
         dialog = MethodsDialog()
         return dialog.exec()
 
-    # button
+
     @Slot()
+    @logger.debug
     def _push_button_create_graph_click(self):
         if not self.state.data:
             return False
@@ -258,6 +269,7 @@ class MainWindow(AbstractWindow):
         return True
 
     @Slot()
+    @logger.debug
     def _push_button_create_calc_click(self):
         """
         create_calc
@@ -274,16 +286,17 @@ class MainWindow(AbstractWindow):
         return f'{self.state.save_data_mode=}'
 
     @Slot()
-    def push_button_add_data_click(self):# ПЕРЕДЕЛАТЬ
+    @logger.debug
+    def push_button_add_data_click(self):
         """
         add data
         """
         self.add_item()
         self.state.save_data_mode = False
-
-        return f'self.state.save_data_mode = {self.state.save_data_mode}'
+        return f'{self.state.save_data_mode=}'
 
     @Slot()
+    @logger.debug
     def push_button_delite_data_click(self):
         """
         delite carent element
@@ -304,7 +317,7 @@ class MainWindow(AbstractWindow):
                         current_index
                     )
                     self.state.save_data_mode = False
-                return f'self.state.save_data_mode = {self.state.save_data_mode}'
+                return f'{self.state.save_data_mode=}'
         return None
 
     @Slot(Data)
@@ -319,14 +332,13 @@ class MainWindow(AbstractWindow):
             self.ui.combo_box_selection_data.clear()
             for key in self.state.data.name():
                 self.ui.combo_box_selection_data.addItem(
-                    key[1],
-                    key
+                    key[1], key
                 )
         self.state.data.set_metadate(True)
         self.fill_listwidget()
         self.enable_ui(True)
 
-    # __init__
+    @logger.debug
     def __init_graph(self):
         """
         primary initialization of the chart window
@@ -351,6 +363,7 @@ class MainWindow(AbstractWindow):
         layout.insertWidget(0, self.graphwindow)
 
         self.ui.frame.setLayout(layout)
+        return True
 
     def __init_timer(self):
         self.timer = QTimer()
@@ -385,12 +398,17 @@ class MainWindow(AbstractWindow):
     def __init_graph_menubar(self):
         self.graphwindow.graph.action_create_graph.triggered.connect(self._push_button_create_graph_click)
 
+    def __init_elemeth(self):
+        self.ui.dockWidget.dockLocationChanged.connect(self.__save_settings)
+        self.graphwindow.graph.toolBar.topLevelChanged.connect(self.__save_settings)
+
     def __init_reaction(self):
         self.__init_graph_menubar()
         self.__init_main_action()
         self.__init_main_button()
         self.__init_main_combobox()
         self.__init_main_list_widget_value()
+        self.__init_elemeth()
 
     # helpfull
     def __update_ui(self):
@@ -444,7 +462,7 @@ class MainWindow(AbstractWindow):
         if self.ui.combo_box_selection_data.currentIndex() != -1 and not self.state.add_mod:
             self.state.add_mod = True
             item = QListWidgetItem()
-            item.setFlags(item.flags() | Qt.ItemIsEditable)  # Добавляем возможность редактирования значения
+            item.setFlags(item.flags() | Qt.ItemIsEditable) # Добавляем возможность редактирования значения
             self.ui.list_widget_value.addItem(item)
             # Выделяем новый элемент и запускаем его редактирование
             self.edit_value(item)
@@ -453,26 +471,36 @@ class MainWindow(AbstractWindow):
         """
         заглушка
         """
-        self.__save_settings()
-        logging.info('main window close')
+        if self.__save_settings(True):
+            logging.info('main window close')
         event.accept()  # Подтверждаем закрытие окна
 
-    def __save_settings(self):
+    @logger.info
+    def __save_settings(self, save_start: bool = False) -> bool:
         """
         заглушка
         """
+
         try:
             settings_ = self.settings.load_json()
-            settings_.window.element = MainWindowElement(
-                dockWidget= self.dockWidgetArea(self.ui.dockWidget),
-                toolBar= self.graphwindow.toolBarArea(self.graphwindow.graph.toolBar)
-            )
+            if any((
+                self.dockWidgetArea(
+                    self.ui.dockWidget
+                ) != settings_.window.element.dockWidget,
+                self.graphwindow.toolBarArea(
+                    self.graphwindow.graph.toolBar
+                ) != settings_.window.element.toolBar,
+            )):
+                settings_.window.element = MainWindowElement(
+                    dockWidget= self.dockWidgetArea(self.ui.dockWidget),
+                    toolBar= self.graphwindow.toolBarArea(self.graphwindow.graph.toolBar)
+                )
             if settings_.save_user_name:
                 save = self.user_db.select_user().username
             else:
                 save = None
-
-            self.settings.save_start(save)
+            if save_start:
+                self.settings.save_start(save)
             self.settings.save_json(settings_)
             logging.info('save settings')
             return True
@@ -480,6 +508,7 @@ class MainWindow(AbstractWindow):
             logging.error(err, exc_info= True)
             return False
 
+    @logger.info
     def fill_listwidget(self): # ПЕРЕСМОРЕТЬ ЧТО МОЖНО УПРОСТИТЬ
         """
         При разных типах ввода разные условия и разные другие параметры
@@ -499,6 +528,7 @@ class MainWindow(AbstractWindow):
         self.fill_listwidget()
         self.__set_method()
 
+    @logger.debug
     def add_selection_data(self, full_data):
         """
         заглушка
@@ -508,7 +538,9 @@ class MainWindow(AbstractWindow):
         self.__fill_combo_box_selection_data()
         self.enable_ui(True)
         self.state.save_data_mode = False
+        return f'{self.state.save_data_mode=}'
 
+    @logger.debug
     def edit_value(self, item):
         """
         заглушка
@@ -520,7 +552,9 @@ class MainWindow(AbstractWindow):
         self.ui.list_widget_value.setItemWidget(item, edit)
         edit.setFocus()
         self.state.save_data_mode = False
+        return f'{self.state.save_data_mode=}'
 
+    @logger.debug
     def save_value(self, item, index, edit: QLineEdit):
         """
         заглушка
@@ -551,6 +585,7 @@ class MainWindow(AbstractWindow):
 
         self.state.add_mod = False
         self.state.save_data_mode = False
+        return f'{self.state.add_mod=}, {self.state.save_data_mode=}'
 
     def __change_stat(self):
         self.state.change_mode = True
@@ -577,6 +612,7 @@ class MainWindow(AbstractWindow):
                 if action == some_action:
                     self.push_button_add_data_click()
 
+    @logger.debug
     def __calculate_answer(self):
         user_settings = self.settings.load_calculation()
         method_ = user_settings.method
@@ -593,7 +629,7 @@ class MainWindow(AbstractWindow):
         self.__set_answer(answers)
 
         self.state.save_data_mode = False
-        logging.debug(f'{method_=}, {significance_level=}')
+        return f'{method_=}, {significance_level=}'
 
     def __fill_combo_box_selection_data(self):
         self.ui.combo_box_selection_data.clear()

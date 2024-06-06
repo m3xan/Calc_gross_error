@@ -22,13 +22,16 @@ class ReadThread(QThread):
     @overload
     def __init__(self) -> None: ...
 
-    def __init__(self, path = None):
+    def __init__(self, path= None):
         super().__init__()
         self.path = path
 
     def run(self):
         if self.path:
-            self.read_signal.emit(Excel.FileReader(self.path).read_file())
+            self.read_signal.emit(
+                Excel.FileReader(self.path).read_file()
+            )
         else:
-            user_db = DatabaseUsersHandler()
-            self.read_signal.emit(user_db.select_calculation())
+            self.read_signal.emit(
+                DatabaseUsersHandler().select_calculation()
+            )

@@ -1,6 +1,6 @@
 {
   "window": {
-    "element":{
+    "element": {
       "dockWidget": 2,
       "toolBar": 4
     },
@@ -16,7 +16,7 @@
   },
   "calculation": {
     "method": 1,
-    "significance_level": "0.95"
+    "significance_level": 0.95
   },
   "save_user_name": true
 }

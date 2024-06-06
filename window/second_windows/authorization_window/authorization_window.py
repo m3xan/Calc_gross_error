@@ -7,6 +7,7 @@ from window.second_windows import InternalAutorizationWindow, InternalRegistrati
 from window.message_window.error_window import ErroWindow
 
 from functions.new_file.check_file import FileChecker
+from functions import logger
 
 from global_param import FILE_PATHS
 
@@ -34,6 +35,7 @@ class AuthorizationWindow(AbstractWindow):
         self.reg_win.setVisible(False)
 
     @Slot(bool)
+    @logger.info
     def __set_window(self):
         if self.aut_win.isVisible():
             self.reg_win.setVisible(True)

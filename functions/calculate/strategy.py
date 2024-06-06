@@ -1,38 +1,18 @@
 """
 calc
 ====
-import calc
+import strategy
 https://studfile.net/preview/3569684/
 version = 0.1
 """
-from abc import ABC, abstractmethod
+
 from decimal import Decimal
-from typing import overload
 import statistics as stat
 from math import sqrt
 
-from functions.settings.pydantic_model import MethodId
-
-from data_base.table_values.table_hanler import DatabaseTableHandler
+from functions.calculate.base_model_method import Method, MethodId
 
 from data_base.table_values import table_model
-
-class Method(ABC):
-    """Abstract class for method calculation"""
-    id: MethodId
-
-    @abstractmethod
-    def calculate(self, data: list[float, ], _p: float) -> list[float | None]: """calc value with metod"""
-
-    def _get_value_db(self, method, _n: int, _p: float) -> float | None:
-        """get table value from db Method"""
-        table_db = DatabaseTableHandler()
-        for corrector in 0, 1, -1:
-            if _value := table_db.select_method(
-                method, _n + corrector, _p
-            ):
-                return _value
-        return None
 
 class Romanovsky(Method):
     id = MethodId.ROMANOVSKY
@@ -85,7 +65,7 @@ class Dixon(Method):
     def calculate(self, data, _p):
         _answer = []
         kd = {}
-        data.sort(key=float)
+        data.sort(key= float)
         table_value = self._get_value_db(
             table_model.DixonTable,
             len(data),
@@ -103,37 +83,3 @@ class Dixon(Method):
             if item > Decimal(table_value):
                 _answer.append(key)
         return _answer
-
-class Calculator:
-
-    @overload
-    def __init__(self) -> None: ...
-    @overload
-    def __init__(self, method: Method) -> None: ...
-
-    def __init__(self, method = None):
-        if method:
-            self.method = method
-        else:
-            self.__method = None
-
-    @property
-    def method(self):
-        return self.__method
-
-    @method.setter
-    def method(self, method: Method):
-        if isinstance(method, Method):
-            self.__method = method
-
-    def calculate_with(self, data: list[float], _p: float):
-        """calc with method"""
-        if self.__method and len(data) >= 3:
-            return self.__method.calculate(data, _p)
-        return None
-#Конфигурационный словарик https://www.youtube.com/watch?v=yHckrS1lvG8&t=7024s 2:56:29
-method_map = {
-    Romanovsky.id: Romanovsky,
-    Charlier.id: Charlier,
-    Dixon.id: Dixon,
-}

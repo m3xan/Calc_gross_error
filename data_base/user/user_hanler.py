@@ -2,6 +2,7 @@
 new
 """
 import hashlib
+from typing import Self
 
 from sqlalchemy import select
 
@@ -16,7 +17,7 @@ from data_class.data import Data
 class DatabaseUsersHandler(OrmHandler):
     _instance = None
 
-    def __new__(cls):
+    def __new__(cls) -> Self:
         if not isinstance(cls._instance, cls):
             cls._instance = object.__new__(cls)
         return cls._instance

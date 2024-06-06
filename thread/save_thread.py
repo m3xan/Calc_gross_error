@@ -7,10 +7,8 @@ from typing import overload
 from PySide6.QtCore import QThread, Signal
 
 from functions.excel.excel import Excel
-
 from data_base.user.user_hanler import DatabaseUsersHandler
 from data_class.data import Data
-
 
 class SaveThread(QThread):
     """
@@ -23,7 +21,7 @@ class SaveThread(QThread):
     @overload
     def __init__(self, data: Data): ...
 
-    def __init__(self, data, path = None):
+    def __init__(self, data, path= None):
         super().__init__()
         self.path = path
         self.data = data

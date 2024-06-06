@@ -262,13 +262,12 @@ class Data:
         self._delit[Values].append((name, (value)))
 
     def to_DataFrame(self):
-        df  = pd.DataFrame({
+        return pd.DataFrame({
             'name': [name[1] for name in self.__name],
             'value': [[value[1] for value in values] for values in self.__value],
             'method': self.__method,
             'answer': [[answer[1] for answer in answers] for answers in self.__answer],
         })
-        return df
 
     def __len__(self): #len()
         return len(self.__name)

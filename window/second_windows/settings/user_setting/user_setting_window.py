@@ -14,7 +14,7 @@ from data_base.user.user_models import User
 
 from functions.circle_image.image import Image as ImageUser
 from functions.circle_image.circle_image import ImageChanger
-from functions.walidation.walid_password import check_password_strength
+from functions.walidation.walidate_password import check_password_strength
 
 from global_param import FILE_EXTENSIONS
 

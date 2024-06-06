@@ -1,13 +1,13 @@
 
 from PySide6.QtWidgets import QApplication
 
-from functions.loger import Logger
+from functions.logger import Logger
 
 class QApplicationWithLogging(QApplication):
     """
     start QApplication and Logger
     """
-    def __init__(self, argv):
-        super().__init__(argv)
+    def __init__(self, *argv):
+        super().__init__(*argv)
         self._logger = Logger()
         self._logger.start_logger()

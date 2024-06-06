@@ -24,7 +24,7 @@ class Window(BaseModel):
 
 class AutoSave(BaseModel):
     switched: bool
-    time: int = None
+    time: int= None
 
     @field_validator('time')
     @classmethod
@@ -33,7 +33,8 @@ class AutoSave(BaseModel):
             return int(v)
         if isinstance(v, str):
             try:
-                return int(v)
+                if int(v) % 60000 == 0:
+                    return int(v)
             except ValueError as err:
                 raise ValueError('time must be int | float not') from err
         raise ValueError('time field must be int | float presentation minute -> millisecond')
@@ -42,7 +43,7 @@ class Calculation(BaseModel):
     method: MethodId = Field(..., enum= MethodId)
     significance_level: float
 
-    @model_validator(mode='after')
+    @model_validator(mode= 'after')
     def validate_significance_level(self):
         if not self.significance_level in [0.99, 0.98, 0.95, 0.9]:
             raise ValueError(

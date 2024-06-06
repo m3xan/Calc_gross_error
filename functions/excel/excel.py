@@ -26,10 +26,17 @@ class FileKeeper(ABC):
 
     @path.setter
     def path(self, path_: str):
+        #test
         try:
             if os.path.isfile(path_):
                 self.__path = path_
+            else:
+                with open(path_, 'w', encoding='utf-8'):
+                    ...
+                self.__path = path_
         except TypeError:
+            self.__path = None
+        except OSError:
             self.__path = None
 
 

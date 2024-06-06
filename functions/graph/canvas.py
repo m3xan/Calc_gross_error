@@ -16,6 +16,9 @@ class Canvas(FigureCanvasQTAgg):
         super().__init__(self.fig)
 
     def update_collor(self, color_fig: str, color_text: str):
+        """
+        update collor on canvas and text, make grid
+        """
         self.fig.set_facecolor(color_fig)
         self.ax.set_title('График распределения', color= color_text)
         self.ax.set_xlabel('Величина', color= color_text)

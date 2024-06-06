@@ -49,7 +49,6 @@ def write_customisation(path: str, original: str, changed: str, file: TextIOWrap
 
     print(f'Успешная генерация настроек {path}')
 
-
 @with_open('r+')
 def add_resource(path: str, file: TextIOWrapper = None):
     """

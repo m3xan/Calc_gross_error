@@ -4,11 +4,11 @@ from decimal import Decimal
 
 from sqlalchemy.orm import Session
 
-from data_base.table_values.table_model import N_Value
-from data_base.table_values.table_model import P_Value
-from data_base.table_values.table_model import Romanovsky_Table
-from data_base.table_values.table_model import Charlier_Table
-from data_base.table_values.table_model import Dixon_Table
+from data_base.table_values.table_model import NValue
+from data_base.table_values.table_model import PValue
+from data_base.table_values.table_model import RomanovskyTable
+from data_base.table_values.table_model import CharlierTable
+from data_base.table_values.table_model import DixonTable
 
 from data_base.engines import table_engine as engine
 
@@ -17,17 +17,17 @@ P_ = [0.99, 0.98, 0.95, 0.9]
 def fill_out_the_table():
     with Session(engine) as session:
         for i in range(1, 101):
-            new_n = N_Value(
+            new_n = NValue(
                 n=i
             )
             session.add(new_n)
         for i in P_:
-            _p = P_Value(
+            _p = PValue(
                 p= i
             )
             session.add(_p)
         for i in range(1, 101):
-            new_sahar = Charlier_Table(
+            new_sahar = CharlierTable(
                 n_id= i,
                 p_id = 3,
                 value = (
@@ -52,7 +52,7 @@ def fill_out_the_table():
                     case 0.9:
                         value = Decimal(math.sqrt(Decimal(0.0018 * i - 0.42) /
                             Decimal(1 + i * ( -0.00715 * i - 0.501))))
-                new = Dixon_Table(
+                new = DixonTable(
                     p_id = q,
                     n_id = i,
                     value = value
@@ -75,7 +75,7 @@ def fill_out_the_table():
                             ) + (Decimal(61.048) / Decimal(i))
                     case 0.9:
                         answer = Decimal(3.3535) - (Decimal(3.3115) / Decimal(math.sqrt(i)))
-                new = Romanovsky_Table(
+                new = RomanovskyTable(
                     value = answer,
                     p_id = q,
                     n_id = i

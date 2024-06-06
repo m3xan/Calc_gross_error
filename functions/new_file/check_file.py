@@ -20,7 +20,7 @@ class FileChecker:
         else:
             self._file_path = None
 
-    def set_file_path(self, file_path: list[str]) -> bool:
+    def set_file_path(self, file_path: list[str, ]) -> bool:
         if all((
             isinstance(file_path, list),
             (isinstance(file, str) for file in file_path)

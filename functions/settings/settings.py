@@ -5,23 +5,17 @@
 import os
 import json
 import logging
-from typing import Self
 
 from PySide6.QtWidgets import QWidget
 
 from global_param import SETTINGS_PATH
 
+from .singleton import SettingSingleton
 from .pydantic_model import Calculation, UserSettings, CanvasModel, Window, AutoSave
 
-class JsonSettings:
+class JsonSettings(SettingSingleton):
     """for json format"""
-    _instance = None
     __user_id = None
-
-    def __new__(cls) -> Self:
-        if not isinstance(cls._instance, cls):
-            cls._instance = object.__new__(cls)
-        return cls._instance
 
     def get_user_id(self) -> None:
         return self.__user_id

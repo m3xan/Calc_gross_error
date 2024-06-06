@@ -1,13 +1,13 @@
 
 from PySide6.QtCore import Signal, Slot
 
-# TODO do module second widow, main window
-from window.second_windows.authorization_window.internal_window.registration.registration_window_class import Ui_Registration
 from window.data_class_for_window.dataclass import DataclassUserSettingsDialog
 from window.abstract_model.models import AbstractWindow
 
 from functions.new_file.create_settings import create_settngs
-from functions.walidation.walid_password import check_password_strength
+from functions.walidation.walidate_password import check_password_strength
+
+from .registration_window_class import Ui_Registration
 
 class InternalRegistrationWindow(AbstractWindow):
     autorisation: Signal = Signal()
