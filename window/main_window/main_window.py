@@ -65,10 +65,7 @@ class MainWindow(AbstractWindow):
     # menubar
     @Slot()
     @logger.info
-    def action_bd_click(self):
-        """
-        on action bd clicked
-        """
+    def __action_bd_click(self):
         self.read_thread = ReadThread()
         self.read_thread.read_signal.connect(self.on_change)
         self.read_thread.start()
@@ -76,14 +73,11 @@ class MainWindow(AbstractWindow):
         self.load_window.exec()
 
         self.state.active_mod = 'bd'
-        return f'{self.state.active_mod=}, {self.state.data=}'
+        return f'{self.state.active_mod=}, {dict(self.state.data)=}'
 
     @Slot()
     @logger.info
-    def action_excel_click(self):
-        """
-        on excel bd clicked
-        """
+    def __action_excel_click(self):
         self.state.excel_path = QFileDialog().getOpenFileName(
             caption='Выбрать файл',
             dir=os.path.join(os.getenv('userprofile')),
@@ -100,7 +94,7 @@ class MainWindow(AbstractWindow):
                 logging.info('timer on')
 
             self.state.active_mod = 'excel'
-            return f'{self.state.active_mod=}, {self.state.excel_path=}, {self.state.data=}'
+            return f'{self.state.active_mod=}, {self.state.excel_path=}, {dict(self.state.data)=}'
         return None
 
     @Slot()
@@ -239,30 +233,28 @@ class MainWindow(AbstractWindow):
 
 
     @Slot()
-    @logger.debug
+    @logger.info
     def _push_button_create_graph_click(self):
         if not self.state.data:
             return False
         self.plt_tool_bar.update()
         self.canvbar.ax.clear()
+        settings = self.settings.load_json()
         hist = [
             data[1] for data in self.state.data[self.ui.combo_box_selection_data.currentData()][0]
         ]
-        # Что бы такое реализовать надо переопределить метод __getitem__
-        n, bins, _ = self.canvbar.ax.hist(hist, rwidth=0.8, color='#ff8921', label= 'Распределение')
+        n, bins, _ = self.canvbar.ax.hist(hist, rwidth= 0.8, color= '#ff8921', label= 'Распределение')
         bin_centers = 0.5 * (bins[:-1] + bins[1:])
 
-        window_size = 5  # Размер окна для усреднения, можно добавить изменение в настройки измерения
-        weights = np.ones(window_size) / window_size  # Веса для усреднения значений
-        smoothed_hist = np.convolve(n, weights, mode='same')  # Применение усреднения по скользящему окну
+        weights = np.ones(settings.graph_settinsgs.window_size) / settings.graph_settinsgs.window_size
+        smoothed_hist = np.convolve(n, weights, mode='same')
 
         aligned_bin_centers = bin_centers[:len(smoothed_hist)]
-        self.canvbar.ax.plot(aligned_bin_centers, smoothed_hist, '-o', label='Прямая распределения')
+        self.canvbar.ax.plot(aligned_bin_centers, smoothed_hist, '-o', label= 'Кривая распределения')
 
-        settings = self.settings.load_canvas()
         self.canvbar.update_collor(
-            settings['canvas'],
-            settings['text']
+            settings.window.canvas_settings.canvas,
+            settings.window.canvas_settings.text
         )
         self.canvbar.ax.legend()
         self.canvbar.draw()
@@ -274,16 +266,22 @@ class MainWindow(AbstractWindow):
         """
         create_calc
         """
-        try:
-            self.__calculate_answer()
-        except Exception as err:
-            logging.error(
-                f'calculation error: {err}',
-                exc_info= True
-            )
-            raise err
+        user_settings = self.settings.load_calculation()
+        method_ = user_settings.method
+        significance_level = user_settings.significance_level
+        name_calc = self.ui.combo_box_selection_data.currentData()
 
-        return f'{self.state.save_data_mode=}'
+        calculator = Calculator()
+        calculator.method = method_map[method_]()
+
+        answers = calculator.calculate_with(
+            [data[1] for data in self.state.data.value(name_calc)],
+            significance_level
+        )
+        self.__set_answer(answers)
+
+        self.state.save_data_mode = False
+        return f'{method_=}, {significance_level=}, {self.state.save_data_mode=}'
 
     @Slot()
     @logger.debug
@@ -384,8 +382,8 @@ class MainWindow(AbstractWindow):
 
     def __init_main_action(self):
         self.ui.action_new.triggered.connect(self.action_new_click)
-        self.ui.action_excel.triggered.connect(self.action_excel_click)
-        self.ui.action_bd.triggered.connect(self.action_bd_click)
+        self.ui.action_excel.triggered.connect(self.__action_excel_click)
+        self.ui.action_bd.triggered.connect(self.__action_bd_click)
         self.ui.action_save.triggered.connect(self.action_save_click)
         self.ui.action_save_as.triggered.connect(self.action_save_as_click)
         self.ui.action_esc.triggered.connect(self.action_esc_click)
@@ -413,7 +411,8 @@ class MainWindow(AbstractWindow):
     # helpfull
     def __update_ui(self):
         self.change_theme()
-        setting_canvas = self.settings.load_canvas()
+        self._push_button_create_graph_click()
+        setting_canvas_ = self.settings.load_canvas()
         setting_window = self.settings.load_window()
 
         self.graphwindow.addToolBar(
@@ -425,8 +424,8 @@ class MainWindow(AbstractWindow):
             self.ui.dockWidget
         )
         self.canvbar.update_collor(
-            setting_canvas.canvas,
-            setting_canvas.text
+            setting_canvas_.canvas,
+            setting_canvas_.text
         )
         self.canvbar.draw()
 
@@ -612,25 +611,6 @@ class MainWindow(AbstractWindow):
                 if action == some_action:
                     self.push_button_add_data_click()
 
-    @logger.debug
-    def __calculate_answer(self):
-        user_settings = self.settings.load_calculation()
-        method_ = user_settings.method
-        significance_level = user_settings.significance_level
-        name_calc = self.ui.combo_box_selection_data.currentData()
-
-        calculator = Calculator()
-        calculator.method = method_map[method_]()
-
-        answers = calculator.calculate_with(
-            [data[1] for data in self.state.data.value(name_calc)],
-            significance_level
-        )
-        self.__set_answer(answers)
-
-        self.state.save_data_mode = False
-        return f'{method_=}, {significance_level=}'
-
     def __fill_combo_box_selection_data(self):
         self.ui.combo_box_selection_data.clear()
         for name in self.state.data.name():
@@ -676,7 +656,7 @@ class MainWindow(AbstractWindow):
             self.ui.line_edit_metod.setText('Для данных неполучиловь найти значений')
         self.state.data.change_method(
             self.ui.combo_box_selection_data.currentData(),
-            self.settings.load_calculation().method.value + 1
+            self.settings.load_calculation().method.value
         )
 
     def __set_method(self):

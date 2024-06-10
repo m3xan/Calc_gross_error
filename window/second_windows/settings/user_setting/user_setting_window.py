@@ -14,7 +14,7 @@ from data_base.user.user_models import User
 
 from functions.circle_image.image import Image as ImageUser
 from functions.circle_image.circle_image import ImageChanger
-from functions.walidation.walidate_password import check_password_strength
+from functions.walidation.walidate_password import UserWalidater
 
 from global_param import FILE_EXTENSIONS
 
@@ -77,7 +77,7 @@ class UserSettingsDialog(AbstractDialog):
         if all((
             empty := (self.ui.linedit_password.text() != ''),
             old_password := (self.ui.linedit_password.text() != user.password),
-            (check_password := check_password_strength(self.ui.linedit_password.text()))[0]
+            (check_password := UserWalidater.check_password(self.ui.linedit_password.text()))[0]
         )):
             password= self.ui.linedit_password.text()
             self.ui.label_walidation_password.setText(

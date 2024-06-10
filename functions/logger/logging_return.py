@@ -9,9 +9,14 @@ def debug(func):
             result = func(*args, **kwargs)
         except TypeError:
             result = func()
-        logging.debug(
-                f'function: {func.__name__} finish with result: {result}'
+            logging.debug(
+                    f'function: {func.__name__} finish with result: {result}'
+                )
+        except Exception as err:
+            logging.error(
+                err, exc_info=True
             )
+            raise err
         return result
     return wrapper
 
@@ -22,8 +27,13 @@ def info(func):
             result = func(*args, **kwargs)
         except TypeError:
             result = func()
-        logging.info(
-            f'function: {func.__name__} finish with result: {result}'
-        )
+            logging.info(
+                f'function: {func.__name__} finish with result: {result}'
+            )
+        except Exception as err:
+            logging.error(
+                err, exc_info=True
+            )
+            raise err
         return result
     return wrapper

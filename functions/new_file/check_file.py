@@ -8,7 +8,9 @@ import concurrent.futures as concur
 from typing import overload
 
 class FileChecker:
-
+    """
+    заглушка
+    """
     @overload
     def __init__(self) -> None: ...
     @overload
@@ -21,6 +23,9 @@ class FileChecker:
             self._file_path = None
 
     def set_file_path(self, file_path: list[str, ]) -> bool:
+        """
+        заглушка
+        """
         if all((
             isinstance(file_path, list),
             (isinstance(file, str) for file in file_path)

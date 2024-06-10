@@ -1,4 +1,6 @@
-
+"""
+заглушка
+"""
 from typing import overload
 
 from sqlalchemy import select
@@ -15,7 +17,12 @@ from data_class.models_data import Names
 from data_class.models_data import Values
 from data_class.models_data import Answers
 
+type NameOfMethodCalculation = str
+
 class CalculationHandler(OrmHandler):
+    """
+    for save load calculation
+    """
 
     @overload
     def __init__(self) -> None: ...
@@ -32,7 +39,10 @@ class CalculationHandler(OrmHandler):
     def get_user_id(self):
         return self.__user_id
 
-    def select_method(self, id_method: int) -> str:
+    def select_method(self, id_method: int) -> NameOfMethodCalculation | None:
+        """
+        заглушка
+        """
         with self.session as session:
             select(Metod).where(Metod.id == id_method)
             result: tuple[Metod, ] = session.execute(
@@ -42,7 +52,10 @@ class CalculationHandler(OrmHandler):
                 return result[0].metod_name
             return None
 
-    def select_calculation(self):
+    def select_calculation(self) -> Data:
+        """
+        заглушка
+        """
         data = Data()
         select_calculation = (
             select(Calculation)
@@ -76,6 +89,9 @@ class CalculationHandler(OrmHandler):
         return data
 
     def save_data(self, data: Data) -> Data:
+        """
+        заглушка
+        """
         self.__data = data
         with self.session as session:
             for delite_item in self.__data.delite():
@@ -264,6 +280,9 @@ class CalculationHandler(OrmHandler):
             self.__data.metadate_clear(name, Answers, index)
 
     def add_method(self, name: str):
+        """
+        заглушка
+        """
         with self.session as session:
             new = Metod(
                 metod_name = name

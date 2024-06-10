@@ -1,13 +1,11 @@
-
-import enum
+"""
+model
+"""
 
 from pydantic import BaseModel, Field, model_validator, field_validator
 from PySide6.QtCore import Qt
 
-class MethodId(enum.Enum):
-    ROMANOVSKY = 1
-    CHARLIER = 2
-    DIXON = 3
+from functions.calculate import MethodId
 
 class CanvasModel(BaseModel):
     text: str
@@ -20,7 +18,7 @@ class MainWindowElement(BaseModel):
 class Window(BaseModel):
     element: MainWindowElement
     theme: str
-    canvas: CanvasModel
+    canvas_settings: CanvasModel
 
 class AutoSave(BaseModel):
     switched: bool
@@ -36,8 +34,10 @@ class AutoSave(BaseModel):
                 if int(v) % 60000 == 0:
                     return int(v)
             except ValueError as err:
-                raise ValueError('time must be int | float not') from err
-        raise ValueError('time field must be int | float presentation minute -> millisecond')
+                raise ValueError(f'time must be int | float not {v}') from err
+        raise ValueError(
+            'time field must be int | float | str presentation minute -> millisecond'
+        )
 
 class Calculation(BaseModel):
     method: MethodId = Field(..., enum= MethodId)
@@ -51,8 +51,12 @@ class Calculation(BaseModel):
             )
         return self
 
+class GraphSettings(BaseModel):
+    window_size: int = 5
+
 class UserSettings(BaseModel):
-    window: Window = Field(default_factory=Window)
-    auto_save: AutoSave = Field(default_factory=AutoSave)
-    calculation: Calculation = Field(default_factory=Calculation)
+    window: Window = Field(default_factory= Window)
+    auto_save: AutoSave = Field(default_factory= AutoSave)
+    calculation: Calculation = Field(default_factory= Calculation)
+    graph_settinsgs: GraphSettings = Field(default_factory= GraphSettings)
     save_user_name: bool

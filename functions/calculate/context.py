@@ -1,9 +1,14 @@
-
+"""
+заглушка
+"""
 from typing import overload
 
-from .base_model_method import Method
+from .strategy.base_strategy import Method, Answer
 
 class Calculator:
+    """
+    заглушка
+    """
 
     @overload
     def __init__(self) -> None: ...
@@ -25,7 +30,7 @@ class Calculator:
         if isinstance(method, Method):
             self.__method = method
 
-    def calculate_with(self, data: list[float, ], _p: float):
+    def calculate_with(self, data: list[float, ], _p: float) -> Answer | None:
         """calc with method"""
         if self.__method and len(data) >= 3:
             return self.__method.calculate(data, _p)

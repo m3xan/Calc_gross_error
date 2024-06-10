@@ -1,4 +1,7 @@
-
+"""
+create all data base
+and fiil in the dase data
+"""
 from data_base.table_values.table_model import Base as Base_Table
 from data_base.user.user_models import Base as Base_User
 from data_base.engines import table_engine

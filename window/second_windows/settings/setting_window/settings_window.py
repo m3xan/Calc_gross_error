@@ -49,8 +49,8 @@ class SettingDialog(AbstractDialog):
                     element['toolBar'] = data
                 case 'theme':
                     settings.window.theme = data
-                case 'canvas':
-                    settings.window.canvas = CanvasModel(
+                case 'canvas_settings':
+                    settings.window.canvas_settings = CanvasModel(
                         text= data['text'],
                         canvas= data['canvas']
                     )

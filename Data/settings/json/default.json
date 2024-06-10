@@ -5,7 +5,7 @@
       "toolBar": 4
     },
     "theme": "light",
-    "canvas": {
+    "canvas_settings": {
       "text": "#3a3a3a",
       "canvas": "white"
     }
@@ -15,8 +15,11 @@
     "time": 120000
   },
   "calculation": {
-    "method": 1,
+    "method": 2,
     "significance_level": 0.95
+  },
+  "graph_settinsgs": {
+    "window_size": 5
   },
   "save_user_name": true
 }

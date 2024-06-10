@@ -1,15 +1,21 @@
+"""
+заглушка
+"""
 
 from abc import ABC, abstractmethod
 
 from data_base.table_values.table_hanler import DatabaseTableHandler
-from functions.settings.pydantic_model import MethodId
+
+from .strategy_id import MethodId
+
+type Answer = list[float | None]
 
 class Method(ABC):
     """Abstract class for method calculation"""
-    id: MethodId
+    id_: MethodId
 
     @abstractmethod
-    def calculate(self, data: list[float, ], _p: float) -> list[float | None]: """calc value with metod"""
+    def calculate(self, data: list[float, ], _p: float) -> Answer | None: """calc value with metod"""
 
     def _get_value_db(self, method, _n: int, _p: float) -> float | None:
         """get table value from db Method"""

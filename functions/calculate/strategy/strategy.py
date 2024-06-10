@@ -8,14 +8,17 @@ version = 0.1
 
 from decimal import Decimal
 import statistics as stat
-from math import sqrt
+import math
 
-from functions.calculate.base_model_method import Method, MethodId
+from functions.calculate.strategy.base_strategy import Method, MethodId
 
 from data_base.table_values import table_model
 
 class Romanovsky(Method):
-    id = MethodId.ROMANOVSKY
+    """
+    заглушка
+    """
+    id_ = MethodId.ROMANOVSKY
     def calculate(self, data, _p):
         max_ = Decimal(max(data))
         min_ = Decimal(min(data))
@@ -28,8 +31,10 @@ class Romanovsky(Method):
         )
         if not table_value:
             return None
-        data = [(Decimal(val) - average)**2 for val in data]
-        sx = Decimal(sqrt(sum(data)/(len(data) - 1)))
+        data = [(Decimal(val) - average) ** 2 for val in data]
+        sx = Decimal(
+            math.sqrt(sum(data) / (len(data) - 1))
+        )
         b1 = abs(max_ - average) / sx
         b2 = abs(min_ - average) / sx
         if b1 > table_value:
@@ -39,7 +44,10 @@ class Romanovsky(Method):
         return _answer
 
 class Charlier(Method):
-    id = MethodId.CHARLIER
+    """
+    заглушка
+    """
+    id_ = MethodId.CHARLIER
     def calculate(self, data, _p):
         _answer = []
         average = Decimal(stat.fmean(data))
@@ -51,17 +59,22 @@ class Charlier(Method):
         )
         if not table_value:
             return None
-        data_double = [(Decimal(val) - average)**2 for val in data]
-        sx = Decimal(sqrt(sum(data_double)/(len(data_double) - 1)))
+        data_double = [(Decimal(val) - average) ** 2 for val in data]
+        sx = Decimal(
+            math.sqrt(sum(data_double) / (len(data_double) - 1))
+        )
         for x in absolut_x:
-            if x > sx * Decimal(table_value):
+            if x > (sx * Decimal(table_value)):
                 _answer.append(
                     data[absolut_x.index(x)]
                 )
         return _answer
 
 class Dixon(Method):
-    id = MethodId.DIXON
+    """
+    заглушка
+    """
+    id_ = MethodId.DIXON
     def calculate(self, data, _p):
         _answer = []
         kd = {}
@@ -77,7 +90,9 @@ class Dixon(Method):
             if i == data[0] or (i - data[data.index(i) - 1]) == (i - data[0]):
                 continue
             kd[i] = (
-            Decimal((i - data[data.index(i) - 1]) / (i - data[0]))
+                Decimal(
+                    (i - data[data.index(i) - 1]) / (i - data[0])
+                )
             )
         for key, item in kd.items():
             if item > Decimal(table_value):

@@ -7,7 +7,7 @@ from typing import Self
 from sqlalchemy import select
 
 from data_base.user.user_models import User
-from data_base.user.calc_handler import CalculationHandler
+from data_base.user.calc_handler import CalculationHandler, NameOfMethodCalculation
 from data_base.user.orm_handler import OrmHandler
 
 from functions.circle_image.image import Image
@@ -15,6 +15,9 @@ from global_param import STANDART_IMAGE
 from data_class.data import Data
 
 class DatabaseUsersHandler(OrmHandler):
+    """
+    for communicate with user bd
+    """
     _instance = None
 
     def __new__(cls) -> Self:
@@ -42,6 +45,9 @@ class DatabaseUsersHandler(OrmHandler):
             return None
 
     def autorisation(self, input_username: str, input_password: str):
+        """
+        заглушка
+        """
         input_password = hashlib.sha256(input_password.encode()).hexdigest()
         with self.session as session:
             stmt = (
@@ -57,6 +63,9 @@ class DatabaseUsersHandler(OrmHandler):
             return None
 
     def select_image(self, input_username: str) -> User | None:
+        """
+        заглушка
+        """
         with self.session as session:
             stmt = (
                 select(User)
@@ -68,6 +77,9 @@ class DatabaseUsersHandler(OrmHandler):
             return None
 
     def select_user(self) -> User | None:
+        """
+        заглушка
+        """
         with self.session as session:
             stmt = (
                 select(User)
@@ -80,7 +92,10 @@ class DatabaseUsersHandler(OrmHandler):
                 return result[0]
             return None
 
-    def update_image(self, image: str | Image):
+    def update_image(self, image: str | Image) -> User | None:
+        """
+        заглушка
+        """
         if isinstance(image, Image):
             image = image.get_image_path()
         if isinstance(image, str):
@@ -101,7 +116,14 @@ class DatabaseUsersHandler(OrmHandler):
                 return result[0]
             return None
 
-    def update_user(self, username: str = None, password: str = None):
+    def update_user(
+        self,
+        username: str = None,
+        password: str = None
+    ) -> None:
+        """
+        заглушка
+        """
         with self.session as session:
             stmt = (
                 select(User)
@@ -124,7 +146,10 @@ class DatabaseUsersHandler(OrmHandler):
         password: str,
         clearance_level: int = 1,
         image: Image | str = STANDART_IMAGE
-    ):
+    ) -> None:
+        """
+        заглушка
+        """
         if isinstance(image, Image):
             image = image.get_image_path()
         password = hashlib.sha256(password.encode()).hexdigest()
@@ -138,14 +163,39 @@ class DatabaseUsersHandler(OrmHandler):
             session.add(new)
             self._commit(session)
 
-    def select_method(self, id_method: int) -> str | None:
+    def close_user(self, name: str) :
+        """
+        заглушка
+        """
+        with self.session as session:
+            select_ = (
+                select(User.username).
+                filter(
+                    User.username.like(f'%{name}%')
+                )
+            )
+            return session.execute(select_).all()
+
+    def select_method(self, id_method: int) -> NameOfMethodCalculation | None:
+        """
+        заглушка
+        """
         return CalculationHandler(self.__user_id).select_method(id_method)
 
     def select_calculation(self) -> Data:
+        """
+        заглушка
+        """
         return CalculationHandler(self.__user_id).select_calculation()
 
     def save_data(self, data: Data) -> Data:
+        """
+        заглушка
+        """
         return CalculationHandler(self.__user_id).save_data(data)
 
     def add_method(self, name: str):
+        """
+        заглушка
+        """
         CalculationHandler().add_method(name)
