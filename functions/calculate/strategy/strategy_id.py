@@ -1,6 +1,7 @@
 """
-заглушка
+Id strategies coincide with these Enum
 """
+
 import enum
 
 class MethodId(enum.Enum):

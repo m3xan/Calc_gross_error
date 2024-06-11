@@ -1,8 +1,7 @@
 """
-calc
+strategy
 ====
 import strategy
-https://studfile.net/preview/3569684/
 version = 0.1
 """
 
@@ -10,15 +9,24 @@ from decimal import Decimal
 import statistics as stat
 import math
 
-from functions.calculate.strategy.base_strategy import Method, MethodId
-
 from data_base.table_values import table_model
+
+from .base_strategy import Method, MethodId
 
 class Romanovsky(Method):
     """
-    заглушка
+    β = |Xi - x average| / Sx
+
+    Sx = sqrt(
+        sum((Xi - x average)**2) / (n - 1)
+    )
+
+    if β 1, 2 > βr:
+        return β 1, 2
     """
+
     id_ = MethodId.ROMANOVSKY
+
     def calculate(self, data, _p):
         max_ = Decimal(max(data))
         min_ = Decimal(min(data))

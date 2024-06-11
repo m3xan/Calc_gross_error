@@ -1,13 +1,15 @@
 """
-заглушка
+Сontains context for working with strategies 
+for calculating gross error
 """
+
 from typing import overload
 
-from .strategy.base_strategy import Method, Answer
+from .strategy.base_strategy import Method
 
 class Calculator:
     """
-    заглушка
+    Сontext for calculating gross errors
     """
 
     @overload
@@ -30,7 +32,7 @@ class Calculator:
         if isinstance(method, Method):
             self.__method = method
 
-    def calculate_with(self, data: list[float, ], _p: float) -> Answer | None:
+    def calculate_with(self, data, _p):
         """calc with method"""
         if self.__method and len(data) >= 3:
             return self.__method.calculate(data, _p)
