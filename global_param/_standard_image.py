@@ -1,2 +1,7 @@
+"""
+collect path for standart image in start programm
+"""
 
-STANDART_IMAGE = r'Data\Data_base\image\8hOlH9yPHi7DbakNO6XafkdRmjw3DANbj2ojvQqw.jpg'
+from typing import Final
+
+STANDART_IMAGE: Final = r'Data\Data_base\image\8hOlH9yPHi7DbakNO6XafkdRmjw3DANbj2ojvQqw.jpg'

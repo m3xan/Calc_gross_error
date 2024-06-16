@@ -16,7 +16,7 @@ from functions.circle_image.image import Image as ImageUser
 from functions.circle_image.circle_image import ImageChanger
 from functions.walidation.walidate_password import UserWalidater
 
-from global_param import FILE_EXTENSIONS
+from global_param import IMAGE_FILE_EXTENSIONS
 
 class UserSettingsDialog(AbstractDialog):
     """
@@ -47,7 +47,7 @@ class UserSettingsDialog(AbstractDialog):
         filedialog = QFileDialog()
         self.image = filedialog.getOpenFileName(
             caption='Выбрать файл',
-            filter= f'Image File ({''.join([f'*{i};' for i in FILE_EXTENSIONS])})'
+            filter= f'Image File ({''.join([f'*{i};' for i in IMAGE_FILE_EXTENSIONS])})'
         )
 
         if self.image != ('', ''):

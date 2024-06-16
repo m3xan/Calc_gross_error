@@ -1,3 +1,6 @@
+"""
+заглушка
+"""
 
 import functools
 import logging

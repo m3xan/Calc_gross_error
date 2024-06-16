@@ -1,10 +1,15 @@
+"""
+param for other logger settings
+"""
 
-ECHO = True
+from typing import Final
 
-FORMAT = '%(asctime)s %(levelname)s %(name)s %(message)s'
+ECHO: Final = True
 
-SQLLOGER = 'sqlalchemy.engine.Engine'
+FORMAT: Final = '%(asctime)s %(levelname)s %(name)s %(message)s'
 
-LOG_PATH = 'Data/logging'
+SQLLOGER: Final = 'sqlalchemy.engine.Engine'
 
-START_LOGER = f'{LOG_PATH}/start.log'
+LOG_PATH: Final = 'Data/logging'
+
+START_LOGER: Final = f'{LOG_PATH}/start.log'

@@ -10,7 +10,7 @@ from window.message_window.error_window import ErroWindow
 
 from functions.new_file.check_file import FileChecker
 
-from global_param import CRIRICAL_FILE
+from global_param import CriticalFilePath
 
 class Programm:
     """
@@ -31,7 +31,7 @@ class Programm:
     @staticmethod
     def __start():
         app = QApplicationWithLogging(sys.orig_argv)
-        if FileChecker(CRIRICAL_FILE).check_all():
+        if FileChecker(CriticalFilePath).check_all():
             window = AuthorizationWindow()
         else:
             window = ErroWindow()

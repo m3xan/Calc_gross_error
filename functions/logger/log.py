@@ -1,3 +1,6 @@
+"""
+заглушка
+"""
 
 import logging
 import os

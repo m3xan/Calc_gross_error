@@ -9,7 +9,7 @@ import logging
 from PySide6.QtWidgets import QWidget
 
 from functions import logger
-from global_param import SETTINGS_PATH
+from global_param import FilePath
 
 from .singleton import SettingSingleton
 from .pydantic_model import Calculation, UserSettings, CanvasModel, Window, AutoSave
@@ -203,6 +203,7 @@ class JsonSettings(SettingSingleton):
 
     @logger.debug
     def __check_user(self) -> tuple[bool, str]:
-        if os.path.exists(f'{SETTINGS_PATH}\\{self.__user_id}.json'):
-            return False, f'{SETTINGS_PATH}\\{self.__user_id}.json'
-        return True, f'{SETTINGS_PATH}\\default.json'
+        settings_ = FilePath().json_setting
+        if os.path.exists(f'{settings_}\\{self.__user_id}.json'):
+            return False, f'{settings_}\\{self.__user_id}.json'
+        return True, f'{settings_}\\default.json'

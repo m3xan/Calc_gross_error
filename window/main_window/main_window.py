@@ -15,11 +15,13 @@ from window.abstract_model.models import AbstractWindow
 from window.data_class_for_window.dataclass import DataclassMainWindow
 from window.main_window.main_window_class import Ui_MainWindow
 from window.main_window.interior_window.graph_window.graph_window import GraphWindow
-from window.second_windows import AddDialog
-from window.second_windows import SettingsDialog
-from window.second_windows import MethodsDialog
-from window.second_windows import LoadDialog
-from window.second_windows import AboutDialog
+from window.second_windows import (
+    AddDialog,
+    SettingsDialog,
+    MethodsDialog,
+    LoadDialog,
+    AboutDialog,
+)
 
 from functions import logger
 from functions.settings.pydantic_model import MainWindowElement
@@ -29,6 +31,8 @@ from functions.graph import GraphicMaker
 from thread import ReadThread, SaveAsThread, SaveThread
 
 from data_class.data import Data
+
+from global_param import FilePath
 
 class MainWindow(AbstractWindow):
     """
@@ -54,11 +58,11 @@ class MainWindow(AbstractWindow):
         self.__init_graph()
         if self.state.auto_save_time.switched:
             self.__init_timer()
-
+        logger_ = logger.Logger()
         if self.state.clearance_level > 1:
-            logger.Logger().change_logger(self.user_db.get_id(), logging.INFO)
+            logger_.change_logger(self.user_db.get_id(), logging.INFO)
         else:
-            logger.Logger().change_logger(self.user_db.get_id())
+            logger_.change_logger(self.user_db.get_id())
 
         self.__init_reaction()
 
@@ -156,12 +160,12 @@ class MainWindow(AbstractWindow):
     @Slot()
     @logger.debug
     @staticmethod
-    def action_help_click(): # ДОДЕЛАНО
+    def action_help_click():
         """
         Открывает пользовательскую документацию
         """
         try:
-            os.startfile(r'Документация\Докуметация пользовательская.docx')
+            os.startfile(FilePath().documentation)
             return True
         except FileNotFoundError as err:
             raise err
@@ -187,8 +191,7 @@ class MainWindow(AbstractWindow):
             self,
             'Сохранить как:',
             f'{os.path.join(os.getenv("userprofile"), f'Измерения {datetime.now().strftime('%d-%m-%Y %H.%M.%S')}')}',
-            filter= "Книга Excel (*.xlsx)"
-            )
+            filter= 'Книга Excel (*.xlsx)')
             if file_name != ('', ''):
                 self.save_as_thread = SaveAsThread(file_name[0], self.state.data)
                 self.save_as_thread.start()
@@ -312,8 +315,7 @@ class MainWindow(AbstractWindow):
                     self.ui.list_widget_value.takeItem(current_index)
                     self.state.data.delite_value(
                         self.ui.combo_box_selection_data.currentData(),
-                        current_index
-                    )
+                        current_index)
                     self.state.save_data_mode = False
                 return f'{self.state.save_data_mode=}'
         return None
@@ -324,14 +326,13 @@ class MainWindow(AbstractWindow):
         заглушка
         """
         self.load_window.close()
-        self.state.data = read_signal
         self.read_thread.quit()
-        if self.state.data:
+        if read_signal:
+            self.state.data = read_signal
             self.ui.combo_box_selection_data.clear()
             for key in self.state.data.name():
                 self.ui.combo_box_selection_data.addItem(
-                    key[1], key
-                )
+                    key[1], key)
         self.state.data.set_metadate(True)
         self.fill_listwidget()
         self.enable_ui(True)
@@ -342,8 +343,8 @@ class MainWindow(AbstractWindow):
         primary initialization of the chart window
         and inserting it into the frame
         """
-        graphic_maker = GraphicMaker()
         settings = self.settings.load_canvas()
+        graphic_maker = GraphicMaker()
         self.canvbar = graphic_maker.empty_with_axes(
             color_text= settings.text,
             color_fig= settings.canvas
@@ -373,7 +374,7 @@ class MainWindow(AbstractWindow):
         self.ui.list_widget_value.customContextMenuRequested.connect(self.__start_menu)
 
     def __init_main_combobox(self):
-        self.ui.combo_box_selection_data.currentIndexChanged.connect(self.set_val_answer)
+        self.ui.combo_box_selection_data.currentIndexChanged.connect(self.__set_values_answers)
 
     def __init_main_button(self):
         self.ui.push_button_create_calc.clicked.connect(self._push_button_create_calc_click)
@@ -408,7 +409,6 @@ class MainWindow(AbstractWindow):
         self.__init_main_list_widget_value()
         self.__init_elemeth()
 
-    # helpfull
     def __update_ui(self):
         self.change_theme()
         self._push_button_create_graph_click()
@@ -508,7 +508,7 @@ class MainWindow(AbstractWindow):
             return False
 
     @logger.info
-    def fill_listwidget(self): # ПЕРЕСМОРЕТЬ ЧТО МОЖНО УПРОСТИТЬ
+    def fill_listwidget(self):
         """
         При разных типах ввода разные условия и разные другие параметры
         заготовка на будещее
@@ -523,16 +523,16 @@ class MainWindow(AbstractWindow):
                 logging.error(err, exc_info= True)
         return False
 
-    def set_val_answer(self):
+    def __set_values_answers(self):
         self.fill_listwidget()
         self.__set_method()
 
     @logger.debug
-    def add_selection_data(self, full_data):
+    def add_selection_data(self, full_data: Data):
         """
         заглушка
         """
-        # ПЕРЕПИСАТЬ ВСЮ ФУНКЦИ
+        # ПЕРЕПИСАТЬ ВЕСЬ МЕТОД
         self.state.data = full_data
         self.__fill_combo_box_selection_data()
         self.enable_ui(True)
@@ -573,13 +573,11 @@ class MainWindow(AbstractWindow):
             self.state.data.change_value(
                 self.ui.combo_box_selection_data.currentData(),
                 index,
-                new_value
-            )
+                new_value)
         else:
             self.state.data.append_value(
                 self.ui.combo_box_selection_data.currentData(),
-                new_value
-            )
+                new_value)
         edit.deleteLater()
 
         self.state.add_mod = False
@@ -615,8 +613,7 @@ class MainWindow(AbstractWindow):
         self.ui.combo_box_selection_data.clear()
         for name in self.state.data.name():
             self.ui.combo_box_selection_data.addItem(
-                name[1], name
-            )
+                name[1], name)
 
     def __fill_list_widget_answer(self):
         self.ui.list_widget_answer.clear()
@@ -633,31 +630,25 @@ class MainWindow(AbstractWindow):
                     self.state.data.change_answer(
                         self.ui.combo_box_selection_data.currentData(),
                         index,
-                        answer
-                    )
+                        answer)
                 except IndexError:
                     self.state.data.append_answer(
                         self.ui.combo_box_selection_data.currentData(),
-                        answer
-                    )
+                        answer)
             self.__fill_list_widget_answer()
             if self.ui.list_widget_answer.count() == 0:
                 self.ui.line_edit_metod.setText(
-                    'Грубых погрешностей не обнаружено'
-                )
+                    'Грубых погрешностей не обнаружено')
             else:
                 self.ui.line_edit_metod.setText(
                     f'Расчёт проведён методом {self.user_db.select_method(
-                        self.settings.load_calculation().method.value + 1
-                    )}'
-                )
+                        self.settings.load_calculation().method.value + 1)}')
             self.state.save_data_mode = False
         else:
             self.ui.line_edit_metod.setText('Для данных неполучиловь найти значений')
         self.state.data.change_method(
             self.ui.combo_box_selection_data.currentData(),
-            self.settings.load_calculation().method.value
-        )
+            self.settings.load_calculation().method.value)
 
     def __set_method(self):
         self.__fill_list_widget_answer()
@@ -665,9 +656,7 @@ class MainWindow(AbstractWindow):
             self.ui.line_edit_metod.setText(
                 f'Расчёт проведён методом {self.user_db.select_method(
                     self.state.data.method(self.ui.combo_box_selection_data.currentData())
-                )}'
-            )
+                )}')
         else:
             self.ui.line_edit_metod.setText(
-                'Значения ещё не подсчитаны'
-            )
+                'Значения ещё не подсчитаны')

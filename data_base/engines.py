@@ -1,8 +1,8 @@
 
 from sqlalchemy import create_engine
 
-from global_param import ECHO
+from global_param import ECHO, FilePath
 
-user_engine = create_engine('sqlite:///Data/Data_base/users.db', echo= ECHO)
+user_engine = create_engine(f'sqlite:///{FilePath().user_bd}', echo= ECHO)
 
-table_engine = create_engine('sqlite:///Data/Data_base/table.db', echo= ECHO)
+table_engine = create_engine(f'sqlite:///{FilePath().table_bd}', echo= ECHO)

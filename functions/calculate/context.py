@@ -33,7 +33,6 @@ class Calculator:
             self.__method = method
 
     def calculate_with(self, data, _p):
-        """calc with method"""
         if self.__method and len(data) >= 3:
             return self.__method.calculate(data, _p)
         return None

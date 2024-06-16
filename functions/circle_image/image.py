@@ -3,7 +3,7 @@ from typing import overload
 import re
 import os
 
-from global_param import STANDART_IMAGE, FILE_EXTENSIONS
+from global_param import STANDART_IMAGE, IMAGE_FILE_EXTENSIONS
 
 class Image:
     standart_image = STANDART_IMAGE
@@ -31,7 +31,7 @@ class Image:
         if image_path:
             if all((
                 os.path.isfile(image_path),
-                os.path.splitext(image_path)[1] in FILE_EXTENSIONS
+                os.path.splitext(image_path)[1] in IMAGE_FILE_EXTENSIONS
             )):
                 return True
         return False

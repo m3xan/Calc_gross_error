@@ -1,3 +1,6 @@
+"""
+заглушка
+"""
 
 from global_param import ECHO
 

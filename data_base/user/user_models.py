@@ -21,7 +21,13 @@ class User(Base):
         back_populates='user', cascade='all, delete-orphan'
     )
     def __repr__(self) -> str:
-        return f'User(id={self.id!r}, name={self.username!r}, password={self.password!r}, clearance_level={self.clearance_level!r}, image={self.image!r})'
+        return ('User('
+            f'id={self.id!r},'
+            f'name={self.username!r},'
+            f'password={self.password!r},'
+            f'clearance_level={self.clearance_level!r},'
+            f'image={self.image!r}'
+        ')')
 
 class Calculation(Base):
     __tablename__ = 'calculation'
@@ -37,7 +43,13 @@ class Calculation(Base):
     )
     calculated: Mapped[bool]
     def __repr__(self) -> str:
-        return f'Calculation(id={self.id!r}, name_calculation={self.name_calculation!r}, user_id={self.id_user!r}, value={self.values!r}, answer={self.answer!r})'
+        return ('Calculation('
+            f'id={self.id!r},'
+            f'name_calculation={self.name_calculation!r},'
+            f'user_id={self.id_user!r},'
+            f'value={self.values!r},'
+            f'answer={self.answer!r}'
+        ')')
 
 class Metod(Base):
     __tablename__ = 'metod'
@@ -51,7 +63,12 @@ class Answer(Base):
     answer_value: Mapped[float] = mapped_column(nullable= False)
     calculation: Mapped['Calculation'] = relationship(back_populates='answer')
     def __repr__(self) -> str:
-        return f'Answer(id={self.id!r}, name_metod={self.calculation_id!r}, answer_value={self.answer_value!r}, calculation={self.calculation!r})'
+        return ('Answer('
+            f'id={self.id!r},'
+            f'name_metod={self.calculation_id!r},'
+            f'answer_value={self.answer_value!r},'
+            f'calculation={self.calculation!r}'
+        ')')
 
 class Value(Base):
     __tablename__ = 'calculation_value'
@@ -59,4 +76,9 @@ class Value(Base):
     value: Mapped[float] = mapped_column(nullable= False)
     calculation: Mapped['Calculation'] = relationship(back_populates='values')
     def __repr__(self) -> str:
-        return f'Value(id={self.id!r}, user_id={self.calculation_id!r}, value={self.value!r}, calculation={self.calculation!r})'
+        return ('Value('
+            f'id={self.id!r},'
+            f'user_id={self.calculation_id!r},'
+            f'value={self.value!r},'
+            f'calculation={self.calculation!r}'
+        ')')

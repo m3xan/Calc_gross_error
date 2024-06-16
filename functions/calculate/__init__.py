@@ -13,6 +13,12 @@ return [1.6]
 from .context import Calculator
 from .strategy.strategy import *
 
+method_id = [
+    Romanovsky.id_,
+    Charlier.id_,
+    Dixon.id_,
+]
+
 # Configuration dict
 method_map = {
     Romanovsky.id_: Romanovsky,

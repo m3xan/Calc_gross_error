@@ -9,7 +9,7 @@ from window.message_window.error_window import ErroWindow
 from functions.new_file.check_file import FileChecker
 from functions import logger
 
-from global_param import FILE_PATHS
+from global_param import FilePath
 
 from .authorization_window_class import Ui_AuthorizationWindow
 
@@ -51,7 +51,7 @@ class AuthorizationWindow(AbstractWindow):
 
     @Slot()
     def __open_mainwindow(self):
-        if FileChecker(FILE_PATHS).check_all():
+        if FileChecker(FilePath).check_all():
             self.main_window = MainWindow()
         else:
             self.main_window = ErroWindow()

@@ -1,19 +1,31 @@
+"""
+param collect other file path
+"""
+from abc import ABC
+from typing import Final, final
 
-FILE_PATHS = [
-    r'Data\Data_base',
-    r'Документация\Докуметация пользовательская.docx',
-    r'Data\settings\json\default.json',
-    r'Data\Data_base\table.db',
-    r'Data\Data_base\users.db',
-    r'Data\settings'
-]
+type Path = str
+type FileExist = str
 
-CRIRICAL_FILE= [
-    r'Data\Data_base',
-    r'Data\Data_base\users.db',
-    r'Data\settings'
-]
+class IterVar(ABC):
+    def __iter__(self):
+        for value in self.__dict__.values():
+            yield value
+@final
+class FilePath(IterVar):
+    def __init__(self) -> None:
+        self.bd: Path = r'Data\Data_base'
+        self.table_bd: Path = r'Data\Data_base\table.db'
+        self.user_bd: Path =  r'Data\Data_base\users.db'
+        self.documentation: Path = r'Документация\Докуметация пользовательская.docx'
+        self.settings: Path =  r'Data\settings'
+        self.json_setting: Path =  r'Data\settings\json'
+        self.default_settings: Path =  r'Data\settings\json\default.json'
+@final
+class CriticalFilePath(IterVar):
+    def __init__(self) -> None:
+        self.bd: Path = r'Data\Data_base'
+        self.user_bd: Path =  r'Data\Data_base\users.db'
+        self.settings: Path =  r'Data\settings'
 
-SETTINGS_PATH = 'Data\\settings\\json'
-
-FILE_EXTENSIONS = ['.png', '.jpg', '.gif', '.svg']
+IMAGE_FILE_EXTENSIONS: Final[list[FileExist]] = ['.png', '.jpg', '.gif', '.svg']

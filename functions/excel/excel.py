@@ -1,4 +1,6 @@
-
+"""
+заглушка
+"""
 from abc import ABC
 import ast
 import logging
@@ -26,7 +28,6 @@ class FileKeeper(ABC):
 
     @path.setter
     def path(self, path_: str):
-        #test
         try:
             if os.path.isfile(path_):
                 self.__path = path_
